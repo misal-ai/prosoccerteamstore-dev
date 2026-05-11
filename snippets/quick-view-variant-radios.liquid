@@ -1,0 +1,23 @@
+<quick-variant-radios class="no-js-hidden" data-section="{{ section.id }}" data-url="{{ product.url }}">
+  {%- for option in product.options_with_values -%}
+    <fieldset class="js product-form__input">
+      <legend class="form__label">
+        <strong>{{ option.name }}:</strong> <span>{{ option.selected_value }}</span>
+      </legend>
+      {% render 'product-variant-options', product: product, option: option, picker_type: settings.varian_picker %}
+    </fieldset>
+  {%- endfor -%}
+
+  <script type="application/json" data-variant>
+    {{ product.variants | json }}
+  </script>
+  <script type="application/javascript" data-preorder>
+    {%- assign firstBrackets = '{'  -%}
+    {%- assign seconrdBrackets = '}'  -%}
+    {{ firstBrackets }}
+    {%- for variant in product.variants -%}
+    "{{variant.id}}": {"qty": {{variant.inventory_quantity}}, "inventory_policy": "{{variant.inventory_policy}}"}{% unless forloop.last == true %},{% endunless %}
+      {%- endfor -%}
+      {{ seconrdBrackets }}
+  </script>
+</quick-variant-radios>

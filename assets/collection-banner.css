@@ -1,0 +1,53 @@
+.collection-top-banner-holder .right-section {
+  padding: 30px !important;
+}
+.collection-top-banner-holder .right-section h1{
+    text-transform: capitalize !important ;
+    margin-bottom: 11px !important;
+    margin-top: 12px !important;
+}
+.collection-top-banner-holder .right-section .home-label .breadcrumbs__link {
+  color: #a2a2a2 !important;
+  text-transform: uppercase !important;
+  font-weight: bold !important;
+}
+.collection-top-banner-holder .right-section .other-label {
+  text-transform: uppercase !important;
+  font-weight: bold !important;
+}
+.px-4 {
+  padding-left: 24px;
+  padding-right: 24px;
+}
+.img-fluid {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+}
+.px-3 {
+  padding-right: 1rem !important;
+  padding-left: 1rem !important;
+}
+.px-0{
+  padding-left:0;
+  padding-right:0;
+}
+@media (min-width: 768px) {
+  .d-md-flex {
+    display: -webkit-box !important;
+    display: -ms-flexbox !important;
+    display: flex !important;
+  }
+  .ps-md-5 {
+    padding-left: 2rem !important;
+  }
+}
+@media (max-width: 767px) {
+  .collection-top-banner-holder .left-section .desktop-banner{
+    display:none !important;
+  }
+  .collection-top-banner-holder .left-section .mobile-banner{
+    display:block !important;
+    height:486px !important;
+  }
+}

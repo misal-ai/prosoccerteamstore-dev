@@ -1,0 +1,1095 @@
+
+{{ 'section-contact-form.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+.field__label{
+ position:relative !important;
+ left:0px !important;
+ top:0px !important;
+ font-family: var(--font-heading-family);
+ color: #000 !important;
+}
+.top_form_fields{
+  padding-bottom:20px !important;
+  border-bottom:1px solid #f1f1f1;
+}
+.input__field_form{
+ margin:5px 0 !important;
+}
+.contact__form--wrapper{
+  padding: 1.25rem 1.5rem 1.5rem;
+}
+.contact__form--wrapper.color-background-3{
+  background:#fff;
+}
+@media screen and (min-width: 750px) {
+  .contact__form--wrapper {
+    padding: 1.5rem 2rem 2rem;
+  }
+}
+.contact__form--wrapper .contact__form--header {
+  margin-bottom: 0.75rem;
+}
+.contact__form--wrapper .contact__form--header .contact__form--text {
+  margin-top: 0.25rem;
+}
+.contact__form--wrapper .form-section-heading {
+  font-size: 2.25rem;
+  font-weight: 600;
+  color: #000;
+  margin: 0.75rem 0 0.5rem;
+  padding: 0;
+  font-family: var(--font-heading-family) !important;
+}
+.contact__form--wrapper .form-section-heading:first-of-type {
+  margin-top: 0.5rem;
+}
+.contact__form--wrapper .input__field_form .field__label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #000 !important;
+}
+.contact__form--wrapper .input__field_form input,
+.contact__form--wrapper .input__field_form select,
+.contact__form--wrapper .input__field_form textarea {
+  padding: 10px 14px;
+  font-size: 1rem;
+  color: #000;
+}
+.contact__form--wrapper .input__field_form select {
+  padding-left: 14px;
+}
+.contact__form--wrapper .form-section-hint {
+  font-size: 0.95rem;
+  color: #000;
+  margin-bottom: 0.5rem;
+}
+.contact__form--wrapper .form-checkbox-group,
+.contact__form--wrapper .form-radio-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+.contact__form--wrapper .form-checkbox-label span,
+.contact__form--wrapper .form-radio-label span {
+  color: #000;
+  font-size: 1rem;
+}
+.contact__form--wrapper .form-checkbox-label,
+.contact__form--wrapper .form-radio-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+.contact__form--wrapper .disclaimer-box {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 0.25rem;
+  font-size: 1.1rem;
+  color: #000;
+}
+.contact__form--wrapper .disclaimer-box p {
+  margin: 0;
+  color: #000;
+}
+.text__area{
+  padding: 10px 14px !important;
+}
+#product_Box_0 .action_btns .deleteBox{
+  opacity:0;
+}
+.counter{
+  font-size:20px;
+}
+#delete{
+  width: 25px;
+  padding: 0px 3px;
+  margin: 0px 15px;
+  cursor:pointer;
+}
+.action_btns{
+  display:flex;
+  align-items:self-end;
+}
+input,select,textarea{
+   -webkit-box-shadow: rgba(50, 50, 93, 0.14902) 0px 1px 3px, rgba(0, 0, 0, 0.0196078) 0px 1px 0px;
+    box-shadow: rgba(50, 50, 93, 0.14902) 0px 1px 3px, rgba(0, 0, 0, 0.0196078) 0px 1px 0px;
+}
+input::-ms-input-placeholder,select::placeholder,textarea::placeholder {
+  color: #6d6d6d !important;
+  padding: 0 2px;
+  font-weight:normal !important;
+}
+input::placeholder,select::placeholder {
+  color: #6d6d6d !important;
+  padding: 0 2px;
+  font-weight:normal !important;
+}
+.contact__form--wrapper input::placeholder,
+.contact__form--wrapper input::-ms-input-placeholder,
+.contact__form--wrapper input::-webkit-input-placeholder,
+.contact__form--wrapper select::placeholder,
+.contact__form--wrapper textarea::placeholder {
+  font-size: 0.8rem !important;
+}
+select{
+  color:#000 !important;
+}
+.customize{
+  margin-top:12px;
+}
+@media(min-width:769px){
+
+.customize label{
+  font-size:20px;
+  font-weight:bold;
+}
+  .customize input{
+width:18px;
+height:18px;
+}
+ .box_inner {
+    margin: 35px 0px;
+    display: flex;
+    grid-template-columns: repeat(3,1fr);
+    align-items: end;
+    gap: 10px;
+    flex-wrap: wrap;
+ }
+  .box_inner .input__field_form{
+    width:30%;
+  }
+  .top_form_fields{
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 10px;
+    align-items: start;
+  }
+
+}
+  #add_another_product,.contact__button button{
+    background: #80cd2c;
+    padding: 8px 12px;
+    color: #fff;
+    text-transform: capitalize;
+    margin-top:15px;
+    font-size:23px;
+    cursor:pointer;
+  }
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.mobile_padding_top }}px;
+    padding-bottom: {{ section.settings.mobile_padding_bottom }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+{%- endstyle -%}
+
+{% liquid
+  case section.settings.button_type
+    when 'primary'
+      assign button_class = 'button button--medium '
+    when 'secondary'
+      assign button_class = 'button button--secondary'
+    when 'icon'
+      assign button_class = 'link with--icon'
+    else
+      assign button_class = 'link'
+  endcase
+
+  if section.settings.full_width
+    assign content_column_class = 'col-12'
+    assign form_wrapper_class = 'col-12'
+  else
+    assign content_column_class = 'col-md-4 col-lg-6 col-12'
+    assign form_wrapper_class = 'col-md-8  col-lg-6 col-12'
+  endif
+%}
+
+<div class="contact__section section-{{ section.id }}-padding">
+  <div class="container">
+    <div class="row contact__form--container {% if section.settings.full_width %} full--width-section {% else %} half--width-section {% endif %}">
+      <div class="{{ content_column_class }}">
+        {%- if section.settings.heading_tag == 'h1' -%}
+          <h1 class="contact__heading {{ section.settings.heading_size }}">{{ section.settings.heading | escape }}</h1>
+        {%- else -%}
+          <h2 class="contact__heading {{ section.settings.heading_size }}">{{ section.settings.heading | escape }}</h2>
+        {%- endif -%}
+
+        {%- if section.blocks.size > 0 -%}
+          <div class="contact__list--wrapper">
+            {%- for block in section.blocks -%}
+              {%- case block.type -%}
+                {%- when 'contact_list' -%}
+                  <div class="contact__list--item" {{ block.shopify_attributes }}>
+                    <span class="h4 contact__list--item-heading">{{ block.settings.heading }}</span>
+                    <div class="contact__list--item-content">{{ block.settings.text }}</div>
+                  </div>
+              {%- endcase -%}
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+      </div>
+      <div class="{{ form_wrapper_class }}">
+        <div class="contact__form--wrapper color-{{ section.settings.color_scheme }}">
+          <div class="contact__form--header">
+            {%- if section.settings.form_heading_tag == 'h2' -%}
+              <h2 class="contact__form--heading {{ section.settings.form_heading_size }}">
+                {{ section.settings.form_heading }}
+              </h2>
+            {%- else -%}
+              <h3 class="contact__form--heading {{ section.settings.form_heading_size }}">
+                {{ section.settings.form_heading }}
+              </h3>
+            {%- endif -%}
+            <p class="contact__form--text">{{ section.settings.subheading }}</p>
+          </div>
+
+          {%- comment -%} Team Store Disclaimer {%- endcomment -%}
+          <div class="disclaimer-box">
+            <p>This program is only for clubs with at least 150 kids/players in the entire club. We will create a custom club team page for your team…giving parents easy and fast way to purchase team kits and other apparel individually.</p>
+          </div>
+
+         {%- form 'contact', id: 'ContactForm' -%}
+    {%- if form.posted_successfully? -%}
+        <div class="form-status form-status-list form__message" tabindex="-1" autofocus>
+            {% render 'icon-success' %}
+            Thanks for your submission!
+        </div>
+    {%- elsif form.errors -%}
+        <div class="form__message">
+            <h2 class="form-status caption-large" role="alert" tabindex="-1" autofocus>
+                {% render 'icon-error' %}
+                Please fix the errors below.
+            </h2>
+        </div>
+        <ul class="form-status-list caption-large" role="list">
+            <li>
+                <a href="#ContactForm-email" class="link">
+                    {{ form.errors.translated_fields.email | capitalize }}
+                    {{ form.errors.messages.email }}
+                </a>
+            </li>
+        </ul>
+    {%- endif -%}
+
+    {%- comment -%} Section 1: Club Info {%- endcomment -%}
+    <div class="form-section-heading">Club Info</div>
+<div class="top_form_fields">
+    <!-- Existing Name Field -->
+    <div class="input__field_form">
+        <label class="field__label" for="ContactForm-name">Name</label>
+        <input
+            class="input__field h6"
+            autocomplete="name"
+            type="text"
+            id="ContactForm-name"
+            name="contact[name]"
+            value="{% if form.name %}{{ form.name }}{% elsif customer %}{{ customer.name }}{% endif %}"
+            placeholder="Name"
+            required
+        >
+    </div>
+
+    <!-- Existing Email Field -->
+    <div class="input__field_form field--with-error">
+        <label class="field__label" for="ContactForm-email">
+            Email <span aria-hidden="true">*</span>
+        </label>
+        <input
+            autocomplete="email"
+            type="email"
+            id="ContactForm-email"
+            class="input__field h6"
+            name="contact[email]"
+            spellcheck="false"
+            autocapitalize="off"
+            value="{% if form.email %}{{ form.email }}{% elsif customer %}{{ customer.email }}{% endif %}"
+            aria-required="true"
+            {% if form.errors contains 'email' %}
+                aria-invalid="true"
+                aria-describedby="ContactForm-email-error"
+            {% endif %}
+            placeholder="Email"
+            required
+        >
+        {%- if form.errors contains 'email' -%}
+            <small class="contact__field-error" id="ContactForm-email-error">
+                <span class="visually-hidden" aria-hidden="true">Error</span>
+                <span class="form__message">
+                    {%- render 'icon-error' -%}
+                    {{- form.errors.translated_fields.email | capitalize }}
+                    {{ form.errors.messages.email -}}
+                </span>
+            </small>
+        {%- endif -%}
+    </div>
+
+  <!-- PO Number -->
+    {% comment %} <div class="input__field_form">
+        <label class="field__label" for="ContactForm-po-number">PO Number</label>
+        <input
+            class="input__field h6"
+            type="text"
+            id="ContactForm-po-number"
+            name="contact[po number]"
+            value="{% if form.po_number %}{{ form.po_number }}{% endif %}"
+            placeholder="PO Number"
+        >
+    </div> {% endcomment %}
+
+    <!-- Club Name -->
+    <div class="input__field_form">
+        <label class="field__label" for="ContactForm-club">Club Name</label>
+        <input
+            class="input__field h6"
+            type="text"
+            id="ContactForm-club"
+            name="contact[club name]"
+            value="{% if form.club %}{{ form.club }}{% endif %}"
+            placeholder="Club Name"
+            required
+        >
+    </div>
+
+    <!-- Club Website (NEW) -->
+    <div class="input__field_form">
+        <label class="field__label" for="ContactForm-club-website">Club Website</label>
+        <input
+            class="input__field h6"
+            type="url"
+            id="ContactForm-club-website"
+            name="contact[club website]"
+            value="{% if form.club_website %}{{ form.club_website }}{% endif %}"
+            placeholder="Club Website (https://...)"
+            required
+        >
+    </div>
+
+    <!-- Address -->
+    <div class="input__field_form">
+        <label class="field__label" for="ContactForm-address">Address / City / State</label>
+        <input
+            class="input__field h6"
+            type="text"
+            id="ContactForm-address"
+            name="contact[address]"
+            value="{% if form.address %}{{ form.address }}{% endif %}"
+            placeholder="Address / City / State"
+            required
+        >
+    </div>
+
+    <!-- Title (NEW) -->
+    <div class="input__field_form">
+        <label class="field__label" for="ContactForm-title">Title</label>
+        <select
+            class="input__field h6"
+            id="ContactForm-title"
+            name="contact[title]"
+            required
+        >
+            <option value="">Select title</option>
+            <option value="Director of Coaching">Director of Coaching</option>
+            <option value="President/Owner">President/Owner</option>
+            <option value="Coach">Coach</option>
+            <option value="Team Captain">Team Captain</option>
+            <option value="Team Manager">Team Manager</option>
+            <option value="Board Member">Board Member</option>
+            <option value="__other__">Other</option>
+        </select>
+    </div>
+    <div class="input__field_form" id="ContactForm-title-other-wrap" style="display:none;">
+        <label class="field__label" for="ContactForm-title-other">Other Title</label>
+        <input
+            class="input__field h6"
+            type="text"
+            id="ContactForm-title-other"
+            name="contact[title other]"
+            value="{% if form.title_other %}{{ form.title_other }}{% endif %}"
+            placeholder="Enter your title"
+        >
+    </div>
+
+    <!-- Primary Contact Phone (NEW) -->
+    <div class="input__field_form">
+        <label class="field__label" for="ContactForm-phone">Primary Contact Phone</label>
+        <input
+            class="input__field h6 contact-form-phone"
+            type="tel"
+            id="ContactForm-phone"
+            name="contact[primary contact phone]"
+            value="{% if form.phone %}{{ form.phone }}{% endif %}"
+            placeholder="(###) ###-####"
+            required
+            maxlength="14"
+            pattern="\([0-9]{3}\) [0-9]{3}-[0-9]{4}"
+        >
+    </div>
+
+    <!-- teams -->
+    {% comment %} <div class="input__field_form">
+        <label class="field__label" for="ContactForm-teams">No of Teams in Club</label>
+        <input
+            class="input__field h6"
+            type="text"
+            id="ContactForm-teams"
+            name="contact[teams]"
+            value="{% if form.teams %}{{ form.teams }}{% endif %}"
+            placeholder="No of Teams in Club"
+        >
+    </div>
+
+    <div class="input__field_form">
+        <label class="field__label" for="ContactForm-players">Total No of Players in Club</label>
+        <input
+            class="input__field h6"
+            type="text"
+            id="ContactForm-players"
+            name="contact[players]"
+            value="{% if form.players %}{{ form.players }}{% endif %}"
+            placeholder="Total No of Players in Club"
+        >
+    </div> {% endcomment %}
+</div>
+
+    {%- comment -%} Section 2: Club Size {%- endcomment -%}
+    <div class="form-section-heading">Club Size</div>
+    <div class="top_form_fields">
+        <div class="input__field_form">
+            <label class="field__label" for="ContactForm-total-players">Total Players</label>
+            <select class="input__field h6" id="ContactForm-total-players" name="contact[total players]" required>
+                <option value="">Select…</option>
+                <option value="150-200">150-200</option>
+                <option value="201-250">201-250</option>
+                <option value="250+">250+</option>
+            </select>
+        </div>
+        <div class="input__field_form">
+            <label class="field__label" for="ContactForm-total-teams">Total Teams</label>
+            <select class="input__field h6" id="ContactForm-total-teams" name="contact[total teams]" required>
+                <option value="">Select…</option>
+                <option value="1-5">1-5</option>
+                <option value="6-10">6-10</option>
+                <option value="11+">11+</option>
+            </select>
+        </div>
+        <div class="input__field_form">
+            <label class="field__label">Boys, Girls, or Both</label>
+            <div class="form-checkbox-group">
+                <label class="form-checkbox-label"><input type="checkbox" name="contact[boys girls both]" value="Boys"><span>Boys</span></label>
+                <label class="form-checkbox-label"><input type="checkbox" name="contact[boys girls both]" value="Girls"><span>Girls</span></label>
+                <label class="form-checkbox-label"><input type="checkbox" name="contact[boys girls both]" value="Both"><span>Both</span></label>
+            </div>
+        </div>
+        <div class="input__field_form">
+            <label class="field__label">Age Groups</label>
+            <div class="form-checkbox-group">
+                <label class="form-checkbox-label"><input type="checkbox" name="contact[age groups]" value="U7"><span>U7</span></label>
+                <label class="form-checkbox-label"><input type="checkbox" name="contact[age groups]" value="U8"><span>U8</span></label>
+                <label class="form-checkbox-label"><input type="checkbox" name="contact[age groups]" value="U9"><span>U9</span></label>
+                <label class="form-checkbox-label"><input type="checkbox" name="contact[age groups]" value="U10"><span>U10</span></label>
+                <label class="form-checkbox-label"><input type="checkbox" name="contact[age groups]" value="U11"><span>U11</span></label>
+                <label class="form-checkbox-label"><input type="checkbox" name="contact[age groups]" value="U12"><span>U12</span></label>
+                <label class="form-checkbox-label"><input type="checkbox" name="contact[age groups]" value="U13"><span>U13</span></label>
+                <label class="form-checkbox-label"><input type="checkbox" name="contact[age groups]" value="U14"><span>U14</span></label>
+                <label class="form-checkbox-label"><input type="checkbox" name="contact[age groups]" value="U15"><span>U15</span></label>
+                <label class="form-checkbox-label"><input type="checkbox" name="contact[age groups]" value="U16"><span>U16</span></label>
+                <label class="form-checkbox-label"><input type="checkbox" name="contact[age groups]" value="U17"><span>U17</span></label>
+                <label class="form-checkbox-label"><input type="checkbox" name="contact[age groups]" value="Other"><span>Other</span></label>
+            </div>
+            <small class="form-section-hint">Select age ranges in your club</small>
+        </div>
+        <div class="input__field_form">
+            <label class="field__label" for="ContactForm-competitive-level">Competitive Level</label>
+            <select class="input__field h6" id="ContactForm-competitive-level" name="contact[competitive level]" required>
+                <option value="">Select…</option>
+                <option value="Recreational">Recreational</option>
+                <option value="Competitive">Competitive</option>
+                <option value="Academy">Academy</option>
+            </select>
+        </div>
+    </div>
+
+    {%- comment -%} Section 3: Apparel Needs {%- endcomment -%}
+    <div class="form-section-heading">Apparel Needs</div>
+    <div class="top_form_fields">
+        <div class="input__field_form">
+            <label class="field__label" for="ContactForm-current-brand">Current Brand</label>
+            <input
+                class="input__field h6"
+                type="text"
+                id="ContactForm-current-brand"
+                name="contact[current brand]"
+                value="{% if form.current_brand %}{{ form.current_brand }}{% endif %}"
+                placeholder=""
+            >
+        </div>
+        <div class="input__field_form">
+            <label class="field__label" for="ContactForm-brand-preference">Brand Preference</label>
+            <select class="input__field h6" id="ContactForm-brand-preference" name="contact[brand preference]" required>
+                <option value="">Select…</option>
+                <option value="adidas">adidas</option>
+                <option value="Joma">Joma</option>
+                <option value="Puma">Puma</option>
+                <option value="Hummel">Hummel</option>
+                <option value="New Balance">New Balance</option>
+                <option value="Umbro">Umbro</option>
+                <option value="__other__">Other</option>
+            </select>
+        </div>
+        <div class="input__field_form" id="ContactForm-brand-other-wrap" style="display:none;">
+            <label class="field__label" for="ContactForm-brand-other">Other Brand</label>
+            <input
+                class="input__field h6"
+                type="text"
+                id="ContactForm-brand-other"
+                name="contact[brand preference other]"
+                value="{% if form.brand_other %}{{ form.brand_other }}{% endif %}"
+                placeholder="Enter brand name"
+            >
+        </div>
+        <div class="input__field_form">
+            <label class="field__label" for="ContactForm-program-type">Program Type</label>
+            <select class="input__field h6" id="ContactForm-program-type" name="contact[program type]" required>
+                <option value="">Select…</option>
+                <option value="Required kits only">Required kits only</option>
+                <option value="Full fan wear program">Full fan wear program</option>
+                <option value="Both">Both</option>
+            </select>
+        </div>
+        <div class="input__field_form">
+            <label class="field__label" for="ContactForm-team-colors">Team Colors</label>
+            <input
+                class="input__field h6"
+                type="text"
+                id="ContactForm-team-colors"
+                name="contact[team colors]"
+                value="{% if form.team_colors %}{{ form.team_colors }}{% endif %}"
+                placeholder="Team colors"
+                required
+            >
+        </div>
+        <div class="input__field_form">
+            <label class="field__label">Customizations</label>
+            <div class="form-radio-group">
+                <label class="form-radio-label">
+                    <input type="radio" name="contact[customizations]" value="Yes" required>
+                    <span>Yes</span>
+                </label>
+                <label class="form-radio-label">
+                    <input type="radio" name="contact[customizations]" value="No">
+                    <span>No</span>
+                </label>
+            </div>
+            <small class="form-section-hint">Team name, logo, player name, player number</small>
+        </div>
+        <div class="input__field_form">
+            <label class="field__label">Are you currently under contract?</label>
+            <div class="form-radio-group">
+                <label class="form-radio-label">
+                    <input type="radio" name="contact[under contract]" value="Yes" required>
+                    <span>Yes</span>
+                </label>
+                <label class="form-radio-label">
+                    <input type="radio" name="contact[under contract]" value="No">
+                    <span>No</span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    {%- comment -%} Section 4: Uniform Kit Needs {%- endcomment -%}
+    <div class="form-section-heading">Uniform Kit Needs</div>
+    <p class="form-section-hint">Select all that apply (multiple selections allowed)</p>
+    <div class="form-checkbox-group">
+        <label class="form-checkbox-label"><input type="checkbox" name="contact[kit jerseys]" value="Yes"><span>Jerseys</span></label>
+        <label class="form-checkbox-label"><input type="checkbox" name="contact[kit shorts]" value="Yes"><span>Shorts</span></label>
+        <label class="form-checkbox-label"><input type="checkbox" name="contact[kit socks]" value="Yes"><span>Socks</span></label>
+        <label class="form-checkbox-label"><input type="checkbox" name="contact[kit backpacks]" value="Yes"><span>Backpacks/Bags</span></label>
+        <label class="form-checkbox-label"><input type="checkbox" name="contact[kit jackets]" value="Yes"><span>Jackets</span></label>
+        <label class="form-checkbox-label"><input type="checkbox" name="contact[kit training tops]" value="Yes"><span>Training Tops</span></label>
+        <label class="form-checkbox-label"><input type="checkbox" name="contact[Pants]" value="Yes"><span>Pants</span></label>
+        <label class="form-checkbox-label"><input type="checkbox" name="contact[Training Jerseys]" value="Yes"><span>Training Jerseys</span></label>
+        <label class="form-checkbox-label"><input type="checkbox" name="contact[kit other]" value="Yes" id="ContactForm-kit-other-trigger"><span>Other</span></label>
+    </div>
+    <div class="input__field_form" id="ContactForm-kit-other-wrap" style="display:none;">
+        <label class="field__label" for="ContactForm-kit-other">Other Kit Needs</label>
+        <input
+            class="input__field h6"
+            type="text"
+            id="ContactForm-kit-other"
+            name="contact[kit other specify]"
+            value="{% if form.kit_other %}{{ form.kit_other }}{% endif %}"
+            placeholder="Specify other kit needs"
+        >
+    </div>
+
+    {%- comment -%} Section 5: Additional Details {%- endcomment -%}
+    <div class="form-section-heading">Additional Details</div>
+
+    <div class="input__field_form textarea__field">
+        {% comment %} <label class="field__label" for="ContactForm-body">Additional comments</label> {% endcomment %}
+        <textarea
+            rows="10"
+            id="ContactForm-body"
+            class="text__area input__field h6"
+            name="contact[body]"
+            placeholder=""
+        >
+            {{- form.body -}}
+        </textarea>
+    </div>
+
+    <!-- Existing Submit Button -->
+    <div class="contact__button">
+        <button type="submit" class="{{ button_class }}">
+            Send
+            {%- if section.settings.button_type == 'icon' -%}
+                {% render 'icon-arrow' %}
+            {%- endif -%}
+        </button>
+    </div>
+{%- endform -%}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let productCount = 2;
+
+        function createProductBox() {
+            const productBox = document.querySelector(".product_box");
+
+            if (!productBox) {
+                console.error("Product box template not found");
+                return;
+            }
+
+            const newProductBox = productBox.cloneNode(true);
+            newProductBox.setAttribute("id", "product-box-" + productCount);
+
+            // Update the item counter in the new product box
+            const counterSpan = newProductBox.querySelector(".counter");
+            if (counterSpan) {
+                counterSpan.textContent = "Item " + productCount;
+            }
+
+            // Add event listener to the deleteBox
+            const deleteBox = newProductBox.querySelector(".deleteBox");
+            if (deleteBox) {
+                deleteBox.addEventListener("click", function () {
+                    // Delete the relevant box
+                    newProductBox.parentNode.removeChild(newProductBox);
+                });
+            }
+
+            // Update input and select elements
+            newProductBox.querySelectorAll("input, select").forEach(function (input) {
+                const nameAttribute = input.getAttribute("name");
+                if (nameAttribute) {
+                    const updatedName = nameAttribute.replace(/\[([^\]]*)\]/, function(match, innerContent) {
+                        return "[" + innerContent + productCount + "]";
+                    });
+                    console.log("Updating input name:", nameAttribute, "to", updatedName);
+                    input.setAttribute("name", updatedName);
+
+                    // Update input id
+                    const inputId = input.getAttribute("id");
+                    if (inputId) {
+                        const updatedId = inputId.replace(/\d+/, productCount);
+                        console.log("Updating input id:", inputId, "to", updatedId);
+                        input.setAttribute("id", updatedId);
+                    }
+
+                    // Update label for attribute
+                    const labelFor = input.getAttribute("id");
+                    const labelElement = document.querySelector('label[for="' + labelFor + '"]');
+                    if (labelElement) {
+                        const updatedLabelFor = labelFor.replace(/\d+/, productCount);
+                        console.log("Updating label for:", labelFor, "to", updatedLabelFor);
+                        labelElement.setAttribute("for", updatedLabelFor);
+                    }
+
+                    // Copy input value
+                    input.value = input.value;
+                }
+            });
+
+            productBox.parentNode.insertBefore(newProductBox, document.getElementById("add_another_product"));
+            productCount++;
+        }
+
+        if (document.getElementById("add_another_product")) {
+            document.getElementById("add_another_product").addEventListener("click", function () {
+                createProductBox();
+            });
+        }
+
+        /* Phone formatting: (###) ###-#### - only digits */
+        var phoneInput = document.querySelector(".contact-form-phone");
+        if (phoneInput) {
+            phoneInput.addEventListener("input", function (e) {
+                var value = e.target.value.replace(/\D/g, "");
+                if (value.length > 0) {
+                    if (value.length <= 3) {
+                        value = "(" + value;
+                    } else if (value.length <= 6) {
+                        value = "(" + value.slice(0, 3) + ") " + value.slice(3);
+                    } else {
+                        value = "(" + value.slice(0, 3) + ") " + value.slice(3, 6) + "-" + value.slice(6, 10);
+                    }
+                }
+                e.target.value = value;
+            });
+            phoneInput.addEventListener("keypress", function (e) {
+                if (/\d/.test(e.key) || e.key === "Backspace" || e.key === "Delete" || e.key === "Tab") return;
+                e.preventDefault();
+            });
+        }
+
+        /* Title "Other" show/hide */
+        var titleSelect = document.getElementById("ContactForm-title");
+        var titleOtherWrap = document.getElementById("ContactForm-title-other-wrap");
+        if (titleSelect && titleOtherWrap) {
+            function toggleTitleOther() {
+                titleOtherWrap.style.display = titleSelect.value === "__other__" ? "block" : "none";
+            }
+            titleSelect.addEventListener("change", toggleTitleOther);
+            toggleTitleOther();
+        }
+
+        /* Brand "Other" show/hide */
+        var brandSelect = document.getElementById("ContactForm-brand-preference");
+        var brandOtherWrap = document.getElementById("ContactForm-brand-other-wrap");
+        if (brandSelect && brandOtherWrap) {
+            function toggleBrandOther() {
+                brandOtherWrap.style.display = brandSelect.value === "__other__" ? "block" : "none";
+            }
+            brandSelect.addEventListener("change", toggleBrandOther);
+            toggleBrandOther();
+        }
+
+        /* Kit "Other" show/hide */
+        var kitOtherTrigger = document.getElementById("ContactForm-kit-other-trigger");
+        var kitOtherWrap = document.getElementById("ContactForm-kit-other-wrap");
+        if (kitOtherTrigger && kitOtherWrap) {
+            kitOtherTrigger.addEventListener("change", function () {
+                kitOtherWrap.style.display = this.checked ? "block" : "none";
+            });
+        }
+
+        /* On submit: replace __other__ with actual value for Title and Brand */
+        var form = document.getElementById("ContactForm");
+        if (form) {
+            form.addEventListener("submit", function () {
+                if (titleSelect && titleSelect.value === "__other__") {
+                    var titleOther = document.getElementById("ContactForm-title-other");
+                    if (titleOther && titleOther.value) {
+                        var hidden = document.createElement("input");
+                        hidden.type = "hidden";
+                        hidden.name = "contact[title]";
+                        hidden.value = "Other: " + titleOther.value;
+                        form.appendChild(hidden);
+                        titleSelect.removeAttribute("name");
+                    }
+                }
+                if (brandSelect && brandSelect.value === "__other__") {
+                    var brandOther = document.getElementById("ContactForm-brand-other");
+                    if (brandOther && brandOther.value) {
+                        var hidden = document.createElement("input");
+                        hidden.type = "hidden";
+                        hidden.name = "contact[brand preference]";
+                        hidden.value = "Other: " + brandOther.value;
+                        form.appendChild(hidden);
+                        brandSelect.removeAttribute("name");
+                    }
+                }
+            });
+        }
+    });
+</script>
+
+{% schema %}
+{
+  "name": "Club membership form",
+  "tag": "section",
+  "disabled_on": {
+      "groups": ["header"]
+    },
+  "class": "spaced-section",
+  "settings": [
+	{
+      "type": "text",
+      "id": "heading",
+      "default": "Pro Soccer Club Team Program",
+      "label": "Heading"
+    },
+    {
+      "type": "select",
+      "id": "heading_tag",
+      "options": [
+        {
+          "value": "h2",
+          "label": "h2"
+        },
+        {
+          "value": "h1",
+          "label": "h1"
+        }
+      ],
+      "default": "h2",
+      "label": "Heading tag",
+      "info": "Used for accessibility and SEO"
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "options": [
+        {
+          "value": "h2",
+          "label": "Small"
+        },
+        {
+          "value": "h1",
+          "label": "Medium"
+        },
+        {
+          "value": "h0",
+          "label": "Large"
+        }
+      ],
+      "default": "h1",
+      "label": "Heading size"
+    },
+    {
+      "type": "header",
+      "content": "Contact form wrapper"
+    },
+	{
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Make section full width",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "form_heading",
+      "default": "Pro Soccer Club Team Program",
+      "label": "Heading"
+    },
+    {
+      "type": "select",
+      "id": "form_heading_tag",
+      "options": [
+        {
+          "value": "h2",
+          "label": "h2"
+        },
+        {
+          "value": "h3",
+          "label": "h3"
+        }
+      ],
+      "default": "h3",
+      "label": "Heading tag",
+      "info": "Used for accessibility and SEO"
+    },
+    {
+      "type": "select",
+      "id": "form_heading_size",
+      "options": [
+        {
+          "value": "h4",
+          "label": "Small"
+        },
+        {
+          "value": "h3",
+          "label": "Medium"
+        },
+        {
+          "value": "h2",
+          "label": "Large"
+        }
+      ],
+      "default": "h4",
+      "label": "Heading size"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "default": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed urna accumsan odio odio.",
+      "label": "Subheading"
+    },
+    {
+      "type": "select",
+      "id": "button_type",
+      "label": "Button type",
+      "default": "primary",
+      "options": [
+		{
+          "value": "primary",
+          "label": "Primary button"
+        },
+        {
+          "value": "secondary",
+          "label": "Secondary button"
+        },
+		{
+          "value": "icon",
+          "label": "Icon button"
+        },
+		{
+          "value": "underline",
+          "label": "Underline button"
+        }
+      ]
+    },
+	  {
+          "type": "select",
+          "id": "color_scheme",
+          "options": [
+            {
+              "value": "accent-1",
+              "label": "t:sections.header.settings.color_scheme.options__1.label"
+            },
+            {
+              "value": "accent-2",
+              "label": "t:sections.header.settings.color_scheme.options__2.label"
+            },
+            {
+              "value": "background-1",
+              "label": "t:sections.header.settings.color_scheme.options__3.label"
+            },
+            {
+              "value": "background-2",
+              "label": "t:sections.header.settings.color_scheme.options__4.label"
+            },
+            {
+              "value": "background-3",
+              "label": "Background 3"
+            },
+            {
+              "value": "inverse",
+              "label": "t:sections.header.settings.color_scheme.options__5.label"
+            }
+          ],
+          "default": "background-3",
+          "label": "t:sections.header.settings.color_scheme.label"
+    } ,
+     {
+      "type": "header",
+      "content": "Section padding"
+    },
+	  {
+          "type": "paragraph",
+          "content": "Desktop"
+        },
+        {
+          "type": "range",
+          "id": "padding_top",
+          "min": 0,
+          "max": 150,
+          "step": 5,
+          "unit": "px",
+          "label": "Padding top",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "padding_bottom",
+          "min": 0,
+          "max": 150,
+          "step": 5,
+          "unit": "px",
+          "label": "Padding bottom",
+          "default": 0
+        },
+		{
+          "type": "paragraph",
+          "content": "Mobile"
+        },
+		{
+          "type": "range",
+          "id": "mobile_padding_top",
+          "min": 0,
+          "max": 150,
+          "step": 5,
+          "unit": "px",
+          "label": "Padding top",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "mobile_padding_bottom",
+          "min": 0,
+          "max": 150,
+          "step": 5,
+          "unit": "px",
+          "label": "Padding bottom",
+          "default": 0
+        }
+  ],
+  "blocks": [
+        {
+          "type": "contact_list",
+          "name": "contact item",
+          "settings": [
+			      {
+              "type": "text",
+              "id": "heading",
+              "default": "Heading:",
+              "label": "Heading"
+            },
+            {
+              "type": "richtext",
+              "id": "text",
+              "default": "<p>Share information such as the store's physical address, contact details, opening hours, etc.<p>",
+              "label": "t:sections.rich-text.blocks.text.settings.text.label"
+            }
+          ]
+        }
+    ],
+  "presets": [
+    {
+      "name": "Club membership",
+      "blocks":[
+        {
+        	"type": "contact_list",
+			 "settings": {
+				"heading": "Phone:",
+			    "text": "<p> <strong> (372) 587-2335 </strong> </br> (372) 555-4665</p>"
+			  }
+        },
+        {
+        	"type": "contact_list",
+              "settings": {
+              "heading": "Email:",
+              "text": "<p><a href=\"mailto:team@prosoccer.com\" target=\"_blank\" title=\"mailto:team@prosoccer.com\"><strong>team@prosoccer.com</strong></a></p>"
+            }
+        },
+		{
+        	"type": "contact_list",
+              "settings": {
+              "heading": "Address:",
+            "text": "<p><strong>Iris Watson<br/>P.O. Box 283 8562 Fusce Rd.<br/>Frederick Nebraska 20620</strong></p>"
+            }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
+

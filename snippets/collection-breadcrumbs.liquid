@@ -1,0 +1,22 @@
+<nav role="navigation" aria-label="breadcrumbs" class="breadcrumbs__wrapper">
+  <ol class="breadcrumbs__list d-flex {{ breadcrumb_align }}">
+    <li class="breadcrumbs__item">
+      <a class="breadcrumbs__link" href="/">{{ 'general.back_to_home_label' | t }}</a>
+    </li>
+    {%- if current_tags -%}
+      <li class="breadcrumbs__item">
+        {{ collection.title | link_to: collection.url }}
+      </li>
+      <li class="breadcrumbs__item">
+        {%- capture tag_url -%}{{ collection.url }}/{{ current_tags | join: "+"}}{%- endcapture -%}
+        <a class="breadcrumbs__link" href="{{ tag_url }}" aria-current="page">
+          {{- current_tags | join: ' + ' -}}
+        </a>
+      </li>
+    {%- else -%}
+      <li class="breadcrumbs__item">
+        <a class="breadcrumbs__link" href="{{ collection.url }}" aria-current="page">{{ collection.title }}</a>
+      </li>
+    {%- endif -%}
+  </ol>
+</nav>

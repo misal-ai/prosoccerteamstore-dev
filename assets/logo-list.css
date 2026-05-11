@@ -1,0 +1,21 @@
+
+.logo__list--media > img {
+  max-width: 100%;
+  height: auto;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  transition: var(--transition);
+  opacity: 0.4;
+}
+.logo__list--media:hover > img {
+  opacity: 1;
+}
+.logo__list--placeholder {
+  padding-top: 100%;
+}
+.logo__list--media {
+  padding-top: 100%;
+  position: relative;
+}

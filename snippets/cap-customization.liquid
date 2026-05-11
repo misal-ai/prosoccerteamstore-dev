@@ -1,0 +1,83 @@
+<div>
+  <input
+    type="checkbox"
+    {% if existing_item_min_quantity == blank or existing_item_min_quantity < 7 %}
+      disabled
+    {% endif %}
+    {% if existing_item_min_quantity > 6 %}
+      class="already"
+    {% endif %}
+    id="show_custom_info"
+    name="properties[show_custom_info]"
+  >
+  <label> Customize this product (Customize applies to order quantities of 7+) </label>
+
+  <div class="custom_info" style="display:none;">
+    <div class='vectorization_info_holder'>
+      <p><strong>NOTE: </strong>A $25.00 logo processing fee will be applied to cart.</p>
+    </div>
+
+    <h4 style="margin-top:10px;">Crest Embroidery($12)</h4>
+    <div class="toggle-group">
+      <input type="radio" name="properties[CapCrestLogoType]" value="0" id="cap_crest_no" data-name="no"  checked>
+      <label for="cap_crest_no">No</label>
+      <input type="radio" name="properties[CapCrestLogoType]" value="51769027952942" id="cap_crest_yes" data-name="Embroidery">
+      <label for="cap_crest_yes">Yes</label>
+    </div>
+
+    <div class="cap_crest_upload_holder logo_holder row" style="display:none; margin-top:15px;margin-left:2px;">
+      <div class="heading col-12">Custom Crest Logo</div>
+      <div class='col align-self-center'>
+        <input accept=".png,.svg,.pdf,.ai,.eps,.jpg,.jpeg,.psd,.tif,.tiff" onchange="validateFile(this);" name="properties[Crest_Logo]" type="file" id="crest_logo">
+      </div>
+      <div class='col align-self-center right'>
+          <img width="" height="" alt="crest-logo" src="{{ 'cap-logo.jpeg' | asset_url }}">
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  $(document).ready(function () {
+    function getTotalQuantities() {
+      let total = 0;
+      $('.tags-holder .quantity__input').each(function () {
+        const value = Number($(this).val());
+        if (!isNaN(value)) total += value;
+      });
+      return total;
+    }
+
+    function checkMinimumQuantity() {
+      const total = getTotalQuantities();
+      const prev = Number('{{ existing_item_min_quantity }}');
+
+      if (total > 6 || prev > 6) {
+        $('#show_custom_info').prop('disabled', false);
+      } else {
+        $('#show_custom_info').prop('checked', false).prop('disabled', true);
+        $('.custom_info').slideUp();
+      }
+    }
+
+    // Main toggle
+    $('#show_custom_info').on('change', function () {
+      this.checked ? $('.custom_info').slideDown() : $('.custom_info').slideUp();
+    });
+
+    // Crest Yes/No toggle
+    $('input[name="properties[CapCrestLogoType]"]').on('change', function () {
+      if ($(this).val() !== '0') {
+        $('.cap_crest_upload_holder').slideDown();
+      } else {
+        $('.cap_crest_upload_holder').slideUp();
+      }
+    });
+
+    // Quantity change
+    $(document).on('change', '.quantity__input', function () {
+      checkMinimumQuantity();
+    });
+
+    checkMinimumQuantity();
+  });
+</script>

@@ -1,0 +1,330 @@
+
+{{ 'logo-list.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+
+.logo__list{
+  min-width:100%;
+  Width:100%;
+  margin:auto;
+}
+
+.marquee {
+
+  --duration: 20s;
+  display: flex;
+  gap: var(--gap);
+  overflow: hidden;
+  white-space: nowrap;
+  flex-wrap:nowrap;
+}
+
+.marquee:hover .marquee__wrapper {
+  animation-play-state: paused;
+}
+
+.marquee__wrapper { 
+  --gap: 5rem;
+  display: flex;
+  flex-shrink: 0;
+  gap: var(--gap);
+  justify-content: space-around;
+  min-width: 100%;
+  padding-block: 30px;
+}
+
+.marquee__wrapper img{
+    width: 200px
+}
+.marquee__wrapper--a {
+  animation: 
+    var(--duration) slide-1 1 linear, 
+   calc(var(--duration) * 2) slide-2 var(--duration) infinite linear; 
+  /* background-color: cornflowerblue; */
+}
+
+.marquee__wrapper--b {
+    animation: calc(var(--duration) * 2) slide-3 infinite linear; 
+  /* background-color: darkorange; */
+}
+
+
+@keyframes slide-1 {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes slide-2 {
+  0% {
+    transform: translateX(100%);
+  }
+
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+
+@keyframes slide-3 {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-200%);
+  }
+}
+  .logo__list--media>img{
+  opacity:1;
+}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.mobile_padding_top }}px;
+    padding-bottom: {{ section.settings.mobile_padding_bottom }}px;
+    --padding-top: {{ section.settings.mobile_padding_top }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+      --padding-top: {{ section.settings.padding_top }}px;
+    }
+  }
+   #MainContent > :first-child .section--top-space-{{ section.id }} {
+    padding-top: calc(var(--header-height) * var(--transparent-header-show) + var(--padding-top));
+  }
+    :root{
+    --grid-desktop-vertical-spacing: 20px;
+    --grid-desktop-horizontal-spacing: 20px;
+    --grid-mobile-vertical-spacing: 20px;
+    --grid-mobile-horizontal-spacing: 20px;
+  }
+{%- endstyle -%}
+
+{% liquid
+  assign productShowXl = section.settings.products_show_on_xl
+  assign productShowSm = section.settings.products_show_on_sm
+%}
+
+<div class=" logo__list container section--top-space-{{ section.id }} section-{{ section.id }}-padding">
+
+      
+  <div class="marquee logo__list--bar grid grid--{{ productShowXl }}-col-desktop grid--{{ productShowSm }}-col-tablet-down track">
+    <div class="marquee__wrapper--a marquee__wrapper">
+    {%- for block in section.blocks -%}
+       {% if block.settings.image_link != blank %}
+         <a role="link" class="d-block" href="{{ block.settings.image_link }}">
+       {% endif %}
+            <img
+              class="multicolumn-card__image"
+              srcset="
+                {%- if block.settings.image.width >= 275 -%}{{ block.settings.image | image_url: width: 275 }} 275w,{%- endif -%}
+                {%- if block.settings.image.width >= 550 -%}{{ block.settings.image | image_url: width: 550 }} 550w,{%- endif -%}
+                {%- if block.settings.image.width >= 710 -%}{{ block.settings.image | image_url: width: 710 }} 710w,{%- endif -%}
+                {%- if block.settings.image.width >= 1420 -%}{{ block.settings.image | image_url: width: 1420 }} 1420w,{%- endif -%}
+                {{ block.settings.image | image_url }} {{ block.settings.image.width }}w
+              "
+              src="{{ block.settings.image | image_url: width: 550 }}"
+              sizes="
+                (min-width: 990px) {% if section.blocks.size <= 2 %}710px{% else %}550px{% endif %},
+                (min-width: 750px) {% if section.blocks.size == 1 %}710px{% else %}550px{% endif %},
+                calc(100vw - 30px)
+              "
+              alt="{{ block.settings.image.alt }}"
+              height="{{ block.settings.image.height }}"
+              width="{{ block.settings.image.width }}"
+              loading="lazy"
+            >
+      {% if block.settings.image_link != blank %}
+        </a>
+     {% endif %}
+    {% endfor %}
+  </div>
+    <div class="marquee__wrapper--b marquee__wrapper">
+      {%- for block in section.blocks -%}
+        {% if block.settings.image_link != blank %}
+          <a role="link" class="d-block" href="{{ block.settings.image_link }}">
+        {%- endif %}
+ <img
+              class="multicolumn-card__image"
+              srcset="
+                {%- if block.settings.image.width >= 275 -%}{{ block.settings.image | image_url: width: 275 }} 275w,{%- endif -%}
+                {%- if block.settings.image.width >= 550 -%}{{ block.settings.image | image_url: width: 550 }} 550w,{%- endif -%}
+                {%- if block.settings.image.width >= 710 -%}{{ block.settings.image | image_url: width: 710 }} 710w,{%- endif -%}
+                {%- if block.settings.image.width >= 1420 -%}{{ block.settings.image | image_url: width: 1420 }} 1420w,{%- endif -%}
+                {{ block.settings.image | image_url }} {{ block.settings.image.width }}w
+              "
+              src="{{ block.settings.image | image_url: width: 550 }}"
+              sizes="
+                (min-width: 990px) {% if section.blocks.size <= 2 %}710px{% else %}550px{% endif %},
+                (min-width: 750px) {% if section.blocks.size == 1 %}710px{% else %}550px{% endif %},
+                calc(100vw - 30px)
+              "
+              alt="{{ block.settings.image.alt }}"
+              height="{{ block.settings.image.height }}"
+              width="{{ block.settings.image.width }}"
+              loading="lazy"
+            >
+      {% if block.settings.image_link != blank %}
+        </a>
+        {%- endif %}
+    {% endfor %}
+    </div>
+  </div>
+      
+  {% if section.settings.mobile_stack == true %}
+    </div>
+    </div>
+  {% endif %}
+</div>
+
+{% schema %}
+{
+  "name": "Logo list",
+  "settings": [
+    {
+        "type": "select",
+        "id": "products_show_on_xl",
+        "label": "Number of columns on desktop",
+        "options": [
+          {
+            "value": "3",
+            "label": "3"
+          },
+          {
+            "value": "4",
+            "label": "4"
+          },
+          {
+            "value": "5",
+            "label": "5"
+          },
+          {
+            "value": "6",
+            "label": "6"
+          }
+        ],
+        "default": "5"
+      },
+     {
+        "type": "select",
+        "id": "products_show_on_sm",
+        "label": "Number of columns on mobile",
+        "options": [
+          {
+            "value": "1",
+            "label": "1"
+          },
+          {
+            "value": "2",
+            "label": "2"
+          }
+        ],
+        "default": "2",
+       "info": "It works unless you enable the \"Stack on mobile\" "
+      },
+    {
+         "type": "checkbox",
+         "id": "mobile_stack",
+         "label": "Stack on mobile",
+         "default": false
+     },
+    {
+        "type": "header",
+        "content": "Section padding"
+      },
+      {
+            "type": "paragraph",
+            "content": "Desktop"
+          },
+          {
+            "type": "range",
+            "id": "padding_top",
+            "min": 0,
+            "max": 150,
+            "step": 5,
+            "unit": "px",
+            "label": "Padding top",
+            "default": 50
+          },
+          {
+            "type": "range",
+            "id": "padding_bottom",
+            "min": 0,
+            "max": 150,
+            "step": 5,
+            "unit": "px",
+            "label": "Padding bottom",
+            "default": 50
+          },
+  		{
+            "type": "paragraph",
+            "content": "Mobile"
+          },
+  		{
+            "type": "range",
+            "id": "mobile_padding_top",
+            "min": 0,
+            "max": 150,
+            "step": 5,
+            "unit": "px",
+            "label": "Padding top",
+            "default": 50
+          },
+          {
+            "type": "range",
+            "id": "mobile_padding_bottom",
+            "min": 0,
+            "max": 150,
+            "step": 5,
+            "unit": "px",
+            "label": "Padding bottom",
+            "default": 50
+          }
+  ],
+  "blocks": [
+  {
+    "type": "logo",
+    "name": "Logo",
+    "settings": [
+      {
+        "type": "image_picker",
+        "id": "image",
+        "label": "t:sections.multicolumn.blocks.column.settings.image.label"
+      },
+      {
+        "type": "url",
+        "id": "image_link",
+        "label": "Link"
+      }
+    ]
+  }
+],
+   "presets": [
+    {
+      "name": "Logo list",
+      "blocks": [
+        {
+          "type": "logo"
+        },
+        {
+          "type": "logo"
+        },
+        {
+          "type": "logo"
+        },
+        {
+          "type": "logo"
+        },
+        {
+          "type": "logo"
+        }
+    ]
+    }
+  ]
+}
+{% endschema %}

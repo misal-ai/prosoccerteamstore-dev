@@ -1,0 +1,48 @@
+{%- liquid
+  assign choose_option = block.settings.choose_options_name | downcase
+
+  for option in product.options_with_values
+    assign option_name = option.name | downcase
+    if option_name == choose_option
+      assign color_swatch_option = 'option' | append: option.position
+    endif
+  endfor
+-%}
+<variant-radios
+  class="no-js-hidden"
+  data-section="{{ section.id }}"
+  data-origin="{{ request.origin }}"
+  data-url="{{ product.url }}"
+  data-color-swatch="{{ color_swatch_option }}"
+  data-color-swatch-style="{{ block.settings.color_option_style }}"
+  {{ block.shopify_attributes }}
+>
+  {%- for option in product.options_with_values -%}
+    <fieldset class="js product-form__input radio--swatch variant--swatch-option{{ option.position }}">
+      <legend class="form__label">
+        <strong>{{ option.name }}:</strong> <span>{{ option.selected_value }}</span>
+      </legend>
+      {% render 'product-variant-options',
+        product: product,
+        option: option,
+        block: block,
+        picker_type: block.settings.picker_type,
+        choose_option: choose_option,
+        swatch_type: block.settings.color_option_style,
+        swatch_button_style: block.settings.color_option_design
+      %}
+    </fieldset>
+  {%- endfor -%}
+  <script type="application/json" data-variant>
+    {{ product.variants | json }}
+  </script>
+  <script type="application/json" data-preorder>
+    {%- assign firstBrackets = '{'  -%}
+    {%- assign seconrdBrackets = '}'  -%}
+    {{ firstBrackets }}
+    {%- for variant in product.variants -%}
+    "{{variant.id}}": {"qty": {{variant.inventory_quantity}}, "inventory_policy": "{{variant.inventory_policy}}"}{% unless forloop.last == true %},{% endunless %}
+      {%- endfor -%}
+      {{ seconrdBrackets }}
+  </script>
+</variant-radios>

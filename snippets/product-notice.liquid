@@ -1,0 +1,17 @@
+<style>
+  .notic-bar{
+    background-color: #efefef;
+    padding: 19px;
+    border: 1px solid #00000094;
+    margin-bottom: 15px;
+  }
+</style>
+{% assign is_joma_socks_collection = false %}
+{% for collection in product.collections %}
+  {% if collection.handle contains 'joma-socks' %}
+    {% assign is_joma_socks_collection = true %}
+  {% endif %}
+{% endfor %}
+{% if is_joma_socks_collection %}
+  <div class="notic-bar"><strong> Note:</strong> Minimum order in pairs of 4</div>
+{% endif %}

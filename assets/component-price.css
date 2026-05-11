@@ -1,0 +1,124 @@
+.price {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  letter-spacing: inherit;
+  line-height: 1.5;
+  color: rgb(var(--color-foreground));
+  gap: 1rem;
+}
+
+.price.price--unavailable {
+  visibility: hidden;
+}
+
+.price--end {
+  justify-content: flex-end;
+}
+
+.price dl {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.price dd {
+  margin: 0 12px 0 0;
+}
+
+.price .price__last:last-of-type {
+  margin: 0;
+}
+
+@media screen and (min-width: 750px) {
+  .price {
+    margin-bottom: 0;
+  }
+}
+
+.price--large {
+  font-size: 20px;
+  line-height: 1.5;
+}
+
+@media screen and (min-width: 750px) {
+  .price--large {
+    font-size: 18px;
+  }
+  .price__box_wrapper .price:not(.price--on-sale) {
+    font-size: 3rem;
+  }
+}
+
+.price--sold-out .price__availability,
+.price__regular {
+  display: block;
+}
+
+.price__sale,
+.price__availability,
+.price .price__badge-sale,
+.price .price__badge-sold-out,
+.price--on-sale .price__regular,
+.price--on-sale .price__availability,
+.price--no-compare .price__compare {
+  display: none;
+}
+
+.price--sold-out .price__badge-sold-out,
+.price--on-sale .price__badge-sale {
+  display: inline-flex;
+}
+
+.price--on-sale .price__sale {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.price--center {
+  display: flex;
+  justify-content: center;
+}
+
+.price--on-sale .price-item--regular {
+  text-decoration: line-through;
+  color: rgba(var(--color-foreground), 0.5);
+}
+
+.unit-price {
+  font-size: 13px;
+  line-height: 1.2;
+  margin-top: 15px;
+  text-transform: uppercase;
+  color: rgba(var(--color-foreground), 0.7);
+}
+.discount_note{
+  color: #84cc29;
+  display: flex;
+  gap: 2px;
+  align-items:center;
+  width:100%;
+  font-size:12px;
+  width:auto;
+}
+.discount_note *{
+  width:15px;
+  height:15px;
+  stroke: #fff;
+  fill: #84cc29;
+}
+.dis_note{
+  color:#000!important;
+  font-size:12px !important;
+}
+@media(min-width:768px){
+  .discount_note{
+    font-size:16px;
+  }
+  .discount_note *{
+    width: 23px;
+    height:23px;
+  }
+}

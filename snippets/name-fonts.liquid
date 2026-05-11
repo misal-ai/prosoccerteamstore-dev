@@ -1,0 +1,126 @@
+<div class="row" style="margin-bottom:15px;">
+  <div class="product-form__input product-form__input--dropdown col-4"> 
+      <label class="form__label" for="Option-{{ section.id }}-player_name_shape">
+        <strong>Player Name Shape:</strong>
+      </label>
+      <div class="select">
+        <select id="Option-{{ section.id }}-player_name_shape"
+          class="select__select"
+          name="properties[{{ 'Player Name Shape' }}]"
+          form="product-form-{{ section.id }}"
+        >
+          <option value='Straight'>Straight</option>
+          <option value='Arc'>Arc</option>
+        </select>                                
+        {% render 'icon-caret' %}
+      </div>
+  </div>
+  <div class="product-form__input product-form__input--dropdown col-4">
+    <label class="form__label" for="Option-{{ section.id }}-player_name_font">
+      <strong>Player Name Font:</strong>
+    </label>
+    <div class="select">
+      <div
+        id="Option-{{ section.id }}-player_name_font"
+        class="name-font-select-selected select__select"
+        name="properties[{{ 'Player Name Font' }}]"
+        form="product-form-{{ section.id }}"
+      >
+        {% if is_adidas_collection %}
+          Adidas Team Support
+        {% else %}
+          Arial
+        {% endif %}
+      </div>
+      <div class="name-font-select-options">
+        {% if is_adidas_collection %}
+          <div class="name-font-select-option" data-value="6" data-type="adidas">
+            <img src="{{ 'adidasNameFont.png' | asset_url }}" alt="Adidas Team Support">
+          </div>
+        {% endif %}
+        <div class="name-font-select-option" data-value="1" data-type="global">
+          <img src="{{ 'arial-new.png' | asset_url }}" alt="Arial">
+        </div>
+        <div class="name-font-select-option" data-value="2" data-type="global">
+          <img src="{{ 'full-black-new.png' | asset_url }}" alt="Full Black">
+        </div>
+        <div class="name-font-select-option" data-value="3" data-type="global">
+          <img src="{{ 'hercules-new.png' | asset_url }}" alt="Hercules">
+        </div>
+        <div class="name-font-select-option" data-value="4" data-type="global">
+          <img src="{{ 'impress-new.png' | asset_url }}" alt="Impress">
+        </div>
+        <div class="name-font-select-option" data-value="5" data-type="global">
+          <img src="{{ 'rex-bold-new.png' | asset_url }}" alt="REXBOLD">
+        </div>
+      </div>
+      {% render 'icon-caret' %}
+    </div>
+  </div>
+  <div class="product-form__input product-form__input--dropdown col-4">
+    <label class="form__label" for="Option-{{ section.id }}-font_color">
+      {% if font_holder=='bag' %}
+        <strong>Name Font Color:</strong>
+      {% else %}
+          <strong>Font Color:</strong>
+      {% endif %}
+    </label>
+    <div class="select">
+      <select
+        id="Option-{{ section.id }}-font_color"
+        class="select__select"
+        name="properties[{{ 'Last Name Font Color' }}]"
+        form="product-form-{{ section.id }}">
+        {% if is_adidas_collection %}
+          <option data-color-name-family="adidas" value="University Red">University Red</option>
+          <option data-color-name-family="adidas" value="Cobalt Blue">Cobalt Blue</option>
+          <option data-color-name-family="adidas" value="Metallic Gold">Metallic Gold</option>
+        {% endif %}
+        <option data-color-name-family="adidas,global" value="White">White</option>
+        <option data-color-name-family="adidas,global" value="Black">Black</option>
+        <option data-color-name-family="adidas,global" value="Navy">Navy</option>
+        <option data-color-name-family="global" value="Bubblegum Pink">Bubblegum Pink</option>
+        <option data-color-name-family="global" value="Columbia Blue">Columbia Blue</option>
+        <option data-color-name-family="global" value="Dark Green">Dark Green</option>
+        <option data-color-name-family="global" value="Gold">Gold</option>
+        <option data-color-name-family="global" value="Grey">Grey</option>
+        <option data-color-name-family="global" value="Kelly">Kelly</option>
+        <option data-color-name-family="global" value="Maroon">Maroon</option>
+        <option data-color-name-family="global" value="Orange">Orange</option>
+        <option data-color-name-family="global" value="Purple">Purple</option>
+        <option data-color-name-family="global" value="Red">Red</option>
+        <option data-color-name-family="global" value="Royal">Royal</option>
+        <option data-color-name-family="global" value="Texas Orange">Texas Orange</option>
+        <option data-color-name-family="global" value="Vegas Gold">Vegas Gold</option>
+      </select>
+      {% render 'icon-caret' %}
+    </div>
+  </div>
+</div>
+<script>
+    $(document).ready(function() {
+      $('.name-font-select-selected').on('click', function() {
+        $('.name-font-select-options').toggle();
+      });
+      $('.name-font-select-option').click(function() {
+         var optionType = $(this).data('type');
+          if(optionType=='adidas'){
+              $("option[data-color-name-family*='adidas']").show();
+              $("option[data-color-name-family='global']").hide();
+              $("option[data-color-name-family*='adidas']").first().prop('selected', true);
+          }else{
+              $("option[data-color-name-family*='global']").show();
+              $("option[data-color-name-family='adidas']").hide();
+              $("option[data-color-name-family*='global']").first().prop('selected', true);
+          }
+        var value = $(this).data('value');
+        var label = $(this).find('img').attr('alt');
+        $('.name-font-select-selected').text(label);
+        $('.name-font-select-options').hide();
+      });
+      {% if is_adidas_collection %}
+        $("option[data-color-name-family*='adidas']").show();
+        $("option[data-color-name-family='global']").hide();
+      {% endif %}
+    });
+  </script>

@@ -1,0 +1,175 @@
+<div>
+  <input
+    type="checkbox"
+    {% if existing_item_min_quantity == blank or existing_item_min_quantity < 7 %}
+      disabled
+    {% endif %}
+    {% if existing_item_min_quantity > 6 %}
+      class="already"
+    {% endif %}
+    id="show_custom_info"
+    name="properties[show_custom_info]"
+  >
+  <label>Customize this product (Customize and Discounts apply to order quantities of 7+)</label>
+  
+  <div class="custom_info" style="display: none; margin-bottom: 10px;">
+    <div class='vectorization_info_holder'>
+      <p><strong>NOTE: </strong>A $25.00 logo processing fee will be applied to cart. Team logos will be on the opposite side of the brand logo.</p>
+    </div>
+
+    <div id="front_section" class="my-1">
+      <div class="crest_logo_holder">
+        <h3>Front Customizations</h3>
+        <h6 class="product-inner-heading">Select Logo Type for Heat Press or Embroidery:</h6>
+        <div class="multi-toggle-group mt-2">
+          <input checked class='imageCheckbox' type="radio" name="properties[pantCrestLogoType]" id="pant_no_crest_logo" value='0' data-name='no'>
+          <label for='pant_no_crest_logo'>&nbsp;No Logo</label><br>
+          <input class='imageCheckbox' type="radio" name="properties[pantCrestLogoType]" value="50431621300526" id="pant_crest_heast_press" data-name='Heat Press'>
+          <label for="pant_crest_heast_press">Heat Press ($7)</label><br>
+          <input class='imageCheckbox' type="radio" name="properties[pantCrestLogoType]" value="50431621366062" id="pant_embroidery_press" data-name='Embroidery'>
+          <label for="pant_embroidery_press">Embroidery ($12)</label><br>
+        </div>
+
+        <div class="pent_crest_logo_image_holder logo_holder row" style="display: none; margin-top:10px;margin-left:2px;">
+          <div class='heading col-12'>Custom Crest Logo</div>
+          <div class='col'>
+            <input accept=".png,.svg,.pdf,.ai,.eps,.jpg,.jpeg,.psd,.tif,.tiff" onchange='validateFile(this);' id="crest_logo" name="properties[Crest_Logo]" type="file">
+          </div>
+          <div class="col">
+            <img width="" height="" alt="Crest Logo Example" src="{{ 'pant-logo.jpg' | asset_url }}">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <h6 class="product-inner-heading" style="margin-top:15px;">2" Small Number:</h6>
+      <div class="multi-toggle-group mt-2">
+        <input name="properties[pantSmallNumber]" type="radio" value="no" checked id="pant_small_no_no" data-name="No">
+        <label for="pant_small_no_no">No</label>
+
+        <input name="properties[pantSmallNumber]" type="radio" value="51712289964334" id="pant_small_heat_press" data-name="Heat Press">
+        <label for="pant_small_heat_press">Heat Press ($6)</label>
+
+        <input name="properties[pantSmallNumber]" type="radio" value="51712293372206" id="pant_small_no_yes" data-name="Embroidery">
+        <label for="pant_small_no_yes">Embroidery ($10)</label>
+      </div>
+
+      <div class="pant_small_number_holder" style="display:none; margin-top: 10px;">
+        <div class="mb-1">
+          <div class="back_number">
+            <img class="back_number_example" alt="Pant Number Example" src="{{ 'pant-number.jpg' | asset_url }}" style="cursor: pointer; width: 160px;">
+          </div>
+        </div>
+        
+        <div class="product-form__input product-form__input--dropdown"> 
+          <label class="form__label" for="Option-{{ section.id }}-font_color"><strong>Font Color:</strong></label>
+          <div class="select">
+            <select id="Option-{{ section.id }}-font_color" class="select__select" name="properties[Font Color]" form="product-form-{{ section.id }}">
+                {% if is_adidas_collection %}
+                  <option data-color-number-family='adidas' value='University Red'>University Red</option>
+                  <option data-color-number-family='adidas' value='Cobalt Blue'>Cobalt Blue</option>
+                  <option data-color-number-family='adidas' value='Metallic Gold'>Metallic Gold</option>
+                {% endif %}
+                <option data-color-number-family='adidas,global' value='White'>White</option>
+                <option data-color-number-family='adidas,global' value='Black'>Black</option>
+                <option data-color-number-family='adidas,global' value='Navy'>Navy</option>
+                <option data-color-number-family='global' value='Bubblegum Pink'>Bubblegum Pink</option>
+                <option data-color-number-family='global' value='Columbia Blue'>Columbia Blue</option>
+                <option data-color-number-family='global' value='Dark Green'>Dark Green</option>
+                <option data-color-number-family='global' value='Gold'>Gold</option>
+                <option data-color-number-family='global' value='Grey'>Grey</option>
+                <option data-color-number-family='global' value='Kelly'>Kelly</option>
+                <option data-color-number-family='global' value='Maroon'>Maroon</option>
+                <option data-color-number-family='global' value='Orange'>Orange</option>
+                <option data-color-number-family='global' value='Purple'>Purple</option>
+                <option data-color-number-family='global' value='Red'>Red</option>
+                <option data-color-number-family='global' value='Royal'>Royal</option>
+                <option data-color-number-family='global' value='Texas Orange'>Texas Orange</option>
+                <option data-color-number-family='global' value='Vegas Gold'>Vegas Gold</option>
+            </select>
+            {% render 'icon-caret' %}
+          </div>
+        </div>
+      </div> 
+    </div>
+
+    <div class="player_number_name row" style="display: none; margin-top:20px;"></div>
+  </div>
+</div>
+
+<script>
+  function getTotalQuantity() {
+    let total = 0;
+    $('.tags-holder .quantity__input').each(function () {
+      const value = Number($(this).val());
+      if (!isNaN(value)) { total += value; }
+    });
+    return total;
+  }
+
+  function appendNames() {
+    const pantSmallNumber = $('input[name="properties[pantSmallNumber]"]:checked').val() !== 'no';
+    const total_quantities = getTotalQuantity();
+    let prev_quantities = Number("{{ existing_item_min_quantity }}");
+
+    if (pantSmallNumber && (total_quantities > 6 || prev_quantities > 6)) {
+      let content = '';
+      let i = 0;
+
+      $('.tags-holder .quantity__input').each(function () {
+       var quantity = parseFloat($(this).val());
+       if(quantity > 0 && !isNaN(quantity)){
+          const size_tag = $(this).attr('name') || 'item';
+          for (let j = 0; j < quantity; j++, i++) {
+            content += `
+              <div class="col-4 player_number_input mb-1">
+                <input 
+                  name="number-${size_tag}-${i}" 
+                  class="input__field player_number" 
+                  placeholder="Number  ${i+1}" 
+                  onkeypress="handleOnlyTwoCharacters(event)" 
+                  type="number" 
+                  value=""
+                >
+              </div>`;
+          }
+        }
+      });
+      $('.player_number_name').empty().show().html(content);
+    } else {
+      $('.player_number_name').empty().hide();
+    }
+  }
+
+  $(document).ready(function() {
+    // Crest Logo Listener
+    $('input[name="properties[pantCrestLogoType]"]').on('change', function () {
+      if ($(this).val() != 0) {
+        $('.pent_crest_logo_image_holder').slideDown();
+      } else {
+        $('.pent_crest_logo_image_holder').slideUp();
+      }
+    });
+
+    // Number Toggle Listener
+    $('input[name="properties[pantSmallNumber]"]').on('change', function () {
+      if ($(this).val() !== 'no') {
+        $('.pant_small_number_holder').show();
+      } else {
+        $('.pant_small_number_holder').hide();
+      }
+      appendNames();
+    });
+
+    // Quantity Change
+    $(document).on('change', '.quantity__input', function () {
+      appendNames();
+    });
+
+    // Main Toggle
+    $('#show_custom_info').on('change', function() {
+      this.checked ? $('.custom_info').slideDown() : $('.custom_info').slideUp();
+    });
+  });
+</script>

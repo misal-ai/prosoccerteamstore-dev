@@ -1,0 +1,154 @@
+<div>
+  <input
+    type="checkbox"
+    {% if existing_item_min_quantity == blank or existing_item_min_quantity < 1 %}
+      disabled
+    {% endif %}
+    {% if existing_item_min_quantity > 6 %}
+      class="already"
+    {% endif %}
+    id="show_custom_info"
+    name="properties[show_custom_info]">
+  <label for="show_custom_info">
+    Customize this product (Customization applies to order quantity of 7+ and Discounts apply to order quantity of 5 or more)
+  </label>
+</div>
+
+{% assign bagLogoType = product.type | downcase | replace: " ", "_" | append: "_logo.jpg" %}
+{% assign bagType = product.type | downcase | replace: " ", "_"  %}
+{% assign bagHeatPressItemId ='' %}
+{% assign bagEmbroieryItemId ='' %}
+
+{% if bagType=='sackpacks' %}
+  {% assign bagHeatPressItemId ='50564127523118' %}
+  {% assign bagEmbroieryItemId ='50564127654190' %}
+{% endif %}
+{% if bagType=='duffel_bags' %}
+  {% assign bagHeatPressItemId ='50566668419374' %}
+  {% assign bagEmbroieryItemId ='50566678348078' %}
+{% endif %}
+{% if bagType=='backpacks' %}
+  {% assign bagHeatPressItemId ='50566670352686' %}
+  {% assign bagEmbroieryItemId ='50566679691566' %}
+{% endif %}
+{% if bagType=='miscellaneous' %}
+  {% assign bagHeatPressItemId ='50566671532334' %}
+  {% assign bagEmbroieryItemId ='50566680117550' %}
+{% endif %}
+
+<div class="custom_info" style="display: none; margin-bottom: 10px;">
+  <div class='vectorization_info_holder'>
+    <p><strong>NOTE: </strong>A $25.00 logo processing fee will be applied to cart. Team logos will be on the opposite side of the brand logo.</p>
+  </div>
+
+  <div id="front_section" class="my-1">
+    <div class="crest_logo_holder">
+      <h3>Bag Customizations</h3>
+      <h6 style="margin-top: 7px; margin-bottom: 7px; font-weight: bolder;">Select Logo Type:</h6>
+      <div class="multi-toggle-group mt-2">
+        <input checked class='imageCheckbox' type="radio" name="properties[bagCrestLogoType]" id="bag_no_crest_logo" value='0' data-name="no">
+        <label for='bag_no_crest_logo'>No Logo</label><br>
+        <input class='imageCheckbox' type="radio" name="properties[bagCrestLogoType]" data-name="Heat Press" value="{{ bagHeatPressItemId }}" id="bag_crest_heat_press">
+        <label for="bag_crest_heat_press">Heat Press ($7)</label><br>
+        <input class='imageCheckbox' type="radio" name="properties[bagCrestLogoType]" data-name="Embroidery" value="{{ bagEmbroieryItemId }}" id="bag_embroidery_press">
+        <label for="bag_embroidery_press">Embroidery ($12)</label><br>
+      </div>
+
+      <div class="bag_crest_logo_image_holder logo_holder row" style="display: none; margin-top:10px;margin-left:2px;">
+        <div class='heading col-12'>Custom Crest Logo</div>
+        <div class='col-7 align-self-center'>
+          <input accept=".png,.svg,.pdf,.ai,.eps,.jpg,.jpeg,.psd,.tif,.tiff" onchange='validateFile(this);' id="crest_logo" name="properties[Crest_Logo]" type="file">
+        </div>
+        <div class='col-5 align-self-center right'>
+          <img src="{{ bagLogoType | asset_url }}" alt="Bag Crest Logo">
+        </div>
+      </div>
+    <h6 class="product-inner-heading" style="margin-top:15px;">2" Small Number:</h6>
+     <div class="multi-toggle-group mt-2">
+        <input checked name="properties[bagSmallNumber]" type="radio" value="no" id="bag_number_no" data-name="no">
+        <label for="bag_number_no">No</label>
+        <input name="properties[bagSmallNumber]" type="radio" value="51712310051118" id="bag_number_heat" data-name="Heat Press">
+        <label for="bag_number_heat">Heat Press ($6)</label>
+        <input name="properties[bagSmallNumber]" type="radio" value="51712312967470" id="bag_number_yes" data-name="Embroidery">
+        <label for="bag_number_yes">Embroidery ($10)</label>
+      </div>
+
+      <h6 class="product-inner-heading" style="margin-top:15px;">Bag Name:</h6>
+      <div class="multi-toggle-group mt-2">
+        <input checked name="properties[bagName]" type="radio" value="no" id="bag_name_no" data-name="no">
+        <label for="bag_name_no">No</label>
+        <input name="properties[bagName]" type="radio" value="51712318341422" id="bag_name_heat" data-name="Heat Press">
+        <label for="bag_name_heat">Heat Press ($9)</label>
+        <input name="properties[bagName]" type="radio" value="51712321323310" id="bag_name_yes" data-name="Embroidery">
+        <label for="bag_name_yes">Embroidery ($12)</label>
+      </div>                
+    </div>
+
+    <div class="player_number_name" style="display: none; margin-top:20px;">
+       <div class="row" style="margin-bottom:15px;" id="bag_number_row"></div>
+       <div class="row" id="bag_name_row"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function getTotalQuantity() {
+    let total = 0;
+    $('.tags-holder .quantity__input').each(function () {
+      const value = Number($(this).val());
+      if (!isNaN(value)) total += value;
+    });
+    return total;
+  }
+
+  function appendNumbers() {
+    // Check if either is active (not "no")
+    const smallNumber = $('input[name="properties[bagSmallNumber]"]:checked').val() !== 'no';
+    const smallName = $('input[name="properties[bagName]"]:checked').val() !== 'no';
+    const total_quantities = getTotalQuantity();
+    let prev_quantities = Number("{{ existing_item_min_quantity }}");
+
+    if ((smallNumber || smallName) && (total_quantities > 6 || prev_quantities > 6)) {
+      let bag_name_content = '';
+      let bag_number_content = '';
+      let i = 0;
+
+      $('.tags-holder .quantity__input').each(function () {
+         var quantity = parseFloat($(this).val());
+         if(quantity > 0 && !isNaN(quantity)){
+           const size_tag = $(this).attr('name') || 'item';
+          for (let j = 0; j < quantity; j++, i++) {
+            if (smallNumber) {
+              bag_number_content += `<div class="col-4 mb-1 player_number_input"><input name="number-${size_tag}-${i}" class="input__field player_number" placeholder="Number ${i+1}" type="number" onkeypress="handleOnlyTwoCharacters(event)"></div>`;
+            }
+            if (smallName) {
+              bag_name_content += `<div class="col-4 mb-1 player_name_input"><input name="name-${size_tag}-${i}" class="input__field player_name" placeholder="Name ${i+1}" type="text"></div>`;
+            }
+          }
+        }
+      });
+
+      $('.player_number_name').show();
+      $('#bag_name_row').html(bag_name_content);
+      $('#bag_number_row').html(bag_number_content);
+    } else {
+      $('.player_number_name').hide().find('#bag_name_row, #bag_number_row').empty();
+    }
+  }
+
+  $(document).ready(function () {
+    $('input[name="properties[bagCrestLogoType]"]').on('change', function () {
+      if ($(this).val() != 0) {
+        $('.bag_crest_logo_image_holder').slideDown();
+      } else {
+        $('.bag_crest_logo_image_holder').slideUp();
+      }
+    });
+
+    $('input[name="properties[bagSmallNumber]"], input[name="properties[bagName]"]').on('change', appendNumbers);
+    $(document).on('change', '.quantity__input', appendNumbers);
+    $('#show_custom_info').on('change', function() {
+      this.checked ? $('.custom_info').slideDown() : $('.custom_info').slideUp();
+    });
+  });
+</script>

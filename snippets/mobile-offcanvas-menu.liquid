@@ -1,0 +1,290 @@
+<link rel="stylesheet" href="{{ 'mobile-offcanvas-menu.css' | asset_url }}" media="print" onload="this.media='all'">
+<noscript>{{ 'mobile-offcanvas-menu.css' | asset_url | stylesheet_tag }}</noscript>
+
+<style>
+     .offcanvas-header {
+      position: fixed;
+      z-index: 9999;
+      top: 0;
+      right: auto;
+      left: 0;
+      width: 100%;
+      max-width: 320px;
+      height: 100vh;
+      transition: var(--transition);
+      transform: translateX(-100%);
+      background-color: #fff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+      visibility: collapse;
+      padding-bottom: 72px;
+      overflow-y: scroll;
+  }
+     .offcanvas-overlay {
+       position: fixed;
+       z-index: 98;
+       top: 0;
+       left: 0;
+       visibility: hidden;
+       width: 100%;
+       height: 100%;
+       transition: var(--transition);
+       opacity: 0;
+       background-color: #000;
+       cursor: crosshair;
+       opacity: 0;
+       display: none;
+     }
+     .offcanvas__inner {
+       position: relative;
+       height: 100%;
+     }
+
+     /* Offacnvas Logo */
+     .offcanvas__logo {
+       display: flex;
+       justify-content: space-between;
+       width: 100%;
+       padding: 20px;
+       background-color: #f5f5f5;
+     }
+     .offcanvas__logo_link {
+       position: relative;
+       display: block;
+       max-width: 100%;
+       word-break: break-word;
+       padding-right: 10px;
+     }
+     .offcanvas__close_btn {
+       position: relative;
+       align-self: center;
+       width: 20px;
+       height: 15px;
+       padding: 0;
+       text-indent: -9999px;
+       border: none;
+       background-color: transparent;
+       flex-shrink: 0;
+     }
+     .offcanvas__close_btn::before, .offcanvas__close_btn::after {
+       position: absolute;
+       top: 50%;
+       left: 0;
+       width: 100%;
+       height: 2px;
+       margin-top: -1px;
+       content: "";
+       transform: rotate(45deg);
+       background-color: #000;
+     }
+     .offcanvas__close_btn::after {
+       transform: rotate(-45deg);
+     }
+
+     /* Mobile Menu */
+     .offcanvas__menu {
+       overflow-y: auto;
+       height: 100%;
+     }
+
+     .offcanvas__menu_ul {
+       overflow: auto;
+       margin: 0;
+       padding: 0;
+       list-style: none;
+     }
+
+     .offcanvas__menu_li {
+       position: relative;
+       border-bottom: 1px solid #ededed;
+     }
+     .offcanvas__menu_li:first-child {
+       border-top: 1px solid #ededed;
+     }
+
+     .offcanvas__menu_item {
+         line-height: 1;
+         display: block;
+         padding: 15px 20px;
+         word-break: break-word;
+         font-size: 1.6rem;
+         color: rgba(var(--color-foreground), 0.8);
+     }
+       .offcanvas__menu_item:hover{
+            color: rgba(var(--color-foreground));
+       }
+     /* Mobile Sub Menu */
+     .offcanvas__sub_menu {
+       display: none;
+       margin: 0;
+       padding: 0;
+       list-style: none;
+     }
+     {% if theme_rtl %}
+    .offcanvas__sub_menu_toggle {
+       font-size: 20px;
+       position: absolute;
+       z-index: 9;
+       top: 0;
+       left: 0;
+       width: 40px;
+       height: 46px;
+       padding: 0;
+       border: none;
+       border-radius: 0;
+       background-color: transparent;
+     }
+      {% else %}
+      .offcanvas__sub_menu_toggle {
+       font-size: 20px;
+       position: absolute;
+       z-index: 9;
+       top: 0;
+       right: 0;
+       width: 40px;
+       height: 46px;
+       padding: 0;
+       border: none;
+       border-radius: 0;
+       background-color: transparent;
+     }
+       {% endif %}
+
+     .offcanvas__sub_menu_toggle::before, .offcanvas__sub_menu_toggle::after {
+       position: absolute;
+       top: 50%;
+       left: 50%;
+       width: 12px;
+       height: 2px;
+       content: "";
+       transition: var(--transition);
+         transform: translateX(-50%) translateY(-50%);
+         background-color: #2c2c2c;
+         }
+     .offcanvas__sub_menu_toggle:not(.active)::after {
+       transform: translateX(-50%) translateY(-50%) rotate(90deg);
+     }
+     .offcanvas__logo span.h2 {
+       margin: 0;
+     }
+     .offcanvas__inner .quick__links {
+       padding-top: 0;
+     }
+     .offcanvas__inner .quick__links {
+       padding-bottom: 1.5rem;
+     }
+       #predictive__search_overlay.active + .offcanvas-overlay, #quick__information_overlay.active + .offcanvas-overlay {
+       visibility: visible;
+       opacity: 0.5;
+       display: block;
+     }
+</style>
+
+<div class="offcanvas-header" tabindex="-1">
+  <div class="offcanvas__inner">
+    <div class="offcanvas__logo">
+      {%- render 'header-logo', className: 'offcanvas__logo_link' -%}
+      <button class="offcanvas__close_btn">close</button>
+    </div>
+    <div class="quick__information--body">
+      <div class="quick__links flex-grow-1 y_scroll">
+        <nav class="offcanvas__menu">
+          {%- render 'mobile-menu-nav' -%}
+        </nav>
+      </div>
+      {%- if section.settings.social_media or section.settings.enable_currency or section.settings.enable_language -%}
+        <div class="menu__drawer--footer">
+          {%- if section.settings.social_media -%}
+            {%- render 'social-media', className: 'text-center' -%}
+          {%- endif -%}
+
+          <div class="localization__store d-flex justify-content-center">
+            {%- if localization.available_countries.size > 1 and section.settings.enable_currency -%}
+              <localization-form>
+                {%- form 'localization', id: 'FooterCountryForm', class: 'localization-form' -%}
+                  <div class="no-js-hidden">
+                    <div class="disclosure">
+                      <button
+                        type="button"
+                        class="dropdown__open_label"
+                        aria-expanded="false"
+                        aria-controls="FooterCountryList"
+                        aria-describedby="FooterCountryLabel"
+                      >
+                        {{ localization.country.name }}
+                        {{ localization.country.currency.iso_code }}
+                        {{ localization.country.currency.symbol }}
+                        {% render 'icon-caret' %}
+                      </button>
+                      <ul id="FooterCountryList" role="list" class="dropdown__open_list list-unstyled" hidden>
+                        {%- for country in localization.available_countries -%}
+                          <li class="disclosure__item" tabindex="-1">
+                            <a
+                              class="dropdown__list__item {% if country.iso_code == localization.country.iso_code %}active{% endif %} "
+                              href="#"
+                              {% if country.iso_code == localization.country.iso_code %}
+                                aria-current="true"
+                              {% endif %}
+                              data-value="{{ country.iso_code }}"
+                            >
+                              {{ country.name }}
+                              <span class="localization-form__currency">
+                                {{- country.currency.iso_code }}
+                                {{ country.currency.symbol -}}
+                              </span>
+                            </a>
+                          </li>
+                        {%- endfor -%}
+                      </ul>
+                    </div>
+                    <input type="hidden" name="country_code" value="{{ localization.country.iso_code }}">
+                  </div>
+                {%- endform -%}
+              </localization-form>
+            {%- endif -%}
+
+            {%- if localization.available_languages.size > 1 and section.settings.enable_language -%}
+              <localization-form>
+                {%- form 'localization', id: 'FooterLanguageForm' -%}
+                  <div class="no-js-hidden">
+                    <div class="disclosure">
+                      <button
+                        type="button"
+                        class="dropdown__open_label"
+                        aria-expanded="false"
+                        aria-controls="FooterLanguageList"
+                        aria-describedby="FooterLanguageLabel"
+                      >
+                        {{ localization.language.endonym_name | capitalize }}
+                        {% render 'icon-caret' %}
+                      </button>
+                      <ul id="FooterLanguageList" role="list" class="dropdown__open_list list-unstyled" hidden>
+                        {%- for language in localization.available_languages -%}
+                          <li class="disclosure__item" tabindex="-1">
+                            <a
+                              class="dropdown__list__item {% if language.iso_code == localization.language.iso_code %} active{% endif %} f"
+                              href="#"
+                              hreflang="{{ language.iso_code }}"
+                              lang="{{ language.iso_code }}"
+                              {% if language.iso_code == localization.language.iso_code %}
+                                aria-current="true"
+                              {% endif %}
+                              data-value="{{ language.iso_code }}"
+                            >
+                              {{ language.endonym_name | capitalize }}
+                            </a>
+                          </li>
+                        {%- endfor -%}
+                      </ul>
+                    </div>
+                    <input type="hidden" name="locale_code" value="{{ localization.language.iso_code }}">
+                  </div>
+                {%- endform -%}
+              </localization-form>
+            {%- endif -%}
+          </div>
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+<div class="offcanvas-overlay"></div>

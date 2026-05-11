@@ -1,0 +1,25 @@
+.breadcrumbs__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.breadcrumbs__item + .breadcrumbs__item {
+  margin-left: 15px;
+  padding-left: 15px;
+  position: relative;
+}
+.breadcrumbs__item + .breadcrumbs__item::before {
+  position: absolute;
+  content: "/";
+  left: -4px;
+}
+.breadcrumbs__link:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.1rem;
+}
+.breadcrumbs__item *{
+  text-transform:lowercase !important;
+}
+.collection-hero__title{
+   text-transform:lowercase !important;
+}

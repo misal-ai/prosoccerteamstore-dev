@@ -1,0 +1,72 @@
+{% comment %}
+  https://community.shopify.com/c/shopify-design/only-show-color-swatches-if-more-than-two-colors/m-p/1711730
+{% endcomment %}
+
+{% liquid
+  assign color_variant_max_size = settings.max_swatches_show
+
+  assign product_content_align = 'justify-content-start'
+  if settings.product_content_alignment == 'center'
+    assign product_content_align = 'justify-content-center'
+  elsif settings.product_content_alignment == 'right'
+    assign product_content_align = 'justify-content-end'
+  endif
+%}
+
+{%- liquid
+  assign choose_option = settings.color_swatch_activation | downcase
+
+  for option in product.options_with_values
+    assign option_name = option.name | downcase
+    if option_name == choose_option
+      assign color_swatch_option = 'option' | append: option.position
+    endif
+  endfor
+-%}
+<variant-swatch-buttons
+  class="no-js-hidden product--color-swatch-wrapper {{ product_content_align }}"
+  data-color-swatch="{{ color_swatch_option }}"
+  data-color-swatch-style="{{ settings.color_swatch_type }}"
+>
+  {%- for option in product.options_with_values -%}
+    {%- liquid
+      assign option_name = option.name | downcase
+    -%}
+    {% if option_name == choose_option %}
+      {% assign number = 0 %}
+      {%- for value in option.values -%}
+        {% assign number = number | plus: 1 %}
+        {%- assign color_item_name = value | escape | downcase -%}
+        {%- assign color_item_name_join = color_item_name | split: ' ' -%}
+
+       
+      {%- endfor -%}
+      {% if number > color_variant_max_size %}
+        <a class="rest__of--color-variants uppercase" href="{{ product.url }}">More colors</a>
+      {% endif %}
+    {% endif %}
+  {%- endfor -%}
+   {% for tag in product.tags %}
+    {% if tag contains 'customizable' %}
+         <a class="rest__of--color-variants customz uppercase" >Customizable </a> 
+    {% endif %}
+     {% if tag contains 'customized_pant' %}
+         <a class="rest__of--color-variants customz uppercase" >Customizable </a> 
+    {% endif %}
+     {% if tag contains 'customized_top' %}
+         <a class="rest__of--color-variants customz uppercase" >Customizable </a> 
+    {% endif %}
+      {% if tag contains 'customized_hoodie' %}
+         <a class="rest__of--color-variants customz uppercase" >Customizable </a> 
+    {% endif %}
+     {% if tag contains 'customized_jacket' %}
+         <a class="rest__of--color-variants customz uppercase" >Customizable </a> 
+    {% endif %}
+     {% if tag contains 'customized_bag' %}
+         <a class="rest__of--color-variants customz uppercase" >Customizable </a> 
+    {% endif %}
+     {% endfor %}
+  <script type="application/json">
+    {{ product.variants | json }}
+  </script>
+</variant-swatch-buttons>

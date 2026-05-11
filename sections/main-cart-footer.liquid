@@ -1,0 +1,1111 @@
+{% liquid
+  assign theme_rtl = false
+  if settings.enable_rtl and settings.langauges_rtl == blank
+    assign theme_rtl = true
+  endif
+
+  if settings.enable_rtl and settings.langauges_rtl != blank
+    assign rtl_languages = settings.langauges_rtl | split: ','
+    for language in rtl_languages
+      if language == request.locale.iso_code
+        assign theme_rtl = true
+      endif
+    endfor
+  endif
+%}
+<style>
+  .hidden_low .cart__checkout-button {opacity: 0.5;pointer-events:none}
+  .hidden_low .cart__dynamic-checkout-buttons {opacity: 0.5;pointer-events:none;;cursor:not-allowed;}
+  button.hidden_low {opacity: 0.5 !important;pointer-events:none !important;;cursor:not-allowed;}
+</style>
+{{ 'component-cart.css' | asset_url | stylesheet_tag }}
+{{ 'component-totals.css' | asset_url | stylesheet_tag }}
+{{ 'component-price.css' | asset_url | stylesheet_tag }}
+{{ 'component-discounts.css' | asset_url | stylesheet_tag }}
+
+{%- if theme_rtl -%}
+  {{ 'component-cart-items-rtl.css' | asset_url | stylesheet_tag }}
+{%- endif -%}
+
+<div class="cart_subtotal container" id="main-cart-footer" data-id="{{ section.id }}">
+  <div class="row">
+    <div class="col-12">
+      <div class="{% if cart == empty %} is-empty{% endif %}">
+        <div>
+          <div class="cart__footer">
+            <div class="cart__information">
+              {%- if section.settings.show_cart_note -%}
+                <cart-note class="cart__note field">
+                  <label for="Cart-note">{{ 'sections.cart.note' | t }}</label>
+                  <textarea
+                    class="text-area text-area--resize-vertical field__input"
+                    form="cart"
+                    name="note"
+                    id="Cart-note"
+                    placeholder="{{ 'sections.cart.note' | t }}"
+                  >{{ cart.note }}</textarea>
+                </cart-note>
+              {%- endif -%}
+            </div>
+
+            {%- if section.settings.shipping_calc_enable -%}
+              <div class="shipping_calculator mt-20" id="shipping_drawer">
+                <div class="action_drawer_heading">
+                  <h6 class="mb-15 mt-0 shipping__calculator--title">
+                    {{ 'general.shipping_calculator.popup_title' | t }}
+                    {%- render 'icon-help' -%}
+                  </h6>
+                </div>
+                <div class="action_drawer_body">
+                  <div class="select__field_form mb-20">
+                    <select
+                      id="AddressCountry_Shipping"
+                      name="address[country]"
+                      autocomplete="country"
+                    >
+                      {{ all_country_option_tags }}
+                    </select>
+                    <svg aria-hidden="true" focusable="false" viewBox="0 0 10 6">
+                      <use href="#icon-caret" />
+                    </svg>
+                  </div>
+
+                  <div id="AddressProvinceContainerNewShiping" class="select__field_form mb-20" style="display: none">
+                    <select
+                      id="AddressProvince_shipping"
+                      name="address[province]"
+                      autocomplete="address-level1"
+                    ></select>
+                    <svg aria-hidden="true" focusable="false" viewBox="0 0 10 6">
+                      <use href="#icon-caret" />
+                    </svg>
+                  </div>
+
+                  <div class="input__field_form mb-20">
+                    <input
+                      type="text"
+                      class="input__field"
+                      id="ShippingAddressZip"
+                      autocapitalize="characters"
+                      autocomplete="postal-code"
+                      placeholder="{{ 'customer.addresses.zip' | t }}"
+                    >
+                  </div>
+                </div>
+                <div class="action_drawer_footer d-flex flex-direction-column">
+                  <button class="button button--primary shipping_calc_save" data-action="shipping">
+                    {{ 'general.shipping_calculator.calculate_button' | t }}
+                  </button>
+                </div>
+                <div class="shipping_rate_message mt-15 no-js-inline">
+                  <p>
+                    {{ 'general.shipping_calculator.address_first_label' | t }}
+                    <span class="shipping_address_count"></span>
+                    {{ 'general.shipping_calculator.address_second_label' | t }}
+                  </p>
+                </div>
+                <div class="shipping_rate_package"></div>
+              </div>
+            {%- endif -%}
+
+            <div class="cart__blocks js-contents">
+              {% for block in section.blocks %}
+                {%- case block.type -%}
+                  {%- when '@app' -%}
+                    {% render block %}
+                  {%- when 'subtotal' -%}
+                    <div {{ block.shopify_attributes }}>
+                      <div class="totals">
+                        <h3 class="totals__subtotal">{{ 'sections.cart.subtotal' | t }}</h3>
+                        <p class="totals__subtotal-value">{{ cart.total_price | money_with_currency }}</p>
+                      </div>
+
+                      <div>
+                        {%- if cart.cart_level_discount_applications.size > 0 -%}
+                          <ul
+                            class="discounts list-unstyled"
+                            role="list"
+                            aria-label="{{ 'customer.order.discount' | t }}"
+                          >
+                            {%- for discount in cart.cart_level_discount_applications -%}
+                              <li class="discounts__discount discounts__discount--end">
+                                {%- render 'icon-discount' -%}
+                                {{ discount.title }}
+                                (-{{ discount.total_allocated_amount | money }})
+                              </li>
+                            {%- endfor -%}
+                          </ul>
+                        {%- endif -%}
+                      </div>
+
+                      <small class="tax-note caption-large rte">
+                        {%- if cart.taxes_included and shop.shipping_policy.body != blank -%}
+                          {{
+                            'sections.cart.taxes_included_and_shipping_policy_html'
+                            | t: link: shop.shipping_policy.url
+                          }}
+                        {%- elsif cart.taxes_included -%}
+                          {{ 'sections.cart.taxes_included_but_shipping_at_checkout' | t }}
+                        {%- elsif shop.shipping_policy.body != blank -%}
+                          {{
+                            'sections.cart.taxes_and_shipping_policy_at_checkout_html'
+                            | t: link: shop.shipping_policy.url
+                          }}
+                        {%- else -%}
+                          {{ 'sections.cart.taxes_and_shipping_at_checkout' | t }}
+                        {%- endif -%}
+                      </small>
+                    </div>
+                  {%- else -%}
+                    <div class="cart__ctas" {{ block.shopify_attributes }}>
+                      <noscript>
+                        <button type="submit" class="cart__update-button button button--secondary" form="cart">
+                          {{ 'sections.cart.update' | t }}
+                        </button>
+                      </noscript>
+
+                      <button
+                        type="submit"
+                        class="cart__checkout-button button checkout-button"
+                        name="checkout"
+                        {% if cart == empty %}
+                          disabled
+                        {% endif %}
+                        form="cart"
+                      >
+                        {{ 'sections.cart.checkout' | t }}
+                      </button>
+                    </div>
+
+                    {%- if additional_checkout_buttons -%}
+                      <div class="cart__dynamic-checkout-buttons additional-checkout-buttons">
+                        {{ content_for_additional_checkout_buttons }}
+                      </div>
+                    {%- endif -%}
+                {%- endcase -%}
+              {% endfor %}
+
+              <div id="cart-errors"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% javascript %}
+  class CartNote extends HTMLElement {
+    constructor() {
+      super();
+
+      this.addEventListener('change', debounce((event) => {
+        const body = JSON.stringify({ note: event.target.value });
+        fetch(`${routes.cart_update_url}`, {...fetchConfig(), ...{ body }});
+      }, 300))
+    }
+  }
+  customElements.define('cart-note', CartNote);
+
+
+
+
+{% endjavascript %}
+<script src="{{ 'shipping_calculator.js' | asset_url }}" defer></script>
+<!-- Cart Customization Logic -->
+<script>
+// ─── Constants ───────────────────────────────────────────────────────────────
+var FRONT_NUMBER_ID  = '47913304129838';
+var BACK_NUMBER_ID   = '47913306521902';
+var CUSTOM_NAME_ID   = '47913308094766';
+var CHEST_LOGO_ID    = '47913309274414';
+var CREST_LOGO_ID    = '47913297477934';
+var VECTOR_LOGO_ID   = '47913271656750';
+var SHORT_NUMBER_ID  = '51858674516270';
+var TOP_NAME_ID      = '50485580890414';
+var HOODIE_NAME_ID   = '50534311428398';
+var JACKET_NAME_ID   = '50536571699502';
+var JERSEY_SLEEVE_LOGO_ID   = 51936281428270;
+var JERSEY_SPONSOR_LOGO_ID  = 51936282247470;
+var SAME_VENDOR_TYPES = ['Jackets','Jersey','Training Tops','Hoodies','Polos','T-Shirt'];
+
+// Dynamic variant IDs (set per item during applyCustomization loop)
+var topNumberVariantId    = null;
+var hoodieNumberVariantId = null;
+var jacketNumberVariantId = null;
+var pantNumberVariantId   = null;
+var bagNumberVariantId    = null;
+var bagNameVariantId      = null;
+
+var PROP_TO_CLASS = {
+  'Count Front Numbers':                  '.totalFrontNumbers',
+  'Count Back Numbers':                   '.totalBackNumbers',
+  'Count Custom Names':                   '.totalNames',
+  'Total Short Numbers':                  '.totalShortNumbers',
+  'Total Jacket Numbers':                 '.totalJacketNumbers',
+  'Total Jacket Names':                   '.totalJacketNames',
+  'Total Pant Numbers':                   '.totalPantNumbers',
+  'Total Top Numbers':                    '.totalTopNumbers',
+  'Total Top Names':                      '.totalTopNames',
+  'Total Hoodie Numbers':                 '.totalHoodieNumbers',
+  'Total Hoodie Names':                   '.totalHoodieNames',
+  'Total Bag Numbers':                    '.totalBagNumbers',
+  'Total Bag Names':                      '.totalBagNames',
+  'total_jacket_heat_press_crest_logos':  '.total_jacket_heat_press_crest_logos',
+  'total_jacket_embroidery_crest_logos':  '.total_jacket_embroidery_crest_logos',
+  'total_pant_heat_press_crest_logos':    '.total_pant_heat_press_crest_logos',
+  'total_pant_embroidery_crest_logos':    '.total_pant_embroidery_crest_logos',
+  'total_top_heat_press_crest_logos':     '.total_top_heat_press_crest_logos',
+  'total_top_embroidery_crest_logos':     '.total_top_embroidery_crest_logos',
+  'total_top_heat_press_chest_logos':     '.total_top_heat_press_chest_logos',
+  'total_top_embroidery_chest_logos':     '.total_top_embroidery_chest_logos',
+  'total_hoodie_heat_press_crest_logos':  '.total_hoodie_heat_press_crest_logos',
+  'total_hoodie_embroidery_crest_logos':  '.total_hoodie_embroidery_crest_logos',
+  'total_hoodie_heat_press_chest_logos':  '.total_hoodie_heat_press_chest_logos',
+  'total_hoodie_embroidery_chest_logos':  '.total_hoodie_embroidery_chest_logos',
+  'total_cap_embroidery_crest_logos':     '.total_cap_embroidery_crest_logos'
+};
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+function showLoader() {
+  if (typeof window.showLoader === 'function' && window.showLoader !== showLoader) window.showLoader();
+  var el = document.getElementById('cart-loading-overlay');
+  if (el) el.style.display = 'flex';
+}
+function hideLoader() {
+  var el = document.getElementById('cart-loading-overlay');
+  if (el) el.style.display = 'none';
+}
+
+function getCartFinalQuantities() {
+  var total = 0;
+  $('tr.cart-item').not('.fee').each(function() {
+    var v = parseInt($(this).find('.quantity__input').val(), 10);
+    if (!isNaN(v)) total += v;
+  });
+  return total;
+}
+
+function clearCart() {
+  $.ajax({
+    type: 'POST', url: '/cart/clear.js', dataType: 'json',
+    success: function() { hideLoader(); location.reload(); },
+    error:   function(e) { console.error('Error clearing cart:', e); }
+  });
+}
+
+function strVal(el) {
+  var v = $(el).val();
+  return (v && v.trim() !== '') ? v.trim() : null;
+}
+
+// ─── applyCustomization ───────────────────────────────────────────────────────
+function applyCustomization() {
+  if (window._applyTimeout) clearTimeout(window._applyTimeout);
+  window._applyTimeout = setTimeout(function() { applyCustomizationDebounced(); }, 150);
+}
+
+function applyCustomizationDebounced() {
+  showLoader();
+
+  var vectorLogoTypes = {}; // track unique logo slot types for processing fee count
+  var vectorLogoNames = {}; // track unique logo file names for processing fee count
+  var chestTotal = 0, crestTotal = 0;
+
+  // Per-item logo accumulators — keyed by variant ID so each item routes independently
+  var logoTotals = {}; // variantId -> qty
+
+  var frontNumberTotal = 0, backNumberTotal = 0, customNameTotal = 0;
+  var totalBagNumbers = 0, totalBagNames = 0;
+  var totalTopNumbers = 0, totalTopNames = 0;
+  var totalShortNumbers = 0;
+  var totalHoodieNumbers = 0, totalHoodieNames = 0;
+  var totalJacketNumbers = 0, totalJacketNames = 0;
+  var totalPantNumbers = 0;
+  var totalJerseySleeveLogos = 0;
+  var totalJerseySponsorLogos = 0;
+
+  $(".cart-item[data-customized='true']").each(function(idx, item) {
+    var qty = parseInt($(item).find('.quantity__input').val()) || 0;
+
+    var chestLogoName = strVal($(item).find('.chest_logo_name'));
+    var crestLogoName = strVal($(item).find('.crest_logo_name'));
+    var alreadyFront  = strVal($(item).find('.alreadyFrontNumber'));
+    var alreadyBack   = strVal($(item).find('.alreadyBackNumber'));
+    var alreadyName   = strVal($(item).find('.alreadyCustomName'));
+
+    var cntFront = parseInt($(item).find('.totalFrontNumbers').val()) || 0;
+    var cntBack  = parseInt($(item).find('.totalBackNumbers').val())  || 0;
+    var cntNames = parseInt($(item).find('.totalNames').val())        || 0;
+
+    // Variant IDs — accumulate only if present on this item
+    var tNV = strVal($(item).find('.top_small_number_variant_id'));
+    var hNV = strVal($(item).find('.hoodie_small_number_variant_id'));
+    var jNV = strVal($(item).find('.jacket_small_number_variant_id'));
+    var pNV = strVal($(item).find('.pant_small_number_variant_id'));
+    var bNV = strVal($(item).find('.bag_small_number_variant_id'));
+    var bnV = strVal($(item).find('.bag_name_variant_id'));
+    if (tNV) topNumberVariantId    = tNV;
+    if (hNV) hoodieNumberVariantId = hNV;
+    if (jNV) jacketNumberVariantId = jNV;
+    if (pNV) pantNumberVariantId   = pNV;
+    if (bNV) bagNumberVariantId    = bNV;
+    if (bnV) bagNameVariantId      = bnV;
+
+    // Read logo types strictly per-item — null means this item has no logo of that type
+    var itemBagLogoType         = strVal($(item).find('.bagLogoType'));
+    var itemPantLogoType        = strVal($(item).find('.pantLogoType'));
+    var itemJacketLogoType      = strVal($(item).find('.jacketLogoType'));
+    var itemTopCrestLogoType    = strVal($(item).find('.topCrestLogoType'));
+    var itemTopChestLogoType    = strVal($(item).find('.topChestLogoType'));
+    var itemHoodieCrestLogoType = strVal($(item).find('.hoodieCrestLogoType'));
+    var itemHoodieChestLogoType = strVal($(item).find('.hoodieChestLogoType'));
+    var itemCapCrestLogoType    = strVal($(item).find('.capCrestLogoType'));
+
+    // Resolve variant IDs only for logo types present on THIS item
+    var itemBagCrestId    = itemBagLogoType ? strVal($(item).find('.bagLogoId')) : null;
+    var itemPantCrestId   = itemPantLogoType   ? (itemPantLogoType   === 'Heat Press' ? '50431621300526' : '50431621366062') : null;
+    var itemJacketCrestId = itemJacketLogoType ? (itemJacketLogoType === 'Heat Press' ? '50536414118190' : '50536414937390') : null;
+    var itemTopCrestId    = itemTopCrestLogoType    ? (itemTopCrestLogoType    === 'Heat Press' ? '50434669150510' : '50434672394542') : null;
+    var itemTopChestId    = itemTopChestLogoType    ? (itemTopChestLogoType    === 'Heat Press' ? '50434671542574' : '50434669576494') : null;
+    var itemHoodieCrestId = itemHoodieCrestLogoType ? (itemHoodieCrestLogoType === 'Heat Press' ? '50534204342574' : '50534209126702') : null;
+    var itemHoodieChestId = itemHoodieChestLogoType ? (itemHoodieChestLogoType === 'Heat Press' ? '50534216794414' : '50534221054254') : null;
+    var itemCapCrestId    = itemCapCrestLogoType    ? (itemCapCrestLogoType    === 'Embroidery'  ? '51769027952942' : '') : null;
+
+    // Name/number fee qty = unique count only
+    if (alreadyFront === 'yes') frontNumberTotal += cntFront;
+    if (alreadyBack  === 'yes') backNumberTotal  += cntBack;
+    if (alreadyName  === 'yes') customNameTotal  += cntNames;
+
+    // ── Track unique logo names for processing fee (mirrors product page vectorLogos logic) ──
+    if (crestLogoName) vectorLogoNames[crestLogoName] = true;
+    if (chestLogoName) vectorLogoNames[chestLogoName] = true;
+
+    var sleeveLogoName   = strVal($(item).find('.jerseySleeveLogoName'));
+    var sponsorLogoName  = strVal($(item).find('.jerseySponsorLogoName'));
+    if (sleeveLogoName)  vectorLogoNames[sleeveLogoName]  = true;
+    if (sponsorLogoName) vectorLogoNames[sponsorLogoName] = true;
+
+    // ── Per-slot logo type tracking (1 processing fee per distinct logo slot) ──
+
+    // Jacket Crest
+    if (itemJacketLogoType) {
+      logoTotals[itemJacketCrestId] = (logoTotals[itemJacketCrestId] || 0) + qty;
+      vectorLogoTypes['jacket_crest'] = true;
+    }
+    // Pant Crest
+    if (itemPantLogoType) {
+      logoTotals[itemPantCrestId] = (logoTotals[itemPantCrestId] || 0) + qty;
+      vectorLogoTypes['pant_crest'] = true;
+    }
+    // Top Crest
+    if (itemTopCrestLogoType) {
+      logoTotals[itemTopCrestId] = (logoTotals[itemTopCrestId] || 0) + qty;
+      vectorLogoTypes['top_crest'] = true;
+    }
+    // Top Chest
+    if (itemTopChestLogoType) {
+      logoTotals[itemTopChestId] = (logoTotals[itemTopChestId] || 0) + qty;
+      vectorLogoTypes['top_chest'] = true;
+    }
+    // Cap Crest
+    if (itemCapCrestLogoType && itemCapCrestId) {
+      logoTotals[itemCapCrestId] = (logoTotals[itemCapCrestId] || 0) + qty;
+      vectorLogoTypes['cap_crest'] = true;
+    }
+    // Hoodie Crest
+    if (itemHoodieCrestLogoType) {
+      logoTotals[itemHoodieCrestId] = (logoTotals[itemHoodieCrestId] || 0) + qty;
+      vectorLogoTypes['hoodie_crest'] = true;
+    }
+    // Hoodie Chest
+    if (itemHoodieChestLogoType) {
+      logoTotals[itemHoodieChestId] = (logoTotals[itemHoodieChestId] || 0) + qty;
+      vectorLogoTypes['hoodie_chest'] = true;
+    }
+    // Bag Crest
+    if (itemBagLogoType && itemBagCrestId) {
+      logoTotals[itemBagCrestId] = (logoTotals[itemBagCrestId] || 0) + qty;
+      vectorLogoTypes['bag_crest'] = true;
+    }
+
+    // Generic Crest toggle (items without a specific type)
+    if (crestLogoName && !itemJacketCrestId && !itemPantCrestId && !itemTopCrestId
+        && !itemHoodieCrestId && !itemCapCrestId && !itemBagCrestId) {
+      crestTotal += qty;
+      vectorLogoTypes['crest'] = true;
+    }
+
+    // Generic Chest toggle (items without a specific type)
+    if (chestLogoName && !itemTopChestId && !itemHoodieChestId) {
+      chestTotal += qty;
+      vectorLogoTypes['chest'] = true;
+    }
+
+    // Typed name/number totals — unique count only
+    totalBagNumbers    += parseInt($(item).find('.totalBagNumbers').val())    || 0;
+    totalBagNames      += parseInt($(item).find('.totalBagNames').val())      || 0;
+    totalTopNumbers    += parseInt($(item).find('.totalTopNumbers').val())    || 0;
+    totalTopNames      += parseInt($(item).find('.totalTopNames').val())      || 0;
+    totalShortNumbers  += parseInt($(item).find('.totalShortNumbers').val())  || 0;
+    totalHoodieNumbers += parseInt($(item).find('.totalHoodieNumbers').val()) || 0;
+    totalHoodieNames   += parseInt($(item).find('.totalHoodieNames').val())   || 0;
+    totalJacketNumbers += parseInt($(item).find('.totalJacketNumbers').val()) || 0;
+    totalJacketNames   += parseInt($(item).find('.totalJacketNames').val())   || 0;
+    totalPantNumbers   += parseInt($(item).find('.totalPantNumbers').val())   || 0;
+
+    // Jersey sleeve & sponsor logos — flat per-unit fee, qty = item quantity
+    if ($(item).find('.jerseySleeveLogoEnabled').val() === 'yes')   totalJerseySleeveLogos  += qty;
+    if ($(item).find('.jerseySponsorLogoEnabled').val() === 'yes')  totalJerseySponsorLogos += qty;
+
+    // Track sleeve/sponsor as distinct logo types for processing fee
+    if ($(item).find('.jerseySleeveLogoEnabled').val() === 'yes')  vectorLogoTypes['sleeve']  = true;
+    if ($(item).find('.jerseySponsorLogoEnabled').val() === 'yes') vectorLogoTypes['sponsor'] = true;
+  });
+
+  // Build desired fee quantities
+  var desired = {};
+  desired[SHORT_NUMBER_ID] = totalShortNumbers;
+  desired[FRONT_NUMBER_ID] = frontNumberTotal;
+  desired[BACK_NUMBER_ID]  = backNumberTotal;
+  desired[CUSTOM_NAME_ID]  = customNameTotal;
+  desired[CREST_LOGO_ID]   = crestTotal;
+  desired[CHEST_LOGO_ID]   = chestTotal;
+  // Logo Processing Fee: mirrors product page logic.
+  // Count unique logo file names — if all logos are the same file → 1, otherwise → count of unique names (max 2).
+  // This matches: allSameVectorLogos ? 1 : 2 on the product page.
+  var uniqueLogoNameCount = Object.keys(vectorLogoNames).length;
+  var vectorFeeQty = 0;
+  if (Object.keys(vectorLogoTypes).length > 0 || uniqueLogoNameCount > 0) {
+    vectorFeeQty = (uniqueLogoNameCount > 1) ? 2 : 1;
+  }
+  desired[VECTOR_LOGO_ID]  = vectorFeeQty;
+  desired[TOP_NAME_ID]     = totalTopNames;
+  desired[HOODIE_NAME_ID]  = totalHoodieNames;
+  desired[JACKET_NAME_ID]  = totalJacketNames;
+  desired[JERSEY_SLEEVE_LOGO_ID]  = totalJerseySleeveLogos;
+  desired[JERSEY_SPONSOR_LOGO_ID] = totalJerseySponsorLogos;
+  if (topNumberVariantId)    desired[topNumberVariantId]    = totalTopNumbers;
+  if (hoodieNumberVariantId) desired[hoodieNumberVariantId] = totalHoodieNumbers;
+  if (jacketNumberVariantId) desired[jacketNumberVariantId] = totalJacketNumbers;
+  if (pantNumberVariantId)   desired[pantNumberVariantId]   = totalPantNumbers;
+  if (bagNumberVariantId)    desired[bagNumberVariantId]    = totalBagNumbers;
+  if (bagNameVariantId)      desired[bagNameVariantId]      = totalBagNames;
+
+  // Merge per-item logo totals (only variants that actually appeared in the loop)
+  // Note: logoTotals may override some of the above — that is intentional
+  Object.keys(logoTotals).forEach(function(vid) {
+    if (vid) desired[vid] = logoTotals[vid];
+  });
+
+  // All known logo variant IDs — ensure stale ones get zeroed
+  var ALL_LOGO_IDS = [
+    '50431621300526','50431621366062', // pant heat press / embroidery
+    '50536414118190','50536414937390', // jacket heat press / embroidery
+    '50434669150510','50434672394542', // top crest heat press / embroidery
+    '50434671542574','50434669576494', // top chest heat press / embroidery
+    '50534204342574','50534209126702', // hoodie crest heat press / embroidery
+    '50534216794414','50534221054254', // hoodie chest heat press / embroidery
+    '51769027952942',                  // cap embroidery
+    51936281428270,                    // jersey sleeve logo
+    51936282247470,                    // jersey sponsor/team logo
+    CREST_LOGO_ID, CHEST_LOGO_ID, VECTOR_LOGO_ID
+  ];
+  ALL_LOGO_IDS.forEach(function(id) {
+    if (id && !(id in desired)) desired[id] = 0;
+  });
+
+  // Compare desired vs current cart quantities — only update if something changed
+  fetch('/cart.js')
+    .then(function(r) { return r.json(); })
+    .then(function(cart) {
+      var currentQtys = {};
+      cart.items.forEach(function(i) { currentQtys[String(i.variant_id)] = i.quantity; });
+
+      var toZero = [], toUpdate = [], toAdd = [];
+      Object.keys(desired).forEach(function(id) {
+        var want = desired[id];
+        var have = currentQtys[id] || 0;
+        if (want === have) return; // no change needed
+        if (want === 0 && have > 0) toZero.push({ id: Number(id), qty: 0 });
+        else if (want > 0 && have > 0) toUpdate.push({ id: Number(id), qty: want });
+        else if (want > 0 && have === 0) toAdd.push({ id: Number(id), qty: want });
+      });
+
+      // Nothing changed — skip update but still reload to sync DOM with cart state
+      if (!toZero.length && !toUpdate.length && !toAdd.length) {
+        hideLoader();
+        location.reload();
+        return;
+      }
+
+      return updateFeeItems(toZero, toUpdate, toAdd);
+    })
+    .catch(function(err) { console.error('applyCustomization error:', err); hideLoader(); });
+}
+
+function updateFeeItems(toZero, toUpdate, toAdd) {
+  var chain = Promise.resolve();
+
+  if (toZero.length) {
+    var fd = new FormData();
+    toZero.forEach(function(u) { fd.append('updates[' + u.id + ']', 0); });
+    chain = chain.then(function() {
+      return fetch('/cart/update.js', { method: 'POST', body: fd }).then(function(r) { return r.json(); });
+    });
+  }
+
+  if (toAdd.length) {
+    chain = chain.then(function() {
+      // Fetch current cart to find the productId of the first customized parent item
+      return fetch('/cart.js')
+        .then(function(r) { return r.json(); })
+        .then(function(cart) {
+          // Find the productId from any existing fee item, or fall back to first customized item
+          var parentProductId = '';
+          cart.items.forEach(function(i) {
+            if (!parentProductId && i.properties && i.properties.productId) {
+              parentProductId = String(i.properties.productId);
+            }
+          });
+          // If no existing fee has a productId, try to get it from the DOM
+          if (!parentProductId) {
+            var firstCustomized = document.querySelector('.cart-item[data-customized="true"]');
+            if (firstCustomized) parentProductId = firstCustomized.getAttribute('data-product-id') || '';
+          }
+          return fetch('/cart/add.js', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              items: toAdd.map(function(u) {
+                return { id: u.id, quantity: u.qty, properties: { productId: parentProductId } };
+              })
+            })
+          }).then(function(r) { return r.json(); });
+        });
+    });
+  }
+
+  if (toUpdate.length) {
+    chain = chain.then(function() {
+      var fd = new FormData();
+      toUpdate.forEach(function(u) { fd.append('updates[' + u.id + ']', u.qty); });
+      return fetch('/cart/update.js', { method: 'POST', body: fd }).then(function(r) { return r.json(); });
+    });
+  }
+
+  return chain
+    .then(function() { location.reload(); })
+    .catch(function(err) { console.error('updateFeeItems error:', err); hideLoader(); });
+}
+
+// ─── showHideCartButton ───────────────────────────────────────────────────────
+function showHideCartButton() {
+  showLoader();
+  var checkoutButton = document.querySelector('.checkout-button');
+  if (!checkoutButton) { hideLoader(); return; }
+
+  var excludedTypes = ['backpacks','sackpacks','duffel bags','miscellaneous'];
+  var vendorGrouped = {};   // sameVendorTypes items grouped by vendor
+  var exactTyped    = {};   // other items grouped by vendor|type
+  var jomaQtys = [], vestQtys = [], bagQtys = [];
+
+  $(".cart-item:not(.cart-fee-based-item)").each(function(i, item) {
+    var qty   = parseInt($(item).find('.quantity__input').val()) || 0;
+    var vendor = $(item).find('.vendor').val() || '';
+    var ptype  = $(item).find('.product_type').val() || '';
+    var isCustomized = $(item).attr('data-customized') === 'true';
+
+    if (excludedTypes.some(function(t) { return ptype.toLowerCase().indexOf(t) !== -1; })) return;
+
+    // Joma socks: always enforce multiples of 4, customized or not
+    if (vendor === 'joma' && ptype === 'Socks') { jomaQtys.push(qty); return; }
+
+    // Only apply min-7 / vest / bag rules to customized items
+    if (!isCustomized) return;
+
+    if (vendor === 'select' && ptype === 'Scrimmage Vest') { vestQtys.push(qty); return; }
+
+    if (SAME_VENDOR_TYPES.indexOf(ptype) !== -1) {
+      vendorGrouped[vendor] = (vendorGrouped[vendor] || 0) + qty;
+    } else if (ptype !== '') {
+      var k = vendor + '|' + ptype;
+      exactTyped[k] = (exactTyped[k] || 0) + qty;
+    } else {
+      bagQtys.push(qty);
+    }
+  });
+
+  var minSevenQtys = Object.values(vendorGrouped).concat(Object.values(exactTyped));
+
+  function atLeast7(arr) {
+    if (!arr.length) return true;
+    return arr.every(function(v) { return v >= 7; }) && arr.reduce(function(s,v){return s+v;},0) >= 7;
+  }
+  function multOf4(arr)  { return arr.every(function(v){return v%4===0;}); }
+  function multOf12(arr) { return arr.every(function(v){return v%12===0;}); }
+  function atLeast1(arr) { return arr.reduce(function(s,v){return s+v;},0) >= 1; }
+
+  var hasMin7 = minSevenQtys.length > 0;
+  var hasBag  = bagQtys.length > 0;
+  var hasJoma = jomaQtys.length > 0;
+  var hasVest = vestQtys.length > 0;
+
+  var ok = (!hasMin7 || atLeast7(minSevenQtys))
+        && (!hasBag  || atLeast1(bagQtys))
+        && (!hasJoma || multOf4(jomaQtys))
+        && (!hasVest || multOf12(vestQtys));
+
+  var finalStatus = (hasMin7 || hasBag || hasJoma || hasVest) ? ok : true;
+
+  setTimeout(function() {
+    hideLoader();
+    var btn = document.querySelector('.checkout-button');
+    if (!btn) return;
+    if (finalStatus) btn.classList.remove('hidden_low');
+    else             btn.classList.add('hidden_low');
+  }, 2000);
+}
+
+// ─── getTotalTargetProducts / getLengthOfTargetProducts ───────────────────────
+function getTotalTargetProducts(productId) {
+  var ref = $('tr[data-product-id="' + productId + '"]').first();
+  if (!ref.length) return 0;
+  var type = ref.data('type'), vendor = ref.data('vendor');
+  var sel;
+  if (SAME_VENDOR_TYPES.indexOf(type) !== -1) {
+    sel = SAME_VENDOR_TYPES.map(function(t) {
+      return 'tr[data-type="' + t + '"][data-vendor="' + vendor + '"][data-customized="true"] input.quantity__input';
+    }).join(',');
+  } else {
+    sel = 'tr[data-type="' + type + '"][data-vendor="' + vendor + '"][data-customized="true"] input.quantity__input';
+  }
+  var total = 0;
+  $(sel).each(function() { total += parseFloat($(this).val()) || 0; });
+  return total;
+}
+
+function getLengthOfTargetProducts(productId) {
+  var ref = $('tr[data-product-id="' + productId + '"]').first();
+  if (!ref.length) return 0;
+  var type = ref.data('type'), vendor = ref.data('vendor');
+  var sel;
+  if (SAME_VENDOR_TYPES.indexOf(type) !== -1) {
+    sel = SAME_VENDOR_TYPES.map(function(t) {
+      return 'tr[data-type="' + t + '"][data-vendor="' + vendor + '"]';
+    }).join(',');
+  } else {
+    sel = 'tr[data-type="' + type + '"][data-vendor="' + vendor + '"]';
+  }
+  return $(sel).length;
+}
+
+// ─── updateHiddenCountFields ──────────────────────────────────────────────────
+// Only used for logo-only items (no names/numbers). Scales logo count fields by ratio.
+function updateHiddenCountFields(lineItemKey, oldQty, newQty) {
+  if (!oldQty || oldQty === newQty) return;
+  var ratio = newQty / oldQty;
+  var row = $('tr[data-cart-item-key="' + lineItemKey + '"]');
+  // Only scale logo-related fields, NOT name/number count fields
+  var logoOnlyClasses = [
+    '.total_jacket_heat_press_crest_logos', '.total_jacket_embroidery_crest_logos',
+    '.total_pant_heat_press_crest_logos',   '.total_pant_embroidery_crest_logos',
+    '.total_top_heat_press_crest_logos',    '.total_top_embroidery_crest_logos',
+    '.total_top_heat_press_chest_logos',    '.total_top_embroidery_chest_logos',
+    '.total_hoodie_heat_press_crest_logos', '.total_hoodie_embroidery_crest_logos',
+    '.total_hoodie_heat_press_chest_logos', '.total_hoodie_embroidery_chest_logos',
+    '.total_cap_embroidery_crest_logos'
+  ];
+  logoOnlyClasses.forEach(function(cls) {
+    var el = row.find(cls);
+    if (el.length) {
+      var v = parseInt(el.val(), 10);
+      if (!isNaN(v) && v > 0) el.val(Math.round(v * ratio));
+    }
+  });
+}
+
+// ─── Name/Number Modal ────────────────────────────────────────────────────────
+function handleOnlyTwoCharacters(event) {
+  if (!/[0-9]/.test(event.key) || event.target.value.length >= 2) event.preventDefault();
+}
+
+function showNameNumberModals(target, productId, changeFor) {
+  var tr = target.closest('tr');
+  var title = $(tr).find('.cart-item__media img').attr('alt') || '';
+  var additionalProps = tr.getAttribute('data-additional-properties') || '';
+  var cartItemKey = tr.getAttribute('data-cart-item-key');
+  var names   = (tr.querySelector('.names')   || {}).value || '';
+  var numbers = (tr.querySelector('.numbers') || {}).value || '';
+
+  var nameList   = names.split(',').map(function(s){return s.trim();}).filter(Boolean);
+  var numberList = numbers.split(',').map(function(s){return s.trim();}).filter(Boolean);
+
+  // Logo-only items (no names/numbers) — update quantity directly then recalculate fees
+  if (!nameList.length && !numberList.length) {
+    var qtyInput = $(tr).find('.quantity__input');
+    var currentQty = parseInt(qtyInput.val(), 10) || 0;
+    var newQty = (changeFor === 'plus') ? currentQty + 1 : Math.max(1, currentQty - 1);
+
+    if (newQty === currentQty) return;
+
+    showLoader();
+
+    // Logo count fields store per-jersey counts — they stay the same when qty changes.
+    // applyCustomization multiplies them by qty, so no scaling needed here.
+    // Just update the parent item quantity in Shopify and reload.
+    fetch(window.Shopify.routes.root + 'cart.js')
+      .then(function(r) { return r.json(); })
+      .then(function(cart) {
+        var lineItem = cart.items.find(function(i) { return i.key === cartItemKey; });
+        return fetch(window.Shopify.routes.root + 'cart/change.js', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: cartItemKey, quantity: newQty, properties: lineItem ? lineItem.properties : {} })
+        });
+      })
+      .then(function(r) { return r.json(); })
+      .then(function() {
+        qtyInput.val(newQty);
+        applyCustomization();
+      })
+      .catch(function(err) { hideLoader(); console.error('logo qty update error:', err); });
+    return;
+  }
+
+  function renderNumbers(list) {
+    return list.map(function(val, i) {
+      return '<div class="number-entry" data-index="' + i + '" style="margin-bottom:10px;display:flex;align-items:center;">'
+        + '<input type="number" onkeypress="handleOnlyTwoCharacters(event)" min="1" maxlength="2" value="' + val + '" style="flex:1;padding:7px;border:1px solid lightgray;border-radius:10px;height:37px;" />'
+        + (changeFor === 'minus' ? '<span class="remove-name-number" data-index="' + i + '" style="margin-left:10px;cursor:pointer;font-weight:bold;color:red;">&times;</span>' : '')
+        + '</div>';
+    }).join('');
+  }
+
+  function renderNames(list) {
+    return list.map(function(val, i) {
+      return '<div class="name-entry" data-index="' + i + '" style="margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;">'
+        + '<input type="text" value="' + val + '" style="padding:5px;border:1px solid lightgray;border-radius:10px;height:37px;font-size:14px;" />'
+        + (changeFor === 'minus' ? '<span class="remove-name-number" data-index="' + i + '" style="margin-left:10px;cursor:pointer;font-weight:bold;color:red;">&times;</span>' : '')
+        + '</div>';
+    }).join('');
+  }
+
+  var heading = (nameList.length && numberList.length) ? 'Manage Names & Numbers for ' + title
+              : nameList.length   ? 'Manage Names for ' + title
+              : numberList.length ? 'Manage Numbers for ' + title
+              : 'Manage Names & Numbers for ' + title;
+
+  var numSection = '', nameSection = '';
+  if (numberList.length) {
+    numSection = '<div id="number-section" style="flex:1;">'
+      + '<h6 style="margin-top:0;margin-bottom:4px;font-weight:bold;">Numbers</h6>'
+      + renderNumbers(numberList)
+      + (changeFor === 'plus' ? '<div class="number-entry" data-index="new" style="margin-bottom:10px;display:flex;align-items:center;"><input type="number" onkeypress="handleOnlyTwoCharacters(event)" min="1" maxlength="2" placeholder="New number" style="flex:1;padding:7px;border:1px solid lightgray;border-radius:10px;height:37px;" /></div>' : '')
+      + '</div>';
+  }
+  if (nameList.length) {
+    nameSection = '<div id="name-section" style="flex:1;">'
+      + '<h6 style="margin-top:0;margin-bottom:4px;font-weight:bold;">Names</h6>'
+      + renderNames(nameList)
+      + (changeFor === 'plus' ? '<div class="name-entry" data-index="new" style="margin-bottom:10px;display:flex;align-items:center;"><input type="text" placeholder="New name" style="padding:5px;border:1px solid lightgray;border-radius:10px;height:37px;font-size:14px;" /></div>' : '')
+      + '</div>';
+  }
+
+  var html = '<div id="nameNumberModal" class="custom-modal">'
+    + '<div class="custom-modal-content">'
+    + '<h6 style="margin:0 0 15px 0;font-weight:bold;">' + heading + '</h6>'
+    + '<div class="name-number-section-holder" style="display:flex;gap:30px;justify-content:space-between;margin-top:20px;">'
+    + numSection + nameSection
+    + '</div>'
+    + '<div style="margin-top:20px;text-align:right;">'
+    + '<a class="back-cart-btn" style="cursor:pointer;margin-right:15px;" onclick="closeNameNumberModal()">Cancel</a>'
+    + '<a class="update-cart-btn" style="cursor:pointer;" onclick="updateNameNumber(\'' + cartItemKey + '\',\'' + productId + '\',\'' + changeFor + '\',\'' + additionalProps + '\')">Update Cart</a>'
+    + '</div></div></div>';
+
+  $('#nameNumberModal').remove();
+  $('body').append(html);
+  $('#nameNumberModal').show().data('tr', tr).attr('data-original-count', numberList.length || nameList.length);
+
+  $(document).off('click.rnm').on('click.rnm', '.remove-name-number', function() {
+    var idx = $(this).data('index');
+    $('#name-section .name-entry[data-index="' + idx + '"]').remove();
+    $('#number-section .number-entry[data-index="' + idx + '"]').remove();
+    // Reindex
+    $('#name-section .name-entry').not('[data-index="new"]').each(function(i) { $(this).attr('data-index', i); });
+    $('#number-section .number-entry').not('[data-index="new"]').each(function(i) { $(this).attr('data-index', i); });
+    $('.remove-name-number').each(function(i) { $(this).attr('data-index', i); });
+  });
+}
+
+function closeNameNumberModal() {
+  $('#nameNumberModal').remove();
+}
+
+// ─── getNumberNameInfo ────────────────────────────────────────────────────────
+function getNumberNameInfo(changeFor) {
+  var includeNew = (changeFor === 'plus');
+  // For minus: exclude the "new" placeholder row's input by filtering parent divs
+  var numInputs  = includeNew
+    ? $('#number-section .number-entry input')
+    : $('#number-section .number-entry').not('[data-index="new"]').find('input');
+  var nameInputs = includeNew
+    ? $('#name-section .name-entry input')
+    : $('#name-section .name-entry').not('[data-index="new"]').find('input');
+
+  var numberCount = 0, nameCount = 0, combined = [];
+  var maxLen = Math.max(numInputs.length, nameInputs.length);
+  for (var i = 0; i < maxLen; i++) {
+    var num  = numInputs[i]  ? $(numInputs[i]).val().trim()  : '';
+    var name = nameInputs[i] ? $(nameInputs[i]).val().trim() : '';
+    if (num)  numberCount++;
+    if (name) nameCount++;
+    if (num || name) combined.push('(' + num + ', ' + name + ')');
+  }
+  return { combined: combined.join(','), numberCount: numberCount, nameCount: nameCount };
+}
+
+// ─── updateNameNumber ─────────────────────────────────────────────────────────
+function updateNameNumber(lineItemKey, productId, changeFor, additionalProperties) {
+  var modal = $('#nameNumberModal');
+  $('.custom-error').remove();
+
+  // Validation
+  if (changeFor === 'plus') {
+    var newNum  = $('#number-section .number-entry[data-index="new"] input').val();
+    var newName = $('#name-section .name-entry[data-index="new"] input').val();
+    newNum  = newNum  ? newNum.trim()  : '';
+    newName = newName ? newName.trim() : '';
+    if ($('#number-section').length && !newNum)  { $('#number-section .number-entry[data-index="new"]').after('<p class="custom-error" style="color:red;margin:4px 0 0;">Number is required.</p>'); return; }
+    if ($('#name-section').length   && !newName) { $('#name-section .name-entry[data-index="new"]').after('<p class="custom-error" style="color:red;margin:4px 0 0;">Name is required.</p>'); return; }
+  } else {
+    var currentCount = Math.max(
+      $('#number-section .number-entry').not('[data-index="new"]').length,
+      $('#name-section .name-entry').not('[data-index="new"]').length
+    );
+    var originalCount = parseInt(modal.attr('data-original-count')) || 0;
+    if (currentCount >= originalCount) {
+      $('.name-number-section-holder').after('<p class="custom-error" style="color:red;margin:4px 0 0;">Please remove at least one entry before updating.</p>');
+      return;
+    }
+  }
+
+  var info = getNumberNameInfo(changeFor);
+  var numberCount = info.numberCount;
+  var nameCount   = info.nameCount;
+  // finalCount = total unique entries count — this becomes the parent item quantity
+  var finalCount  = numberCount && !nameCount ? numberCount
+                  : nameCount && !numberCount ? nameCount
+                  : Math.max(numberCount, nameCount);
+
+  // Build properties to update — store unique counts
+  var propsArr = additionalProperties ? additionalProperties.split('|').map(function(p){return p.trim();}) : [];
+  var propsObj = {};
+  propsArr.forEach(function(key) {
+    var lk = key.toLowerCase();
+    if (lk.indexOf('number') !== -1)    propsObj[key] = numberCount;
+    else if (lk.indexOf('name') !== -1) propsObj[key] = nameCount;
+    else                                propsObj[key] = '';
+  });
+  if (info.combined) propsObj['Custom Info'] = info.combined;
+  propsObj['Custom Info Counts'] = numberCount + ',' + nameCount;
+
+  // Update DOM hidden fields with unique counts
+  Object.keys(propsObj).forEach(function(key) {
+    var cls = PROP_TO_CLASS[key];
+    if (cls) $('tr[data-cart-item-key="' + lineItemKey + '"]').find(cls).val(propsObj[key]);
+  });
+
+  showLoader();
+  fetch(window.Shopify.routes.root + 'cart.js')
+    .then(function(r) { return r.json(); })
+    .then(function(cart) {
+      var lineItem = cart.items.find(function(i) { return i.key === lineItemKey; });
+      var merged = Object.assign({}, lineItem ? lineItem.properties : {}, propsObj);
+      // Update quantity to finalCount so the cart input reflects the number of entries
+      return fetch(window.Shopify.routes.root + 'cart/change.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: lineItemKey, quantity: finalCount, properties: merged })
+      });
+    })
+    .then(function(r) { return r.json(); })
+    .then(function() {
+      // Update the DOM quantity input to show the new entry count
+      $('input.quantity__input[data-cart-item-key="' + lineItemKey + '"]').val(finalCount);
+      closeNameNumberModal();
+      applyCustomization();
+    })
+    .catch(function(err) { hideLoader(); console.error('updateNameNumber error:', err); });
+}
+
+// ─── Remove helpers ───────────────────────────────────────────────────────────
+function manageRemove(productId, orderItemKey) {
+  showLoader();
+  var remainingRows = document.querySelectorAll('tr[data-product-id="' + productId + '"]');
+  var remainingCount = 0;
+  remainingRows.forEach(function(row) {
+    if (row.dataset.cartItemKey !== orderItemKey) remainingCount++;
+  });
+
+  var updates = {};
+  updates[orderItemKey] = 0;
+
+  fetch('/cart/update.js', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ updates: updates })
+  })
+  .then(function() {
+    // Remove the main row from DOM so applyCustomization recalculates without it
+    var removedRow = document.querySelector('tr[data-cart-item-key="' + orderItemKey + '"]');
+    if (removedRow) removedRow.remove();
+    // applyCustomization recalculates all fees from remaining items and reloads
+    applyCustomization();
+  })
+  .catch(function(err) { console.error('manageRemove error:', err); hideLoader(); });
+}
+
+function manageSingleRemove(productId, orderItemKey) {
+  showLoader();
+  var updates = {};
+  updates[orderItemKey] = 0;
+
+  fetch('/cart/update.js', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ updates: updates })
+  })
+  .then(function() {
+    // Remove the main row from DOM so applyCustomization recalculates without it
+    var removedRow = document.querySelector('tr[data-cart-item-key="' + orderItemKey + '"]');
+    if (removedRow) removedRow.remove();
+    // applyCustomization recalculates all fees from remaining items and reloads
+    applyCustomization();
+  })
+  .catch(function(err) { console.error('manageSingleRemove error:', err); hideLoader(); });
+}
+
+// ─── Error modal ──────────────────────────────────────────────────────────────
+function showErrorForLessThanSeven(message) {
+  $('#customModal').remove();
+  var html = '<div id="customModal" class="custom-modal">'
+    + '<div class="custom-modal-content" style="position:relative;">'
+    + '<span class="custom-modal-close" style="cursor:pointer;position:absolute;top:10px;right:15px;font-size:20px;">&times;</span>'
+    + '<p>' + message + '</p>'
+    + '<div style="text-align:center;margin-top:15px;">'
+    + '<a class="custom-modal-close" style="cursor:pointer;border:1px solid black;padding:4px 30px;border-radius:5px;">Close</a>'
+    + '</div></div></div>';
+  $('body').append(html);
+  $('#customModal').fadeIn();
+  $(document).off('click.cmodal').on('click.cmodal', '.custom-modal-close', function() {
+    $('#customModal').fadeOut(function() { $(this).remove(); });
+  });
+}
+
+// ─── initialize ───────────────────────────────────────────────────────────────
+function initialize() {
+  $(".cart-fee-based-item .cart-item__quantity").css('visibility', 'hidden');
+  // Only check checkout button eligibility on load — do NOT call applyCustomization
+  // (that would cause an infinite reload loop since applyCustomization reloads the page)
+  setTimeout(showHideCartButton, 500);
+
+  document.addEventListener('click', function(event) {
+    // ── Quantity +/- buttons ──
+    if (event.target && event.target.classList.contains('quantity__button')) {
+      var productId    = event.target.getAttribute('data-product-id');
+      var orderItemKey = event.target.getAttribute('data-key');
+      var changeFor    = event.target.getAttribute('name'); // 'plus' or 'minus'
+      // Use the specific row for this item key
+      var refRow = $('tr[data-cart-item-key="' + orderItemKey + '"]');
+      if (!refRow.length) refRow = $('tr[data-product-id="' + productId + '"]').first();
+
+      if (refRow.is('[data-customized="true"]')) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+
+        var sameSum = getTotalTargetProducts(productId);
+        var effective = (changeFor === 'minus') ? sameSum - 1 : sameSum;
+        if (effective < 7) {
+          showErrorForLessThanSeven('Customizable items require a minimum of 7. To make changes, please remove this item and start over from the product page.');
+        } else {
+          showNameNumberModals(event.target, productId, changeFor);
+        }
+      } else {
+        // Non-customized item qty changed — recalculate fees and checkout eligibility
+        showHideCartButton();
+        applyCustomization();
+      }
+    }
+
+    // ── Remove (trash) button ──
+    if (event.target && event.target.closest('a.cart-remove-button')) {
+      var btn = event.target.closest('a.cart-remove-button');
+      var productId    = btn.getAttribute('data-product-id');
+      var orderItemKey = btn.getAttribute('data-key');
+      var isCustomized = btn.getAttribute('data-customized') === 'true';
+
+      event.preventDefault();
+      event.stopImmediatePropagation();
+
+      if (!isCustomized) {
+        manageSingleRemove(productId, orderItemKey);
+        return;
+      }
+
+      var groupLen = getLengthOfTargetProducts(productId);
+      if (groupLen <= 1) {
+        manageSingleRemove(productId, orderItemKey);
+      } else {
+        var sameSum = getTotalTargetProducts(productId);
+        var refRow  = $('tr[data-cart-item-key="' + orderItemKey + '"]');
+        var thisQty = parseInt(refRow.find('.quantity__input').val()) || 0;
+        var remaining = sameSum - thisQty;
+        if (remaining < 7) {
+          showErrorForLessThanSeven('Customizable items require a minimum of 7. To make changes, please remove this item and start over from the product page.');
+        } else {
+          manageRemove(productId, orderItemKey);
+        }
+      }
+    }
+  }, true); // useCapture=true so we intercept before quantity-input web component
+}
+
+document.addEventListener('DOMContentLoaded', initialize);
+</script>
+
+{% schema %}
+{
+  "name": "t:sections.main-cart-footer.name",
+  "class": "cart__footer-wrapper",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_cart_note",
+      "default": true,
+      "label": "t:sections.main-cart-footer.settings.show_cart_note.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "shipping_calc_enable",
+      "default": true,
+      "label": "Show shipping calculator"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "subtotal",
+      "name": "t:sections.main-cart-footer.blocks.subtotal.name",
+      "limit": 1
+    },
+    {
+      "type": "buttons",
+      "name": "t:sections.main-cart-footer.blocks.buttons.name",
+      "limit": 1
+    },
+    {
+      "type": "@app"
+    }
+  ]
+}
+{% endschema %}
+

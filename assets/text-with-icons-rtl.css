@@ -1,0 +1,8 @@
+@media only screen and (min-width: 992px) {
+  .text__with--icons-grid-3
+    .text__with--icons-single--item
+    + .text__with--icons-single--item:before {
+    right: -7.5rem;
+    left: auto;
+  }
+}

@@ -1,0 +1,5 @@
+.cart-item__totals .cart-item__price-wrapper:has(.bss-qb-total-price-item) .price.price--end,
+.cart-item__details:has(.bss-qb-price-item) .cart-item__old-price.price {
+  display: block !important;
+  text-decoration: line-through;
+}

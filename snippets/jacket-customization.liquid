@@ -1,0 +1,186 @@
+<div>
+  <input
+    type="checkbox"
+    {% if existing_item_min_quantity == blank or existing_item_min_quantity < 7 %}
+      disabled
+    {% endif %}
+    {% if existing_item_min_quantity > 6 %}
+      class="already"
+    {% endif %}
+    id="show_custom_info"
+    name="properties[show_custom_info]"
+  >
+  <label>Customize this product (Customize and Discounts apply to order quantities of 7+)</label>
+
+  <div class="custom_info" style="display: none; margin-bottom: 10px;">
+    <div class='vectorization_info_holder'>
+      <p><strong>NOTE: </strong>A $25.00 logo processing fee will be applied to cart. Team logos will be on the opposite side of the brand logo.</p>
+    </div>
+
+    <div id="front_section" class="my-1">
+      <h3>Front Customizations</h3>
+      
+      <div class="crest_logo_holder logo_parent">
+        <h6 class="product-inner-heading">Crest Logo Type:</h6>
+        <div class="multi-toggle-group mt-2">
+          <input class='imageCheckbox' type="radio" name="properties[JacketCrestLogoType]" id="jacket_no_crest_logo" value='0' checked data-name="no">
+          <label for='jacket_no_crest_logo'>No Logo</label><br>
+          <input class='imageCheckbox' type="radio" name="properties[JacketCrestLogoType]" value="50536414118190" id="jacket_crest_heat_press" data-name='Heat Press'>
+          <label for="jacket_crest_heat_press">Heat Press ($7)</label><br>
+          <input class='imageCheckbox' type="radio" name="properties[JacketCrestLogoType]" value="50536414937390" id="jacket_crest_embroidery_press" data-name='Embroidery'>
+          <label for="jacket_crest_embroidery_press">Embroidery ($12)</label><br>
+        </div>
+
+        <div class="jacket_crest_logo_image_holder logo_holder row" style="display: none; margin-top:10px;margin-left:2px;">
+            <div class="heading col-12">Custom Crest Logo</div>
+            <div class='col align-self-center'>
+              <input accept=".png,.svg,.pdf,.ai,.eps,.jpg,.jpeg,.psd,.tif,.tiff" onchange='validateFile(this);' id="crest_logo" name="properties[Crest_Logo]" type="file">
+            </div>
+            <div class='col align-self-center right'>
+              <img width="" height="" alt="crest-logo" src="{{ 'crest_logo.png' | asset_url }}">
+            </div>
+        </div>
+      </div>
+
+      <h6 class="product-inner-heading" style="margin-top: 15px;">2" Small Number:</h6>
+      <div class="multi-toggle-group mt-2">
+        <input name="properties[jacketSmallNumber]" type="radio" value="no" checked id="jacket_num_no" data-name="No">
+        <label for="jacket_num_no">No</label>
+
+        <input name="properties[jacketSmallNumber]" type="radio" value="51712255689006" id="jacket_num_heat_press" data-name="Heat Press">
+        <label for="jacket_num_heat_press">Heat Press ($6)</label>
+
+        <input name="properties[jacketSmallNumber]" type="radio" value="51712260571438" id="jacket_num_embroidery" data-mame="Embroidery">
+        <label for="jacket_num_embroidery">Embroidery ($10)</label>
+      </div>
+
+      <div class="jacket_small_number_holder" style="display:none; margin-top: 10px;">
+        <div class="mb-1">
+          <img class="back_number_example" alt="Front Number Example" src="{{ 'jacket-number.jpg' | asset_url }}" style="width: 160px;">
+        </div>
+        {% render 'number-fonts', font_holder:'jacket' %}
+      </div>
+    </div>
+
+    <div id="back_section" class="my-1">
+        <h3 class="mb-0">Back Customizations</h3>
+        <h6 class="product-inner-heading">Team name/Last name: ($8.00)</h6>
+        <div class="toggle-group">
+          <input name="properties[jacketLastName]" type="radio" value="no" checked id="jacket_last_name_no">
+          <label for="jacket_last_name_no">No</label>
+          <input name="properties[jacketLastName]" type="radio" value="yes" id="jacket_last_name_yes">
+          <label for="jacket_last_name_yes">Yes </label>
+        </div>
+        
+        <div class="jacket_last_name_holder" style="display:none; margin-top: 15px;">
+          <div style="display: flex; margin-bottom: 10px;">
+            <div class="back_number">
+              <img class="straight_number" alt="Back Name Example" src="{{ 'jacket_last_name.jpg' | asset_url }}" style="cursor: pointer; width: 160px;">
+            </div>
+          </div>
+          {% render 'name-fonts', font_holder:'jacket' %}
+        </div>
+    </div>
+
+    <div class="player_number_name" style="display: none; margin-top: 20px; border-top: 1px solid #ddd; padding-top: 10px;">
+      <h5 class="mb-2">Enter Details:</h5>
+      <div class="row player_number_name" id="jacket_name_row"></div>
+      <div class="row player_number_name" id="jacket_number_row" style="margin-top: 10px;"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function getJacketTotalQuantities() {
+    let total = 0;
+    $('.tags-holder .quantity__input').each(function () {
+      const value = Number($(this).val());
+      if (!isNaN(value)) { total += value; }
+    });
+    return total;
+  }
+
+  function appendNames() {
+    // jacketSmallNumber is active if it's anything but "no"
+    const jacketSmallNumber = $('input[name="properties[jacketSmallNumber]"]:checked').val() !== 'no';
+    // jacketLastName remains active only on "yes"
+    const jacketLastName = $('input[name="properties[jacketLastName]"]:checked').val() === 'yes';
+    
+    const total_quantities = getJacketTotalQuantities();
+    let prev_quantities = Number("{{ existing_item_min_quantity }}");
+
+    if ((jacketSmallNumber || jacketLastName) && (total_quantities > 6 || prev_quantities > 6)) {
+      let jacket_front_num_html = '';
+      let jacket_back_name_html = '';
+      let i = 0;
+
+      $('.tags-holder .quantity__input').each(function () {
+       var quantity = parseFloat($(this).val());
+       if(quantity > 0 && !isNaN(quantity)){
+          const size_tag = $(this).attr('name') || 'item';
+          for (let j = 0; j < quantity; j++, i++) {
+            if (jacketSmallNumber) {
+              jacket_front_num_html += `
+                <div class="col-4 mb-1 player_number_input">
+                  <input name="number-${size_tag}-${i+1}" class="input__field player_number" placeholder="Number ${i+1}" type="number" onkeypress="return event.target.value.length < 2">
+                </div>`;
+            }
+            if (jacketLastName) {
+              jacket_back_name_html += `
+                <div class="col-4 mb-1 player_name_input">
+                  <input name="name-${size_tag}-${i+1}" class="input__field player_name" placeholder="Name ${i+1}" type="text">
+                </div>`;
+            }
+          }
+        }
+      });
+
+      $('.player_number_name').show();
+      $('#jacket_name_row').html(jacket_front_num_html);
+      $('#jacket_number_row').html(jacket_back_name_html);
+    } else {
+      $('.player_number_name').hide().find('#jacket_name_row, #jacket_number_row').empty();
+    }
+  }
+
+  $(document).ready(function() {
+    // 1. Crest Logo Toggle
+    $('input[name="properties[JacketCrestLogoType]"]').on('change', function () {
+      if ($(this).val() !== '0') {
+        $('.jacket_crest_logo_image_holder').slideDown();
+      } else {
+        $('.jacket_crest_logo_image_holder').slideUp();
+      }
+    });
+
+    // 2. Front Small Number Toggle (3-Option Logic)
+    $('input[name="properties[jacketSmallNumber]"]').on('change', function () {
+      if ($(this).val() !== 'no') {
+        $('.jacket_small_number_holder').slideDown();
+      } else {
+        $('.jacket_small_number_holder').slideUp();
+      }
+      appendNames();
+    });
+
+    // 3. Back Name Toggle (Original Yes/No Logic)
+    $('input[name="properties[jacketLastName]"]').on('change', function () {
+      if ($(this).val() === 'yes') {
+        $('.jacket_last_name_holder').slideDown();
+      } else {
+        $('.jacket_last_name_holder').slideUp();
+      }
+      appendNames();
+    });
+
+    // 4. Quantity Change
+    $(document).on('change', '.quantity__input', function () {
+      appendNames();
+    });
+
+    // 5. Main Customization Toggle
+    $('#show_custom_info').on('change', function() {
+      this.checked ? $('.custom_info').slideDown() : $('.custom_info').slideUp();
+    });
+  });
+</script>

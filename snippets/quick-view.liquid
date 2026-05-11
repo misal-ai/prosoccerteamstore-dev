@@ -1,0 +1,17 @@
+<quick-view-modal>
+   {%- if cart_button_style == "style1" -%}
+  <button aria-haspopup="dialog" type="button" class="product-grid-item__actions__btn h6  mb-0" data-product-handle="{{ product_card_product.handle }}">
+    <span class="action__btn--text">
+      {%- render 'cart-plus' -%}
+      <span class="action__btn--text--label">
+        {{ 'products.product.select_options' | t }}
+      </span>
+    </span>
+  </button>
+  {%- else -%}
+  <button aria-haspopup="dialog" type="button" class="cart--icon-button button--icon h6 mb-0" data-product-handle="{{ product_card_product.handle }}" aria-label="{{ 'products.product.select_options' | t }}">
+    {%- render 'cart-plus' -%}
+  </button>
+  {%- endif -%}
+</quick-view-modal>
+

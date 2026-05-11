@@ -1,0 +1,141 @@
+<div>
+  <input
+    type="checkbox"
+    {% if existing_item_min_quantity < 7 %} disabled {% endif %}
+    {% if existing_item_min_quantity > 6 %} class="already" {% endif %}
+    id="show_custom_info"
+    name="properties[show_custom_info]"
+  >
+  <label>Customize this product (Customize and Discounts apply to order quantities of 7+)</label>
+
+  <div class="custom_info" style="display:none; margin-bottom:10px;">
+
+    <!-- Front -->
+    <div id="front_section">
+      <div>
+        <b>4" Number($3.50/unit):</b>
+        <div class="toggle-group">
+          <input name="properties[shortFrontNumber]" type="radio"  checked id="front_no" value="no">
+          <label for="front_no">No</label>
+
+          <input name="properties[shortFrontNumber]" type="radio" id="front_yes" value="51858674516270">
+          <label for="front_yes">Yes</label>
+        </div>
+      </div>
+    </div>
+    <!-- Back -->
+    <div id="back_section" class="mt-1">
+      <div class="short_number_holder" style="display:none;">
+        {% if adult_tag_found %}
+            <div class="adult_customizations">
+            <b>Adult Customizations</b>
+            {% for tag in adult_size_tags %}
+                {% assign tag_name = tag | remove: 'Adult_' | remove: 'Size_' %}
+                <div class="{{ tag_name }}" style="display:none;">
+                <div>{{ tag_name }}</div>
+                <div></div>
+                </div>
+            {% endfor %}
+            </div>
+        {% endif %}
+        {% if youth_tag_found %}
+        <div class="youth_customizations">
+          <b>Youth Customizations</b>
+          {% for tag in youth_size_tags %}
+            {% assign tag_name = tag | remove: 'Youth_' %}
+            <div class="{{ tag_name }}" style="display:none;">
+              <div>{{ tag_name }}</div>
+              <div></div>
+            </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+$(document).ready(function () {
+
+  function updateCustomization(input, type) {
+    let sum = 0;
+
+    $('.all_quantity .quantity__input').each(function () {
+      let val = parseFloat($(this).val());
+      if (!isNaN(val)) sum += val;
+    });
+
+    // Enable / Disable checkbox
+    if (sum > 6) {
+      $('#show_custom_info').prop('disabled', false);
+      if ($('#show_custom_info').prop('checked')) {
+        $('.custom_info').show();
+      }
+    } else {
+      if (!$('#show_custom_info').hasClass('already')) {
+        $('#show_custom_info').prop('disabled', true);
+        $('.custom_info').hide();
+      }
+    }
+
+    let qty = parseInt(input.val()) || 0;
+    let size = input.attr('size_tag');
+    let container = $(`.short_number_holder .${type}_customizations .${size}`);
+
+    container.toggle(qty > 0);
+
+    let target = container.children('div').eq(1);
+    target.empty();
+
+    let disabled = $('#show_custom_info').prop('disabled');
+    let content = "<div class='row'>";
+
+    for (let i = 0; i < qty; i++) {
+      content += `
+        <div class="col-4">
+          <div class="player_number_input" style="margin:10px 10px 10px 0; text-align:left; ${disabled ? 'display:none;' : ''}">
+            <input 
+              name="properties[number-${type === 'adult' ? 'Adult' : 'Youth'}_${size}-${i}]"
+              class="input__field player_number"
+              min="0"
+              onkeypress="handleOnlyTwoCharacters(event)"
+              placeholder="Player ${i + 1}"
+              type="number">
+          </div>
+        </div>`;
+    }
+
+    content += "</div>";
+    target.append(content);
+  }
+
+  // Adult quantity change
+  $(document).on('change', '.adult .quantity__input', function () {
+    updateCustomization($(this), 'adult');
+  });
+
+  // Youth quantity change
+  $(document).on('change', '.youth .quantity__input', function () {
+    updateCustomization($(this), 'youth');
+  });
+
+  // Checkbox toggle
+  $('#show_custom_info').on('change', function () {
+    $('.custom_info').toggle(this.checked);
+  });
+
+  // Front number toggle (UPDATED NAME)
+  $('input[name="properties[shortFrontNumber]"]').on('change', function () {
+        let value = $(this).val();
+        if(value==='no'){
+            $('.short_number_holder').hide();
+        }else{
+            $('.short_number_holder').show();
+        }
+  });
+
+});
+</script>

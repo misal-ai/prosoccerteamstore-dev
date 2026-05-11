@@ -1,0 +1,68 @@
+<div class="product-form__input product-form__input--dropdown">
+  <label class="form__label" for="Option-{{ section.id }}-font_color">
+    {% if font_holder=='bag' %}
+       <strong>Number Font Color:</strong>
+    {% else %}
+        <strong>Font Color:</strong>
+    {% endif %}
+  </label>
+  <div class="select">
+    <select
+      id="Option-{{ section.id }}-font_color"
+      class="select__select"
+      name="properties[{{ 'Number Font Color' }}]"
+      form="product-form-{{ section.id }}">
+      {% if is_adidas_collection %}
+        <option data-color-number-family="adidas" value="University Red">University Red</option>
+        <option data-color-number-family="adidas" value="Cobalt Blue">Cobalt Blue</option>
+        <option data-color-number-family="adidas" value="Metallic Gold">Metallic Gold</option>
+      {% endif %}
+      <option data-color-number-family="adidas,global" value="White">White</option>
+      <option data-color-number-family="adidas,global" value="Black">Black</option>
+      <option data-color-number-family="adidas,global" value="Navy">Navy</option>
+      <option data-color-number-family="global" value="Bubblegum Pink">Bubblegum Pink</option>
+      <option data-color-number-family="global" value="Columbia Blue">Columbia Blue</option>
+      <option data-color-number-family="global" value="Dark Green">Dark Green</option>
+      <option data-color-number-family="global" value="Gold">Gold</option>
+      <option data-color-number-family="global" value="Grey">Grey</option>
+      <option data-color-number-family="global" value="Kelly">Kelly</option>
+      <option data-color-number-family="global" value="Maroon">Maroon</option>
+      <option data-color-number-family="global" value="Orange">Orange</option>
+      <option data-color-number-family="global" value="Purple">Purple</option>
+      <option data-color-number-family="global" value="Red">Red</option>
+      <option data-color-number-family="global" value="Royal">Royal</option>
+      <option data-color-number-family="global" value="Texas Orange">Texas Orange</option>
+      <option data-color-number-family="global" value="Vegas Gold">Vegas Gold</option>
+    </select>
+    {% render 'icon-caret' %}
+  </div>
+</div>
+<script>
+  $(document).ready(function() {
+
+      $('.number-font-select-selected').on('click', function() {
+        $('.number-font-select-options').toggle();
+      });
+      $('.number-font-select-option').click(function() {
+        var optionType = $(this).data('type');
+        if(optionType=='adidas'){
+            $("option[data-color-number-family*='adidas']").show();
+            $("option[data-color-number-family='global']").hide();
+            $("option[data-color-number-family*='adidas']").first().prop('selected', true);
+        }else{
+
+            $("option[data-color-number-family*='global']").show();
+            $("option[data-color-number-family='adidas']").hide();
+            $("option[data-color-number-family*='global']").first().prop('selected', true);
+        }
+        var value = $(this).data('value');
+        var label = $(this).find('img').attr('alt');
+        $('.number-font-select-selected').text(label);
+        $('.number-font-select-options').hide();
+      });
+      {% if is_adidas_collection %}
+        $("option[data-color-number-family*='adidas']").show();
+        $("option[data-color-number-family='global']").hide();
+      {% endif %}
+    });
+</script>
