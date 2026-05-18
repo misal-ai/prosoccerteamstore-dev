@@ -365,7 +365,7 @@ function applyCustomizationDebounced() {
     var itemBagCrestId    = itemBagLogoType ? strVal($(item).find('.bagLogoId')) : null;
     var itemPantCrestId   = itemPantLogoType   ? (itemPantLogoType   === 'Heat Press' ? '50431621300526' : '50431621366062') : null;
     var itemJacketCrestId = itemJacketLogoType ? (itemJacketLogoType === 'Heat Press' ? '50536414118190' : '50536414937390') : null;
-    var itemTopCrestId    = itemTopCrestLogoType    ? (itemTopCrestLogoType    === 'Heat Press' ? '50434669150510' : '50434672394542') : null;
+    var itemTopCrestId    = itemTopCrestLogoType    ? (itemTopCrestLogoType    === 'Heat Press' ? '52049128489262' : '52049122328878') : null;
     var itemTopChestId    = itemTopChestLogoType    ? (itemTopChestLogoType    === 'Heat Press' ? '50434671542574' : '50434669576494') : null;
     var itemHoodieCrestId = itemHoodieCrestLogoType ? (itemHoodieCrestLogoType === 'Heat Press' ? '50534204342574' : '50534209126702') : null;
     var itemHoodieChestId = itemHoodieChestLogoType ? (itemHoodieChestLogoType === 'Heat Press' ? '50534216794414' : '50534221054254') : null;
@@ -428,11 +428,22 @@ function applyCustomizationDebounced() {
       vectorLogoTypes['bag_crest'] = true;
     }
 
-    // Generic Crest toggle (items without a specific type)
+    // Generic Crest toggle — split by product type
     if (crestLogoName && !itemJacketCrestId && !itemPantCrestId && !itemTopCrestId
         && !itemHoodieCrestId && !itemCapCrestId && !itemBagCrestId) {
-      crestTotal += qty;
-      vectorLogoTypes['crest'] = true;
+
+      var itemProductType = strVal($(item).find('.product_type'));
+      var itemPoloCrestVariantId = strVal($(item).find('.crest_logo_variant_id'));
+
+      if (itemProductType === 'Polos' && itemPoloCrestVariantId) {
+        // Polo: accumulate against the actual Heat Press / Embroidery variant
+        logoTotals[itemPoloCrestVariantId] = (logoTotals[itemPoloCrestVariantId] || 0) + qty;
+        vectorLogoTypes['polo_crest'] = true;
+      } else {
+        // All other types: use the legacy fixed crest fee variant
+        crestTotal += qty;
+        vectorLogoTypes['crest'] = true;
+      }
     }
 
     // Generic Chest toggle (items without a specific type)
@@ -501,7 +512,8 @@ function applyCustomizationDebounced() {
   var ALL_LOGO_IDS = [
     '50431621300526','50431621366062', // pant heat press / embroidery
     '50536414118190','50536414937390', // jacket heat press / embroidery
-    '50434669150510','50434672394542', // top crest heat press / embroidery
+    '50434669150510','50434672394542', // top crest heat press / embroidery (legacy — zeroes stale cart items)
+    '52049128489262','52049122328878', // top crest heat press / embroidery (new polo variant IDs)
     '50434671542574','50434669576494', // top chest heat press / embroidery
     '50534204342574','50534209126702', // hoodie crest heat press / embroidery
     '50534216794414','50534221054254', // hoodie chest heat press / embroidery
