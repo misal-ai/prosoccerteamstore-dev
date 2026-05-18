@@ -238,6 +238,10 @@
                             {%  assign  child_product_type ='logo_name' %}
                             <input type='hidden' class='crest_logo_name' value='{{ item.properties['Crest Logo Name'] }}'>
                           {% endif %}
+
+                          {% if item.properties['Crest Logo Variant Id'] %}
+                            <input type='hidden' class='crest_logo_variant_id' value='{{ item.properties['Crest Logo Variant Id'] }}'>
+                          {% endif %}
                                 
                           {% if item.properties['Chest Logo Name'] %}
                               {%  assign  child_product_type ='logo_name' %}
