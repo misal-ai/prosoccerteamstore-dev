@@ -1358,8 +1358,36 @@
                     </div>  
                     <div id="front_section" class="my-1">
                       <h3>Front customizations</h3>
+
                       <div class='row'>
-                        <div class='col-4'>                   
+                        {% if product.type == 'Polos' %}
+                        <div class='col-12' style="margin-bottom:10px;">
+                          <div><b>Upper Left Chest Crest:</b></div>
+                          <div class="multi-toggle-group mt-2">
+                            <input class='imageCheckbox' name="properties[showCrestLogoDropzone]" type="radio" checked="" value="no" id='ul_crest_logo_no' data-name="No Logo">
+                            <label for='ul_crest_logo_no'>No Logo</label><br>
+                            <input class='imageCheckbox' name="properties[showCrestLogoDropzone]" type="radio" value="52049128489262" id='ul_crest_logo_heat_press' data-name="Heat Press">
+                            <label for='ul_crest_logo_heat_press'>Heat Press ($6)</label><br>
+                            <input class='imageCheckbox' name="properties[showCrestLogoDropzone]" type="radio" value="52049122328878" id='ul_crest_logo_embroidery' data-name="Embroidery">
+                            <label for='ul_crest_logo_embroidery'>Embroidery ($10)</label><br>
+                          </div>
+                          <div style="display: none;margin-left:2px;" class="custom_crest_logo logo_holder row">
+                            <div class='heading col-12'>Custom Crest Logo</div>
+                            <div class='col-7 align-self-center'>
+                              <input accept=".png,.svg,.pdf,.ai,.eps,.jpg,.jpeg,.psd,.tif,.tiff"
+                                      data-message='Please Choose the Crest Logo'
+                                      id="crest_logo" 
+                                      name="properties[Crest_Logo]" 
+                                      type="file">
+                            </div>
+                            <div class='col-5 align-self-center right'>
+                              <img alt="Crest Logo Example" src="{{ 'crest_logo.png' | asset_url }}">
+                            </div>
+                          </div>
+                        </div>
+                        <div class='col-4'>
+                        {% else %}
+                        <div class='col-4'>
                           <div><b>Upper Left Chest Crest: ($6.00/unit)</b></div>
                           <div class="toggle-group">
                             <input class='imageCheckbox' name="properties[showCrestLogoDropzone]" type="radio" checked="" value="no" id='ul_crest_logo_no'>
@@ -1382,6 +1410,7 @@
                           </div>
                         </div>
                         <div class='col-4'>
+                        {% endif %}
                           <div><b>Middle Chest Logo/Team Name: ($10.00/unit)</b></div>
                           <div class="toggle-group">
                             <input class='imageCheckbox' name="properties[showChestType]" type="radio" value="no" checked="" id='mc_team_logo_no'>
@@ -2031,11 +2060,10 @@
     
                     $('input[name="properties[showCrestLogoDropzone]"]').click(function(){
                         var selectedValue = $('input[name="properties[showCrestLogoDropzone]"]:checked').val();
-                        if(selectedValue == "yes"){
-                          $('.custom_crest_logo').show();
-                        }
                         if(selectedValue == "no"){
                           $('.custom_crest_logo').hide();
+                        } else {
+                          $('.custom_crest_logo').show();
                         }
                     });
     
@@ -2542,7 +2570,6 @@
                                     apply_vector_fee = true;
                                 }
 
-
                                 // ---------------- Top Chest ----------------
                                 var topChestType = $('input[name="properties[TopChestLogoType]"]:checked').data('name')?.trim();
                                 if (topChestType && topChestType.toLowerCase() !== 'no') {
@@ -2620,10 +2647,11 @@
                                     apply_vector_fee = true;
                                 }
                                 // ---------------- Crest Toggle ----------------
-                                if (crest_logo_enable == "yes") {
+                                if (crest_logo_enable && crest_logo_enable !== "no") {
                                     count_of_crest_logo += quantity;
                                     vectorLogos.push(crestLogoFile?.name ?? '');
                                     apply_vector_fee = true;
+                                    properties['Crest Logo Variant Id'] = crest_logo_enable;
                                 }
                                 // ---------------- Chest Toggle ----------------
                                 var showChestType = $('input[name="properties[showChestType]"]:checked').val();
@@ -3190,7 +3218,16 @@
 
 
                   // ----- Simple Items -----
-                  handleSimpleItem(count_of_crest_logo, 47913297477934, "#alreadyCrestItem", "#alreadyCrestItemTotal");
+                  // Crest: for Polos use the selected variant ID directly; for all others use the legacy fee variant
+                  if (count_of_crest_logo) {
+                    var crestSelectedVal = $('input[name="properties[showCrestLogoDropzone]"]:checked').val();
+                    var isPoloCrest = (crestSelectedVal !== 'yes' && crestSelectedVal !== 'no');
+                    if (isPoloCrest) {
+                      handleSimpleItem(count_of_crest_logo, +crestSelectedVal, "#alreadyCrestItem", "#alreadyCrestItemTotal");
+                    } else {
+                      handleSimpleItem(count_of_crest_logo, 47913297477934, "#alreadyCrestItem", "#alreadyCrestItemTotal");
+                    }
+                  }
                   handleSimpleItem(count_of_chest_logo, 47913309274414, "#alreadyChestItem", "#alreadyChestItemTotal");
                   handleSimpleItem(count_of_front_number, 47913304129838, "#alreadyFrontNumber", "#alreadyFrontNumberTotal");
                   handleSimpleItem(count_of_jersey_sleeve_logo, 51936281428270, "#alreadyJerseySleeveLogoItem", "#alreadyJerseySleeveLogoTotal");
