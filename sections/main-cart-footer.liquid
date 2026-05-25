@@ -308,7 +308,7 @@ function applyCustomizationDebounced() {
   showLoader();
 
   var vectorLogoTypes = {}; // track unique logo slot types for processing fee count
-  var vectorLogoNames = {}; // track unique logo file names for processing fee count
+  var vectorLogoKeys = {};  // track unique (logo name + style) keys for processing fee count
   var chestTotal = 0, crestTotal = 0;
 
   // Per-item logo accumulators — keyed by variant ID so each item routes independently
@@ -376,14 +376,15 @@ function applyCustomizationDebounced() {
     if (alreadyBack  === 'yes') backNumberTotal  += cntBack;
     if (alreadyName  === 'yes') customNameTotal  += cntNames;
 
-    // ── Track unique logo names for processing fee (mirrors product page vectorLogos logic) ──
-    if (crestLogoName) vectorLogoNames[crestLogoName] = true;
-    if (chestLogoName) vectorLogoNames[chestLogoName] = true;
+    function addVectorKey(name, style) {
+      var n = strVal(name);
+      var s = strVal(style) || 'Standard';
+      if (!n) return;
+      vectorLogoKeys[n + '|' + s] = true;
+    }
 
     var sleeveLogoName   = strVal($(item).find('.jerseySleeveLogoName'));
     var sponsorLogoName  = strVal($(item).find('.jerseySponsorLogoName'));
-    if (sleeveLogoName)  vectorLogoNames[sleeveLogoName]  = true;
-    if (sponsorLogoName) vectorLogoNames[sponsorLogoName] = true;
 
     // ── Per-slot logo type tracking (1 processing fee per distinct logo slot) ──
 
@@ -391,41 +392,49 @@ function applyCustomizationDebounced() {
     if (itemJacketLogoType) {
       logoTotals[itemJacketCrestId] = (logoTotals[itemJacketCrestId] || 0) + qty;
       vectorLogoTypes['jacket_crest'] = true;
+      addVectorKey(crestLogoName, itemJacketLogoType);
     }
     // Pant Crest
     if (itemPantLogoType) {
       logoTotals[itemPantCrestId] = (logoTotals[itemPantCrestId] || 0) + qty;
       vectorLogoTypes['pant_crest'] = true;
+      addVectorKey(crestLogoName, itemPantLogoType);
     }
     // Top Crest
     if (itemTopCrestLogoType) {
       logoTotals[itemTopCrestId] = (logoTotals[itemTopCrestId] || 0) + qty;
       vectorLogoTypes['top_crest'] = true;
+      addVectorKey(crestLogoName, itemTopCrestLogoType);
     }
     // Top Chest
     if (itemTopChestLogoType) {
       logoTotals[itemTopChestId] = (logoTotals[itemTopChestId] || 0) + qty;
       vectorLogoTypes['top_chest'] = true;
+      addVectorKey(chestLogoName, itemTopChestLogoType);
     }
     // Cap Crest
     if (itemCapCrestLogoType && itemCapCrestId) {
       logoTotals[itemCapCrestId] = (logoTotals[itemCapCrestId] || 0) + qty;
       vectorLogoTypes['cap_crest'] = true;
+      addVectorKey(crestLogoName, itemCapCrestLogoType);
     }
     // Hoodie Crest
     if (itemHoodieCrestLogoType) {
       logoTotals[itemHoodieCrestId] = (logoTotals[itemHoodieCrestId] || 0) + qty;
       vectorLogoTypes['hoodie_crest'] = true;
+      addVectorKey(crestLogoName, itemHoodieCrestLogoType);
     }
     // Hoodie Chest
     if (itemHoodieChestLogoType) {
       logoTotals[itemHoodieChestId] = (logoTotals[itemHoodieChestId] || 0) + qty;
       vectorLogoTypes['hoodie_chest'] = true;
+      addVectorKey(chestLogoName, itemHoodieChestLogoType);
     }
     // Bag Crest
     if (itemBagLogoType && itemBagCrestId) {
       logoTotals[itemBagCrestId] = (logoTotals[itemBagCrestId] || 0) + qty;
       vectorLogoTypes['bag_crest'] = true;
+      addVectorKey(crestLogoName, itemBagLogoType);
     }
 
     // Generic Crest toggle — split by product type
@@ -439,10 +448,15 @@ function applyCustomizationDebounced() {
         // Polo: accumulate against the actual Heat Press / Embroidery variant
         logoTotals[itemPoloCrestVariantId] = (logoTotals[itemPoloCrestVariantId] || 0) + qty;
         vectorLogoTypes['polo_crest'] = true;
+        var poloStyle = (itemPoloCrestVariantId === '52049128489262') ? 'Heat Press'
+                      : (itemPoloCrestVariantId === '52049122328878') ? 'Embroidery'
+                      : 'Standard';
+        addVectorKey(crestLogoName, poloStyle);
       } else {
         // All other types: use the legacy fixed crest fee variant
         crestTotal += qty;
         vectorLogoTypes['crest'] = true;
+        addVectorKey(crestLogoName, 'Standard');
       }
     }
 
@@ -450,6 +464,7 @@ function applyCustomizationDebounced() {
     if (chestLogoName && !itemTopChestId && !itemHoodieChestId) {
       chestTotal += qty;
       vectorLogoTypes['chest'] = true;
+      addVectorKey(chestLogoName, 'Standard');
     }
 
     // Typed name/number totals — unique count only
@@ -471,6 +486,9 @@ function applyCustomizationDebounced() {
     // Track sleeve/sponsor as distinct logo types for processing fee
     if ($(item).find('.jerseySleeveLogoEnabled').val() === 'yes')  vectorLogoTypes['sleeve']  = true;
     if ($(item).find('.jerseySponsorLogoEnabled').val() === 'yes') vectorLogoTypes['sponsor'] = true;
+
+    addVectorKey(sleeveLogoName, 'Standard');
+    addVectorKey(sponsorLogoName, 'Standard');
   });
 
   // Build desired fee quantities
@@ -481,13 +499,10 @@ function applyCustomizationDebounced() {
   desired[CUSTOM_NAME_ID]  = customNameTotal;
   desired[CREST_LOGO_ID]   = crestTotal;
   desired[CHEST_LOGO_ID]   = chestTotal;
-  // Logo Processing Fee: mirrors product page logic.
-  // Count unique logo file names — if all logos are the same file → 1, otherwise → count of unique names (max 2).
-  // This matches: allSameVectorLogos ? 1 : 2 on the product page.
-  var uniqueLogoNameCount = Object.keys(vectorLogoNames).length;
+  var uniqueKeyCount = Object.keys(vectorLogoKeys).length;
   var vectorFeeQty = 0;
-  if (Object.keys(vectorLogoTypes).length > 0 || uniqueLogoNameCount > 0) {
-    vectorFeeQty = (uniqueLogoNameCount > 1) ? 2 : 1;
+  if (Object.keys(vectorLogoTypes).length > 0 || uniqueKeyCount > 0) {
+    vectorFeeQty = (uniqueKeyCount > 1) ? 2 : 1;
   }
   desired[VECTOR_LOGO_ID]  = vectorFeeQty;
   desired[TOP_NAME_ID]     = totalTopNames;
