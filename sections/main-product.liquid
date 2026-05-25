@@ -917,6 +917,7 @@
 
             {% assign CartCrestLogoFileName = '' %}
             {% assign CartChestLogoFileName = '' %}
+            {% assign CartVectorLogoKeys = '' %}
             <!-- Applied the logic for same vendor quantities -->
             {% assign same_vendor_types = "Jackets,Jersey,Training Tops,Hoodies,Polos,T-Shirt" | split: "," %}
             {% assign existing_item_min_quantity = 0 %}
@@ -944,6 +945,75 @@
                   {% assign CartChestLogoFileName = CartChestLogoFileName | append: ", " | append: property.last %}   
                 {% endif %}                                                                 
               {%- endfor -%}
+
+              {% assign itemCrestName = item.properties['Crest Logo Name'] | default: '' %}
+              {% assign itemChestName = item.properties['Chest Logo Name'] | default: '' %}
+              {% assign itemSleeveName = item.properties['Sleeve Logo Name'] | default: '' %}
+              {% assign itemSponsorName = item.properties['Sponsor Logo Name'] | default: '' %}
+
+              {% assign jacketLogoType = item.properties['Jacket Logo Type'] | default: '' %}
+              {% assign pantLogoType = item.properties['Pant Logo Type'] | default: '' %}
+              {% assign topCrestLogoType = item.properties['Top Crest Logo Type'] | default: '' %}
+              {% assign topChestLogoType = item.properties['Top Chest Logo Type'] | default: '' %}
+              {% assign hoodieCrestLogoType = item.properties['Hoodie Crest Logo Type'] | default: '' %}
+              {% assign hoodieChestLogoType = item.properties['Hoodie Chest Logo Type'] | default: '' %}
+              {% assign capCrestLogoType = item.properties['Cap Crest Logo Type'] | default: '' %}
+              {% assign bagLogoType = item.properties['Bag Logo Type'] | default: '' %}
+
+              {% if itemCrestName != blank and jacketLogoType != blank %}
+                {% assign CartVectorLogoKeys = CartVectorLogoKeys | append: ", " | append: itemCrestName | append: "|" | append: jacketLogoType %}
+              {% endif %}
+              {% if itemCrestName != blank and pantLogoType != blank %}
+                {% assign CartVectorLogoKeys = CartVectorLogoKeys | append: ", " | append: itemCrestName | append: "|" | append: pantLogoType %}
+              {% endif %}
+              {% if itemCrestName != blank and topCrestLogoType != blank %}
+                {% assign CartVectorLogoKeys = CartVectorLogoKeys | append: ", " | append: itemCrestName | append: "|" | append: topCrestLogoType %}
+              {% endif %}
+              {% if itemChestName != blank and topChestLogoType != blank %}
+                {% assign CartVectorLogoKeys = CartVectorLogoKeys | append: ", " | append: itemChestName | append: "|" | append: topChestLogoType %}
+              {% endif %}
+              {% if itemCrestName != blank and hoodieCrestLogoType != blank %}
+                {% assign CartVectorLogoKeys = CartVectorLogoKeys | append: ", " | append: itemCrestName | append: "|" | append: hoodieCrestLogoType %}
+              {% endif %}
+              {% if itemChestName != blank and hoodieChestLogoType != blank %}
+                {% assign CartVectorLogoKeys = CartVectorLogoKeys | append: ", " | append: itemChestName | append: "|" | append: hoodieChestLogoType %}
+              {% endif %}
+              {% if itemCrestName != blank and capCrestLogoType != blank %}
+                {% assign CartVectorLogoKeys = CartVectorLogoKeys | append: ", " | append: itemCrestName | append: "|" | append: capCrestLogoType %}
+              {% endif %}
+              {% if itemCrestName != blank and bagLogoType != blank %}
+                {% assign CartVectorLogoKeys = CartVectorLogoKeys | append: ", " | append: itemCrestName | append: "|" | append: bagLogoType %}
+              {% endif %}
+
+              {% assign item_has_typed_crest = false %}
+              {% if jacketLogoType != blank or pantLogoType != blank or topCrestLogoType != blank or hoodieCrestLogoType != blank or capCrestLogoType != blank or bagLogoType != blank %}
+                {% assign item_has_typed_crest = true %}
+              {% endif %}
+              {% if itemCrestName != blank and item_has_typed_crest == false %}
+                {% assign crestVariantId = item.properties['Crest Logo Variant Id'] | default: '' %}
+                {% assign crestStyle = 'Standard' %}
+                {% if crestVariantId == '52049128489262' %}
+                  {% assign crestStyle = 'Heat Press' %}
+                {% elsif crestVariantId == '52049122328878' %}
+                  {% assign crestStyle = 'Embroidery' %}
+                {% endif %}
+                {% assign CartVectorLogoKeys = CartVectorLogoKeys | append: ", " | append: itemCrestName | append: "|" | append: crestStyle %}
+              {% endif %}
+
+              {% assign item_has_typed_chest = false %}
+              {% if topChestLogoType != blank or hoodieChestLogoType != blank %}
+                {% assign item_has_typed_chest = true %}
+              {% endif %}
+              {% if itemChestName != blank and item_has_typed_chest == false %}
+                {% assign CartVectorLogoKeys = CartVectorLogoKeys | append: ", " | append: itemChestName | append: "|Standard" %}
+              {% endif %}
+
+              {% if itemSleeveName != blank %}
+                {% assign CartVectorLogoKeys = CartVectorLogoKeys | append: ", " | append: itemSleeveName | append: "|Standard" %}
+              {% endif %}
+              {% if itemSponsorName != blank %}
+                {% assign CartVectorLogoKeys = CartVectorLogoKeys | append: ", " | append: itemSponsorName | append: "|Standard" %}
+              {% endif %}
             {% endfor %}                    
             {% comment %} Cart Detection End {% endcomment %}
 
@@ -2387,11 +2457,8 @@
                     $(document).ready(function() {
                     console.log("ready working for bag");
                     var globalProductId = "{{ product.id }}";
-                    var CartCrestLogoFileName = "{{ CartCrestLogoFileName }}";
-                    var CartChestLogoFileName = "{{ CartChestLogoFileName }}";
-                    var CartCrestLogoFileNameArray = CartCrestLogoFileName.split(',').map(s => s.trim()).filter(Boolean) || [];
-                    var CartChestLogoFileNameArray = CartChestLogoFileName.split(',').map(s => s.trim()).filter(Boolean) || [];
-                    var vectorLogos =CartCrestLogoFileNameArray.concat(CartChestLogoFileNameArray); 
+                    var CartVectorLogoKeys = "{{ CartVectorLogoKeys }}";
+                    var vectorLogoKeys = CartVectorLogoKeys.split(',').map(s => s.trim()).filter(Boolean) || [];
                     $(document).on('click', '.product-form__submit', function(e) {
                   
                         e.preventDefault();
@@ -2537,7 +2604,8 @@
                                         : total_jacket_embroidery_crest_logos += quantity;
 
                                     count_of_jacket_crest_logos += quantity;
-                                    vectorLogos.push(crestLogoFile?.name ?? '');
+                                    var crestName = crestLogoFile?.name ?? '';
+                                    if (crestName) vectorLogoKeys.push(crestName + '|' + jacketCrestType);
                                     apply_vector_fee = true;
                                 }
 
@@ -2553,7 +2621,8 @@
                                         : total_pant_embroidery_crest_logos += quantity;
 
                                     count_of_pant_crest_logos += quantity;
-                                    vectorLogos.push(crestLogoFile?.name ?? '');
+                                    var crestName = crestLogoFile?.name ?? '';
+                                    if (crestName) vectorLogoKeys.push(crestName + '|' + pantCrestType);
                                     apply_vector_fee = true;
                                 }
                                 // ---------------- Top Crest ----------------
@@ -2566,7 +2635,8 @@
                                         : total_top_embroidery_crest_logos += quantity;
 
                                     count_of_top_crest_logos += quantity;
-                                    vectorLogos.push(crestLogoFile?.name ?? '');
+                                    var crestName = crestLogoFile?.name ?? '';
+                                    if (crestName) vectorLogoKeys.push(crestName + '|' + topCrestType);
                                     apply_vector_fee = true;
                                 }
 
@@ -2581,7 +2651,8 @@
                                         : total_top_embroidery_chest_logos += quantity;
 
                                     count_of_top_chest_logos += quantity;
-                                    vectorLogos.push(chestLogoFile?.name ?? '');
+                                    var chestName = chestLogoFile?.name ?? '';
+                                    if (chestName) vectorLogoKeys.push(chestName + '|' + topChestType);
                                     apply_vector_fee = true;
                                 }
 
@@ -2592,7 +2663,8 @@
                                     productItem.crestLogoFile = crestLogoFile;
                                     total_cap_embroidery_crest_logos += quantity;
                                     count_of_cap_crest_logos += quantity;
-                                    vectorLogos.push(crestLogoFile?.name ?? '');
+                                    var crestName = crestLogoFile?.name ?? '';
+                                    if (crestName) vectorLogoKeys.push(crestName + '|' + capCrestType);
                                     apply_vector_fee = true;
                                 }
 
@@ -2606,7 +2678,8 @@
                                         ? total_hoodie_heat_press_crest_logos += quantity
                                         : total_hoodie_embroidery_crest_logos += quantity;
                                     count_of_hoodie_crest_logos += quantity;
-                                    vectorLogos.push(crestLogoFile?.name ?? '');
+                                    var crestName = crestLogoFile?.name ?? '';
+                                    if (crestName) vectorLogoKeys.push(crestName + '|' + hoodieCrestType);
                                     apply_vector_fee = true;
                                 }
 
@@ -2622,7 +2695,8 @@
                                         : total_hoodie_embroidery_chest_logos += quantity;
 
                                     count_of_hoodie_chest_logos += quantity;
-                                    vectorLogos.push(chestLogoFile?.name ?? '');
+                                    var chestName = chestLogoFile?.name ?? '';
+                                    if (chestName) vectorLogoKeys.push(chestName + '|' + hoodieChestType);
                                     apply_vector_fee = true;
                                 }
 
@@ -2643,13 +2717,15 @@
                                         : total_bag_embroidery_crest_logos += quantity;
 
                                     count_of_bag_crest_logos += quantity;
-                                    vectorLogos.push(crestLogoFile?.name ?? '');
+                                    var crestName = crestLogoFile?.name ?? '';
+                                    if (crestName) vectorLogoKeys.push(crestName + '|' + bagCrestType);
                                     apply_vector_fee = true;
                                 }
                                 // ---------------- Crest Toggle ----------------
                                 if (crest_logo_enable && crest_logo_enable !== "no") {
                                     count_of_crest_logo += quantity;
-                                    vectorLogos.push(crestLogoFile?.name ?? '');
+                                    var crestName = crestLogoFile?.name ?? '';
+                                    if (crestName) vectorLogoKeys.push(crestName + '|Standard');
                                     apply_vector_fee = true;
                                     properties['Crest Logo Variant Id'] = crest_logo_enable;
                                 }
@@ -2659,7 +2735,8 @@
 
                                 if (showChestType == "yes") {
                                     count_of_chest_logo += quantity;
-                                    vectorLogos.push(chestLogoFile?.name ?? '');
+                                    var chestName = chestLogoFile?.name ?? '';
+                                    if (chestName) vectorLogoKeys.push(chestName + '|Standard');
                                     apply_vector_fee = true;
                                 }
 
@@ -2820,7 +2897,7 @@
                                 var sleeveLogoFile = $('#sleeve_logo_file')[0]?.files?.[0] ?? null;
                                 if (sleeveLogoFile) {
                                   properties['Sleeve Logo Name'] = sleeveLogoFile.name;
-                                  vectorLogos.push(sleeveLogoFile.name);
+                                  vectorLogoKeys.push(sleeveLogoFile.name + '|Standard');
                                 }
                                 count_of_jersey_sleeve_logo += quantity;
                                 apply_vector_fee = true;
@@ -2833,7 +2910,7 @@
                                 var sponsorLogoFile = $('#sponsor_logo_file')[0]?.files?.[0] ?? null;
                                 if (sponsorLogoFile) {
                                   properties['Sponsor Logo Name'] = sponsorLogoFile.name;
-                                  vectorLogos.push(sponsorLogoFile.name);
+                                  vectorLogoKeys.push(sponsorLogoFile.name + '|Standard');
                                 }
                                 count_of_jersey_sponsor_logo += quantity;
                                 apply_vector_fee = true;
@@ -3129,8 +3206,9 @@
                         if (apply_vector_fee==true) {
                           var globalProductId = "{{ product.id }}";
                           var alreadyVectorItem = $("#alreadyVectorItem").val();
-                          var allSameVectorLogos = vectorLogos.every(function(element) {return element === vectorLogos[0];});
-                          vectorQuantities= allSameVectorLogos?1:2;
+                          var uniqueVectorKeys = new Set(vectorLogoKeys.filter(Boolean));
+                          var uniqueKeyCount = uniqueVectorKeys.size;
+                          vectorQuantities = uniqueKeyCount > 1 ? 2 : 1;
                           if(alreadyVectorItem==="no"){
                             var item = { 
                               'variantId': 47913271656750,
