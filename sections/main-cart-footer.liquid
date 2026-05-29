@@ -441,19 +441,17 @@ function applyCustomizationDebounced() {
     if (crestLogoName && !itemJacketCrestId && !itemPantCrestId && !itemTopCrestId
         && !itemHoodieCrestId && !itemCapCrestId && !itemBagCrestId) {
 
-      var itemProductType = strVal($(item).find('.product_type'));
-      var itemPoloCrestVariantId = strVal($(item).find('.crest_logo_variant_id'));
+      var crestVariantId = strVal($(item).find('.crest_logo_variant_id'));
+      var isStyleCrest = crestVariantId && crestVariantId !== 'yes' && crestVariantId !== 'no';
 
-      if (itemProductType === 'Polos' && itemPoloCrestVariantId) {
-        // Polo: accumulate against the actual Heat Press / Embroidery variant
-        logoTotals[itemPoloCrestVariantId] = (logoTotals[itemPoloCrestVariantId] || 0) + qty;
-        vectorLogoTypes['polo_crest'] = true;
-        var poloStyle = (itemPoloCrestVariantId === '52049128489262') ? 'Heat Press'
-                      : (itemPoloCrestVariantId === '52049122328878') ? 'Embroidery'
+      if (isStyleCrest) {
+        logoTotals[crestVariantId] = (logoTotals[crestVariantId] || 0) + qty;
+        vectorLogoTypes['typed_crest'] = true;
+        var crestStyle = (crestVariantId === '52049128489262') ? 'Heat Press'
+                      : (crestVariantId === '52049122328878') ? 'Embroidery'
                       : 'Standard';
-        addVectorKey(crestLogoName, poloStyle);
+        addVectorKey(crestLogoName, crestStyle);
       } else {
-        // All other types: use the legacy fixed crest fee variant
         crestTotal += qty;
         vectorLogoTypes['crest'] = true;
         addVectorKey(crestLogoName, 'Standard');
@@ -535,6 +533,15 @@ function applyCustomizationDebounced() {
     '51769027952942',                  // cap embroidery
     51936281428270,                    // jersey sleeve logo
     51936282247470,                    // jersey sponsor/team logo
+    // bag crest logo — heatpress / embroidery (all bag types)
+    '50564127523118','50564127654190', // sackpack heatpress / embroidery
+    '50566668419374','50566678348078', // duffel bag heatpress / embroidery
+    '50566670352686','50566679691566', // backpack heatpress / embroidery
+    '50566671532334','50566680117550', // miscellaneous heatpress / embroidery
+    // bag small number — heatpress / embroidery
+    '51712310051118','51712312967470', // bag number heatpress / embroidery
+    // bag name — heatpress / embroidery
+    '51712318341422','51712321323310', // bag name heatpress / embroidery
     CREST_LOGO_ID, CHEST_LOGO_ID, VECTOR_LOGO_ID
   ];
   ALL_LOGO_IDS.forEach(function(id) {
