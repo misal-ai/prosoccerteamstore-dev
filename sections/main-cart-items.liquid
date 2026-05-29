@@ -90,6 +90,16 @@
                       {% if item.properties['Item Status'] == 'customized' and fee_tag_found == false %}
                         {% assign customizable_tag_found = true %}
                       {% endif %}
+                      {% comment %} Mark bag items with logo/heatpress customizations so fee cleanup works on removal {% endcomment %}
+                      {% if fee_tag_found == false and customizable_tag_found == false %}
+                        {% if item.properties['bagCrestLogoType'] and item.properties['bagCrestLogoType'] != '0' %}
+                          {% assign customizable_tag_found = true %}
+                        {% elsif item.properties['bagSmallNumber'] and item.properties['bagSmallNumber'] != 'no' %}
+                          {% assign customizable_tag_found = true %}
+                        {% elsif item.properties['bagName'] and item.properties['bagName'] != 'no' %}
+                          {% assign customizable_tag_found = true %}
+                        {% endif %}
+                      {% endif %}
 
                      
                       {% assign all_property_names = "Count Front Numbers,Count Back Numbers,Count Custom Names,Total Top Numbers,Total Short Numbers,Total Hoodie Numbers,Total Jacket Numbers,Total Pant Numbers,Total Bag Numbers,Total Top Names,Total Hoodie Names,Total Jacket Names,Total Bag Names,Crest Logo Name,Chest Logo Name,total_jacket_heat_press_crest_logos,total_jacket_embroidery_crest_logos,total_pant_heat_press_crest_logos,total_pant_embroidery_crest_logos,total_top_heat_press_crest_logos,total_top_embroidery_crest_logos,total_top_heat_press_chest_logos,total_top_embroidery_chest_logos,total_hoodie_heat_press_crest_logos,total_hoodie_embroidery_crest_logos,total_hoodie_heat_press_chest_logos,total_hoodie_embroidery_chest_logos,total_cap_embroidery_crest_logos" | split: "," %}
