@@ -3,3 +3,15 @@
   display: block !important;
   text-decoration: line-through;
 }
+
+[bss-b2b-qb-show-price-active="true"][bss-b2b-item-original-price] {
+    color: #303030 !important;
+}
+
+[bss-b2b-qb-show-price-active="true"] {
+    color: red !important;
+}
+
+[bss-b2b-qb-show-price-active="true"][bss-b2b-item-original-price] .bss-b2b-qb-price {
+    color: red !important;
+}
