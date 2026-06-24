@@ -226,7 +226,7 @@ var HOODIE_NAME_ID   = '50534311428398';
 var JACKET_NAME_ID   = '50536571699502';
 var JERSEY_SLEEVE_LOGO_ID   = 51936281428270;
 var JERSEY_SPONSOR_LOGO_ID  = 51936282247470;
-var PS_LOGO_HANDLE          = 'prosoccer-Logo-5-per-off'; // added to cart by handle, qty 1 when any PS Logo checked
+var PS_LOGO_DISCOUNT_CODE   = 'prosoccer-Logo-5-per-off';
 var SAME_VENDOR_TYPES = ['Jackets','Jersey','Training Tops','Hoodies','Polos','T-Shirt'];
 
 // Dynamic variant IDs (set per item during applyCustomization loop)
@@ -559,52 +559,32 @@ function applyCustomizationDebounced() {
     if (id && !(id in desired)) desired[id] = 0;
   });
 
-  // ─── PS Custom Logo product (prosoccer-Logo-5-per-off) ────────────────────
-  // Resolve variant ID from product handle, then include in desired map so the
-  // standard add/remove logic handles it automatically.
-  function runComparision(psVariantId) {
-    if (psVariantId) {
-      desired[String(psVariantId)] = hasPsLogo ? 1 : 0;
-    }
+  // Compare desired vs current cart quantities — only update if something changed
+  fetch('/cart.js')
+    .then(function(r) { return r.json(); })
+    .then(function(cart) {
+      var currentQtys = {};
+      cart.items.forEach(function(i) { currentQtys[String(i.variant_id)] = i.quantity; });
 
-    // Compare desired vs current cart quantities — only update if something changed
-    fetch('/cart.js')
-      .then(function(r) { return r.json(); })
-      .then(function(cart) {
-        var currentQtys = {};
-        cart.items.forEach(function(i) { currentQtys[String(i.variant_id)] = i.quantity; });
+      var toZero = [], toUpdate = [], toAdd = [];
+      Object.keys(desired).forEach(function(id) {
+        var want = desired[id];
+        var have = currentQtys[id] || 0;
+        if (want === have) return;
+        if (want === 0 && have > 0) toZero.push({ id: Number(id), qty: 0 });
+        else if (want > 0 && have > 0) toUpdate.push({ id: Number(id), qty: want });
+        else if (want > 0 && have === 0) toAdd.push({ id: Number(id), qty: want });
+      });
 
-        var toZero = [], toUpdate = [], toAdd = [];
-        Object.keys(desired).forEach(function(id) {
-          var want = desired[id];
-          var have = currentQtys[id] || 0;
-          if (want === have) return;
-          if (want === 0 && have > 0) toZero.push({ id: Number(id), qty: 0 });
-          else if (want > 0 && have > 0) toUpdate.push({ id: Number(id), qty: want });
-          else if (want > 0 && have === 0) toAdd.push({ id: Number(id), qty: want });
-        });
+      if (!toZero.length && !toUpdate.length && !toAdd.length) {
+        hideLoader();
+        location.reload();
+        return;
+      }
 
-        if (!toZero.length && !toUpdate.length && !toAdd.length) {
-          hideLoader();
-          location.reload();
-          return;
-        }
-
-        return updateFeeItems(toZero, toUpdate, toAdd);
-      })
-      .catch(function(err) { console.error('applyCustomization error:', err); hideLoader(); });
-  }
-
-  fetch('/products/' + PS_LOGO_HANDLE + '.js')
-    .then(function(r) { return r.ok ? r.json() : null; })
-    .then(function(product) {
-      var psVariantId = product && product.variants && product.variants[0] ? product.variants[0].id : null;
-      runComparision(psVariantId);
+      return updateFeeItems(toZero, toUpdate, toAdd);
     })
-    .catch(function() {
-      // If product not found, still run comparison without PS Logo
-      runComparision(null);
-    });
+    .catch(function(err) { console.error('applyCustomization error:', err); hideLoader(); });
 }
 
 function updateFeeItems(toZero, toUpdate, toAdd) {
@@ -1070,40 +1050,31 @@ function showErrorForLessThanSeven(message) {
 function initialize() {
   $(".cart-fee-based-item .cart-item__quantity").css('visibility', 'hidden');
 
-  // ── One-time PS Logo sync on page load ──────────────────────────────────────
-  // If any customized item has PS Logo = yes but the fee product isn't in the
-  // cart yet, trigger applyCustomization once. Use sessionStorage to prevent
-  // a reload loop (applyCustomization reloads the page after updating the cart).
-  (function checkPsLogoOnLoad() {
-    // Only run once per page load (not after the reload applyCustomization causes)
-    if (sessionStorage.getItem('psLogoSynced') === '1') {
-      sessionStorage.removeItem('psLogoSynced');
-      return;
-    }
-    var needsPs = false;
-    $(".cart-item[data-customized='true']").each(function() {
-      var val = ($(this).find('.psCustomLogoEnabled').val() || '').toLowerCase();
-      if (val === 'yes') { needsPs = true; return false; }
-    });
-    if (!needsPs) return;
+  // ── PS Logo discount code — intercept checkout button ────────────────────
+  // If any cart item has PS Logo = yes, redirect through /discount/<code>
+  // so Shopify auto-applies the discount before the checkout page loads.
+  (function setupPsLogoCheckout() {
+    var checkoutBtn = document.querySelector('.checkout-button');
+    if (!checkoutBtn) return;
 
-    // Check if PS Logo product is already in cart
-    fetch('/cart.js')
-      .then(function(r) { return r.json(); })
-      .then(function(cart) {
-        return fetch('/products/' + PS_LOGO_HANDLE + '.js')
-          .then(function(r) { return r.ok ? r.json() : null; })
-          .then(function(product) {
-            if (!product) return;
-            var psVid = String(product.variants[0].id);
-            var alreadyInCart = cart.items.some(function(i) { return String(i.variant_id) === psVid; });
-            if (!alreadyInCart) {
-              sessionStorage.setItem('psLogoSynced', '1');
-              applyCustomization();
-            }
+    checkoutBtn.addEventListener('click', function(e) {
+      // Check directly from cart items' properties — no dependency on applyCustomization
+      fetch('/cart.js')
+        .then(function(r) { return r.json(); })
+        .then(function(cart) {
+          var hasPsLogo = cart.items.some(function(item) {
+            var val = (item.properties && item.properties['PS Custom Logo']) || '';
+            return val.toLowerCase() === 'yes';
           });
-      })
-      .catch(function() {});
+          if (hasPsLogo) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            window.location.href = '/discount/' + PS_LOGO_DISCOUNT_CODE + '?redirect=/checkout';
+          }
+          // else: let default checkout proceed normally
+        })
+        .catch(function() {}); // on fetch error, let checkout proceed
+    });
   })();
 
   // Only check checkout button eligibility on load — do NOT call applyCustomization
