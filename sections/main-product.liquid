@@ -1558,6 +1558,26 @@
                       </div>
                       {% endif %}
 
+                      <div class="ps-logo-holder mt-3 col-12">
+                        <div><b>PS Custom Logo:</b></div>
+                        <div class="toggle-group">
+                          <input type="checkbox" name="properties[PS Custom Logo]" id="jersey_ps_logo_checkbox" value="yes">
+                          <label for="jersey_ps_logo_checkbox">Add PS Logo (Free)</label>
+                        </div>
+                        <div class="jersey_ps_logo_position_holder" style="display:none; margin-top:8px;">
+                          <div class="product-form__input product-form__input--dropdown">
+                            <label class="form__label" for="jersey_ps_logo_position"><strong>PS Logo Position:</strong></label>
+                            <div class="select">
+                              <select id="jersey_ps_logo_position" class="select__select" name="properties[PS Logo Position]">
+                                <option value="Bottom Left">Bottom Left</option>
+                                <option value="Bottom Right">Bottom Right</option>
+                              </select>
+                              {% render 'icon-caret' %}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
                     </div> 
                     <!-- Start Back Customization -->
                     <div id="back_section" class="mt-1">
@@ -2159,6 +2179,11 @@
                           ? $('.sponsor_logo_upload').show()
                           : $('.sponsor_logo_upload').hide();
                     });
+
+                    // PS Custom Logo toggle
+                    $('#jersey_ps_logo_checkbox').on('change', function(){
+                        $(this).prop('checked') ? $('.jersey_ps_logo_position_holder').slideDown() : $('.jersey_ps_logo_position_holder').slideUp();
+                    });
     
                     $('input[name="properties[frontNumber]"]').click(function(){
                       var selectedFrontNumberValue = $('input[name="properties[frontNumber]"]:checked').val();
@@ -2725,7 +2750,10 @@
                                 if (crest_logo_enable && crest_logo_enable !== "no") {
                                     count_of_crest_logo += quantity;
                                     var crestName = crestLogoFile?.name ?? '';
-                                    if (crestName) vectorLogoKeys.push(crestName + '|Standard');
+                                    var crestStyle = (crest_logo_enable === '52049128489262') ? 'Heat Press'
+                                                  : (crest_logo_enable === '52049122328878') ? 'Embroidery'
+                                                  : 'Standard';
+                                    if (crestName) vectorLogoKeys.push(crestName + '|' + crestStyle);
                                     apply_vector_fee = true;
                                     properties['Crest Logo Variant Id'] = crest_logo_enable;
                                 }
@@ -2914,6 +2942,14 @@
                                 }
                                 count_of_jersey_sponsor_logo += quantity;
                                 apply_vector_fee = true;
+                              }
+
+                              // ---------------- PS Custom Logo ----------------
+                              var psLogoEnable = $('#show_custom_info').prop('checked') && $('input[name="properties[PS Custom Logo]"]').prop('checked');
+                              if (psLogoEnable) {
+                                properties['PS Custom Logo'] = 'yes';
+                                var psLogoPosition = $('select[name="properties[PS Logo Position]"]').val();
+                                if (psLogoPosition) properties['PS Logo Position'] = psLogoPosition;
                               }
 
                               console.log(properties);
