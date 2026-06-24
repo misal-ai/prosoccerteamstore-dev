@@ -226,6 +226,7 @@ var HOODIE_NAME_ID   = '50534311428398';
 var JACKET_NAME_ID   = '50536571699502';
 var JERSEY_SLEEVE_LOGO_ID   = 51936281428270;
 var JERSEY_SPONSOR_LOGO_ID  = 51936282247470;
+var PS_LOGO_HANDLE          = 'prosoccer-Logo-5-per-off'; // added to cart by handle, qty 1 when any PS Logo checked
 var SAME_VENDOR_TYPES = ['Jackets','Jersey','Training Tops','Hoodies','Polos','T-Shirt'];
 
 // Dynamic variant IDs (set per item during applyCustomization loop)
@@ -489,6 +490,15 @@ function applyCustomizationDebounced() {
     addVectorKey(sponsorLogoName, 'Standard');
   });
 
+  // ─── PS Custom Logo — check if any customized item has PS Logo enabled ────
+  var hasPsLogo = false;
+  $(".cart-item[data-customized='true']").each(function(idx, item) {
+    if ($(item).find('.psCustomLogoEnabled').val() === 'yes') {
+      hasPsLogo = true;
+      return false; // break
+    }
+  });
+
   // Build desired fee quantities
   var desired = {};
   desired[SHORT_NUMBER_ID] = totalShortNumbers;
@@ -548,33 +558,52 @@ function applyCustomizationDebounced() {
     if (id && !(id in desired)) desired[id] = 0;
   });
 
-  // Compare desired vs current cart quantities — only update if something changed
-  fetch('/cart.js')
-    .then(function(r) { return r.json(); })
-    .then(function(cart) {
-      var currentQtys = {};
-      cart.items.forEach(function(i) { currentQtys[String(i.variant_id)] = i.quantity; });
+  // ─── PS Custom Logo product (prosoccer-Logo-5-per-off) ────────────────────
+  // Resolve variant ID from product handle, then include in desired map so the
+  // standard add/remove logic handles it automatically.
+  function runComparision(psVariantId) {
+    if (psVariantId) {
+      desired[String(psVariantId)] = hasPsLogo ? 1 : 0;
+    }
 
-      var toZero = [], toUpdate = [], toAdd = [];
-      Object.keys(desired).forEach(function(id) {
-        var want = desired[id];
-        var have = currentQtys[id] || 0;
-        if (want === have) return; // no change needed
-        if (want === 0 && have > 0) toZero.push({ id: Number(id), qty: 0 });
-        else if (want > 0 && have > 0) toUpdate.push({ id: Number(id), qty: want });
-        else if (want > 0 && have === 0) toAdd.push({ id: Number(id), qty: want });
-      });
+    // Compare desired vs current cart quantities — only update if something changed
+    fetch('/cart.js')
+      .then(function(r) { return r.json(); })
+      .then(function(cart) {
+        var currentQtys = {};
+        cart.items.forEach(function(i) { currentQtys[String(i.variant_id)] = i.quantity; });
 
-      // Nothing changed — skip update but still reload to sync DOM with cart state
-      if (!toZero.length && !toUpdate.length && !toAdd.length) {
-        hideLoader();
-        location.reload();
-        return;
-      }
+        var toZero = [], toUpdate = [], toAdd = [];
+        Object.keys(desired).forEach(function(id) {
+          var want = desired[id];
+          var have = currentQtys[id] || 0;
+          if (want === have) return;
+          if (want === 0 && have > 0) toZero.push({ id: Number(id), qty: 0 });
+          else if (want > 0 && have > 0) toUpdate.push({ id: Number(id), qty: want });
+          else if (want > 0 && have === 0) toAdd.push({ id: Number(id), qty: want });
+        });
 
-      return updateFeeItems(toZero, toUpdate, toAdd);
+        if (!toZero.length && !toUpdate.length && !toAdd.length) {
+          hideLoader();
+          location.reload();
+          return;
+        }
+
+        return updateFeeItems(toZero, toUpdate, toAdd);
+      })
+      .catch(function(err) { console.error('applyCustomization error:', err); hideLoader(); });
+  }
+
+  fetch('/products/' + PS_LOGO_HANDLE + '.js')
+    .then(function(r) { return r.ok ? r.json() : null; })
+    .then(function(product) {
+      var psVariantId = product && product.variants && product.variants[0] ? product.variants[0].id : null;
+      runComparision(psVariantId);
     })
-    .catch(function(err) { console.error('applyCustomization error:', err); hideLoader(); });
+    .catch(function() {
+      // If product not found, still run comparison without PS Logo
+      runComparision(null);
+    });
 }
 
 function updateFeeItems(toZero, toUpdate, toAdd) {
