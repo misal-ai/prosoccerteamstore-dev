@@ -60,6 +60,25 @@
         </div>
         {% render 'number-fonts', font_holder:'jacket' %}
       </div>
+
+      <div class="ps-logo-holder mt-3">
+        <h6 class="product-inner-heading">PS Custom Logo:</h6>
+        <div class="toggle-group">
+          <input type="checkbox" name="properties[PS Custom Logo]" id="jacket_ps_logo_checkbox" value="yes">
+          <label for="jacket_ps_logo_checkbox">Add PS Logo (Free)</label>
+        </div>
+        <div class="jacket_ps_logo_position_holder" style="display:none; margin-top:8px;">
+          <div class="product-form__input product-form__input--dropdown">
+            <label class="form__label" for="jacket_ps_logo_position"><strong>PS Logo Position:</strong></label>
+            <div class="select">
+              <select id="jacket_ps_logo_position" class="select__select" name="properties[PS Logo Position]">
+                <option value="Bottom Left">Bottom Left</option>
+                <option value="Bottom Right">Bottom Right</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div id="back_section" class="my-1">
@@ -181,6 +200,11 @@
     // 5. Main Customization Toggle
     $('#show_custom_info').on('change', function() {
       this.checked ? $('.custom_info').slideDown() : $('.custom_info').slideUp();
+    });
+
+    // 6. PS Custom Logo toggle
+    $('#jacket_ps_logo_checkbox').on('change', function() {
+      $(this).prop('checked') ? $('.jacket_ps_logo_position_holder').slideDown() : $('.jacket_ps_logo_position_holder').slideUp();
     });
   });
 </script>
