@@ -1080,32 +1080,16 @@ function initialize() {
       });
 
       var notice = document.getElementById('ps-logo-discount-notice');
-
-      if (_psLogoInCart) {
-        // Show pending notice only if discount not already applied in cart
-        var alreadyApplied = (cart.cart_level_discount_applications || []).some(function(d) {
-          return d.title && d.title.toLowerCase() === PS_LOGO_DISCOUNT_CODE.toLowerCase();
-        });
-        if (notice) notice.style.display = alreadyApplied ? 'none' : 'block';
-      } else {
-        // No PS Logo items — hide notice
+      if (!_psLogoInCart) {
         if (notice) notice.style.display = 'none';
-
-        // Clear stale PS Logo discount from session if it is applied
-        var staleDiscount = (cart.cart_level_discount_applications || []).some(function(d) {
-          return d.title && d.title.toLowerCase() === PS_LOGO_DISCOUNT_CODE.toLowerCase();
-        });
-        if (staleDiscount) {
-          // Remove by POSTing empty discount to cart update
-          fetch('/cart/update.js', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ discount: '' })
-          })
-          .then(function() { location.reload(); })
-          .catch(function() {});
-        }
+        return;
       }
+
+      // PS Logo exists — show pending notice only if not already applied
+      var alreadyApplied = (cart.cart_level_discount_applications || []).some(function(d) {
+        return d.title && d.title.toLowerCase() === PS_LOGO_DISCOUNT_CODE.toLowerCase();
+      });
+      if (notice) notice.style.display = alreadyApplied ? 'none' : 'block';
     })
     .catch(function() {});
 
