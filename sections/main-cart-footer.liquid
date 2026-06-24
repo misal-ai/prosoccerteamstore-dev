@@ -138,12 +138,20 @@
                         {%- endif -%}
                       </div>
 
-                      {%- comment -%} PS Custom Logo discount notice {%- endcomment -%}
+                      {%- comment -%} PS Custom Logo discount notice — only show when discount not yet applied {%- endcomment -%}
+                      {%- assign ps_discount_already_applied = false -%}
+                      {%- for discount in cart.cart_level_discount_applications -%}
+                        {%- if discount.title == 'prosoccer-Logo-5-per-off' or discount.title == 'PROSOCCER-LOGO-5-PER-OFF' -%}
+                          {%- assign ps_discount_already_applied = true -%}
+                        {%- endif -%}
+                      {%- endfor -%}
                       <div id="ps-logo-discount-notice" style="display:none; margin: 6px 0; font-size:0.9em; color:#2e7d32;">
+                        {%- unless ps_discount_already_applied -%}
                         <span style="display:inline-flex; align-items:center; gap:6px;">
                           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
                           <strong>prosoccer-Logo-5-per-off</strong> discount will be applied at checkout
                         </span>
+                        {%- endunless -%}
                       </div>
 
                       <small class="tax-note caption-large rte">
@@ -1058,63 +1066,18 @@ function showErrorForLessThanSeven(message) {
 function initialize() {
   $(".cart-fee-based-item .cart-item__quantity").css('visibility', 'hidden');
 
-  // ── PS Logo discount code — intercept checkout button ────────────────────
-  // If any cart item has PS Logo = yes, redirect through /discount/<code>
-  // so Shopify auto-applies the discount before the checkout page loads.
-  (function setupPsLogoCheckout() {
-    var checkoutBtn = document.querySelector('.checkout-button');
-    if (!checkoutBtn) return;
-
-    // Show/hide the discount notice on page load
-    fetch('/cart.js')
-      .then(function(r) { return r.json(); })
-      .then(function(cart) {
-        var hasPsLogo = cart.items.some(function(item) {
-          var val = (item.properties && item.properties['PS Custom Logo']) || '';
-          return val.toLowerCase() === 'yes';
-        });
-        var notice = document.getElementById('ps-logo-discount-notice');
-        if (notice) notice.style.display = hasPsLogo ? 'block' : 'none';
-      })
-      .catch(function() {});
-
-    checkoutBtn.addEventListener('click', function(e) {
-      // Prevent immediately — async check below decides where to go
-      e.preventDefault();
-      e.stopImmediatePropagation();
-
-      fetch('/cart.js')
-        .then(function(r) { return r.json(); })
-        .then(function(cart) {
-          var hasPsLogo = cart.items.some(function(item) {
-            var val = (item.properties && item.properties['PS Custom Logo']) || '';
-            return val.toLowerCase() === 'yes';
-          });
-          if (hasPsLogo) {
-            window.location.href = '/discount/' + PS_LOGO_DISCOUNT_CODE + '?redirect=/checkout';
-          } else {
-            // No PS Logo — submit the cart form normally
-            var cartForm = document.querySelector('form#cart, form[action="/cart"]');
-            if (cartForm) {
-              // Temporarily remove our listener to avoid re-triggering
-              var submitBtn = cartForm.querySelector('[name="checkout"]');
-              if (submitBtn) {
-                submitBtn.removeAttribute('data-ps-intercepted');
-                cartForm.submit();
-              } else {
-                window.location.href = '/checkout';
-              }
-            } else {
-              window.location.href = '/checkout';
-            }
-          }
-        })
-        .catch(function() {
-          // On error fall back to normal checkout
-          window.location.href = '/checkout';
-        });
-    });
-  })();
+  // ── PS Logo discount notice — show if any item has PS Custom Logo = yes ──
+  fetch('/cart.js')
+    .then(function(r) { return r.json(); })
+    .then(function(cart) {
+      var hasPsLogo = cart.items.some(function(item) {
+        var val = (item.properties && item.properties['PS Custom Logo']) || '';
+        return val.toLowerCase() === 'yes';
+      });
+      var notice = document.getElementById('ps-logo-discount-notice');
+      if (notice) notice.style.display = hasPsLogo ? 'block' : 'none';
+    })
+    .catch(function() {});
 
   // Only check checkout button eligibility on load — do NOT call applyCustomization
   // (that would cause an infinite reload loop since applyCustomization reloads the page)
