@@ -1559,10 +1559,12 @@
                       {% endif %}
 
                       <div class="ps-logo-holder mt-3 col-12">
-                        <div><b>PS Custom Logo:</b></div>
+                        <div><b>PS Custom Logo (Free):</b></div>
                         <div class="toggle-group">
-                          <input type="checkbox" name="properties[PS Custom Logo]" id="jersey_ps_logo_checkbox" value="yes">
-                          <label for="jersey_ps_logo_checkbox">Add PS Logo (Free)</label>
+                          <input type="radio" name="properties[PS Custom Logo]" id="jersey_ps_logo_no" value="no" checked>
+                          <label for="jersey_ps_logo_no">No</label>
+                          <input type="radio" name="properties[PS Custom Logo]" id="jersey_ps_logo_yes" value="yes">
+                          <label for="jersey_ps_logo_yes">Yes</label>
                         </div>
                         <div class="jersey_ps_logo_position_holder" style="display:none; margin-top:8px;">
                           <div class="product-form__input product-form__input--dropdown">
@@ -2181,8 +2183,8 @@
                     });
 
                     // PS Custom Logo toggle
-                    $('#jersey_ps_logo_checkbox').on('change', function(){
-                        $(this).prop('checked') ? $('.jersey_ps_logo_position_holder').slideDown() : $('.jersey_ps_logo_position_holder').slideUp();
+                    $('input[name="properties[PS Custom Logo]"]').on('change', function(){
+                        $(this).val() === 'yes' ? $('.jersey_ps_logo_position_holder').slideDown() : $('.jersey_ps_logo_position_holder').slideUp();
                     });
     
                     $('input[name="properties[frontNumber]"]').click(function(){
@@ -2945,8 +2947,8 @@
                               }
 
                               // ---------------- PS Custom Logo ----------------
-                              var psLogoEnable = $('#show_custom_info').prop('checked') && $('input[name="properties[PS Custom Logo]"]').prop('checked');
-                              if (psLogoEnable) {
+                              var psLogoEnable = $('input[name="properties[PS Custom Logo]"]:checked').val();
+                              if (psLogoEnable === 'yes') {
                                 properties['PS Custom Logo'] = 'yes';
                                 var psLogoPosition = $('select[name="properties[PS Logo Position]"]').val();
                                 if (psLogoPosition) properties['PS Logo Position'] = psLogoPosition;
