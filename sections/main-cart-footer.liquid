@@ -116,10 +116,18 @@
                   {%- when 'subtotal' -%}
                     <div {{ block.shopify_attributes }}>
 
-                      {%- comment -%} PS discount notice flag {%- endcomment -%}
+                      {%- comment -%} Check if any cart item actually has PS Custom Logo = yes {%- endcomment -%}
+                      {%- assign has_ps_logo_item = false -%}
+                      {%- for item in cart.items -%}
+                        {%- if item.properties['PS Custom Logo'] == 'yes' or item.properties['PS Custom Logo'] == 'Yes' -%}
+                          {%- assign has_ps_logo_item = true -%}
+                        {%- endif -%}
+                      {%- endfor -%}
+
                       {%- assign ps_discount_already_applied = false -%}
                       {%- for discount in cart.cart_level_discount_applications -%}
-                        {%- if discount.title == 'prosoccer-Logo-5-per-off' or discount.title == 'PROSOCCER-LOGO-5-PER-OFF' -%}
+                        {%- assign discount_title_lower = discount.title | downcase -%}
+                        {%- if discount_title_lower == 'prosoccer-logo-5-per-off' -%}
                           {%- assign ps_discount_already_applied = true -%}
                         {%- endif -%}
                       {%- endfor -%}
@@ -132,6 +140,11 @@
                       {%- if cart.cart_level_discount_applications.size > 0 -%}
                         <ul class="discounts list-unstyled" role="list" aria-label="{{ 'customer.order.discount' | t }}">
                           {%- for discount in cart.cart_level_discount_applications -%}
+                            {%- assign discount_title_lower = discount.title | downcase -%}
+                            {%- comment -%} Only show PS Logo discount if there is actually a PS Logo item {%- endcomment -%}
+                            {%- if discount_title_lower == 'prosoccer-logo-5-per-off' and has_ps_logo_item == false -%}
+                              {%- continue -%}
+                            {%- endif -%}
                             <li class="discounts__discount discounts__discount--end">
                               {%- render 'icon-discount' -%}
                               {{ discount.title }}
@@ -141,14 +154,12 @@
                         </ul>
                       {%- endif -%}
 
-                      {%- comment -%} PS Logo discount pending notice — only when not yet applied {%- endcomment -%}
+                      {%- comment -%} PS Logo discount pending notice — only when PS item exists but discount not yet applied {%- endcomment -%}
                       <div id="ps-logo-discount-notice" style="display:none; margin:6px 0; font-size:0.9em; color:#2e7d32;">
-                        {%- unless ps_discount_already_applied -%}
-                          <span style="display:inline-flex; align-items:center; gap:6px;">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
-                            <strong>prosoccer-Logo-5-per-off</strong> discount will be applied at checkout
-                          </span>
-                        {%- endunless -%}
+                        <span style="display:inline-flex; align-items:center; gap:6px;">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                          <strong>prosoccer-Logo-5-per-off</strong> discount will be applied at checkout
+                        </span>
                       </div>
 
                       <small class="tax-note caption-large rte">
@@ -1067,8 +1078,34 @@ function initialize() {
         var val = (item.properties && item.properties['PS Custom Logo']) || '';
         return val.toLowerCase() === 'yes';
       });
+
       var notice = document.getElementById('ps-logo-discount-notice');
-      if (notice) notice.style.display = _psLogoInCart ? 'block' : 'none';
+
+      if (_psLogoInCart) {
+        // Show pending notice only if discount not already applied in cart
+        var alreadyApplied = (cart.cart_level_discount_applications || []).some(function(d) {
+          return d.title && d.title.toLowerCase() === PS_LOGO_DISCOUNT_CODE.toLowerCase();
+        });
+        if (notice) notice.style.display = alreadyApplied ? 'none' : 'block';
+      } else {
+        // No PS Logo items — hide notice
+        if (notice) notice.style.display = 'none';
+
+        // Clear stale PS Logo discount from session if it is applied
+        var staleDiscount = (cart.cart_level_discount_applications || []).some(function(d) {
+          return d.title && d.title.toLowerCase() === PS_LOGO_DISCOUNT_CODE.toLowerCase();
+        });
+        if (staleDiscount) {
+          // Remove by POSTing empty discount to cart update
+          fetch('/cart/update.js', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ discount: '' })
+          })
+          .then(function() { location.reload(); })
+          .catch(function() {});
+        }
+      }
     })
     .catch(function() {});
 
@@ -1223,3 +1260,4 @@ document.addEventListener('DOMContentLoaded', initialize);
   ]
 }
 {% endschema %}
+
