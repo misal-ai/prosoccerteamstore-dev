@@ -493,7 +493,8 @@ function applyCustomizationDebounced() {
   // ─── PS Custom Logo — check if any customized item has PS Logo enabled ────
   var hasPsLogo = false;
   $(".cart-item[data-customized='true']").each(function(idx, item) {
-    if ($(item).find('.psCustomLogoEnabled').val() === 'yes') {
+    var val = ($(item).find('.psCustomLogoEnabled').val() || '').toLowerCase();
+    if (val === 'yes') {
       hasPsLogo = true;
       return false; // break
     }
@@ -1068,6 +1069,43 @@ function showErrorForLessThanSeven(message) {
 // ─── initialize ───────────────────────────────────────────────────────────────
 function initialize() {
   $(".cart-fee-based-item .cart-item__quantity").css('visibility', 'hidden');
+
+  // ── One-time PS Logo sync on page load ──────────────────────────────────────
+  // If any customized item has PS Logo = yes but the fee product isn't in the
+  // cart yet, trigger applyCustomization once. Use sessionStorage to prevent
+  // a reload loop (applyCustomization reloads the page after updating the cart).
+  (function checkPsLogoOnLoad() {
+    // Only run once per page load (not after the reload applyCustomization causes)
+    if (sessionStorage.getItem('psLogoSynced') === '1') {
+      sessionStorage.removeItem('psLogoSynced');
+      return;
+    }
+    var needsPs = false;
+    $(".cart-item[data-customized='true']").each(function() {
+      var val = ($(this).find('.psCustomLogoEnabled').val() || '').toLowerCase();
+      if (val === 'yes') { needsPs = true; return false; }
+    });
+    if (!needsPs) return;
+
+    // Check if PS Logo product is already in cart
+    fetch('/cart.js')
+      .then(function(r) { return r.json(); })
+      .then(function(cart) {
+        return fetch('/products/' + PS_LOGO_HANDLE + '.js')
+          .then(function(r) { return r.ok ? r.json() : null; })
+          .then(function(product) {
+            if (!product) return;
+            var psVid = String(product.variants[0].id);
+            var alreadyInCart = cart.items.some(function(i) { return String(i.variant_id) === psVid; });
+            if (!alreadyInCart) {
+              sessionStorage.setItem('psLogoSynced', '1');
+              applyCustomization();
+            }
+          });
+      })
+      .catch(function() {});
+  })();
+
   // Only check checkout button eligibility on load — do NOT call applyCustomization
   // (that would cause an infinite reload loop since applyCustomization reloads the page)
   setTimeout(showHideCartButton, 500);
