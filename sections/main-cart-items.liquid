@@ -342,6 +342,11 @@
                               <input type='hidden' class='jerseySponsorLogoName' value='{{ item.properties['Sponsor Logo Name'] | default: '' }}'>
                           {% endif %}
 
+                          {% if item.properties['PS Custom Logo'] %}
+                              <input type='hidden' class='psCustomLogoEnabled' value='{{ item.properties['PS Custom Logo'] }}'>
+                              <input type='hidden' class='psLogoPosition' value='{{ item.properties['PS Logo Position'] | default: '' }}'>
+                          {% endif %}
+
                         
                           {% if item.properties['Total Pant Numbers'] %}
                             {%  assign  child_product_type ='number' %}
