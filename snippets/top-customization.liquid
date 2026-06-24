@@ -26,10 +26,10 @@
             <div class="multi-toggle-group mt-2">
               <input checked class='imageCheckbox' type="radio" name="properties[TopCrestLogoType]" id="top_no_crest_logo" value='0' data-name="no">
               <label for='top_no_crest_logo'>No Logo</label><br>
-              <input class='imageCheckbox' type="radio" name="properties[TopCrestLogoType]" value="50434669150510" id="top_crest_heat_press" data-name='Heat Press'>
-              <label for="top_crest_heat_press">Heat Press ($7)</label><br>
-              <input class='imageCheckbox' type="radio" name="properties[TopCrestLogoType]" value="50434672394542" id="top_crest_embroidery_press" data-name='Embroidery'>
-              <label for="top_crest_embroidery_press">Embroidery ($12)</label><br>
+              <input class='imageCheckbox' type="radio" name="properties[TopCrestLogoType]" value="52049128489262" id="top_crest_heat_press" data-name='Heat Press'>
+              <label for="top_crest_heat_press">Heat Press ($6)</label><br>
+              <input class='imageCheckbox' type="radio" name="properties[TopCrestLogoType]" value="52049122328878" id="top_crest_embroidery_press" data-name='Embroidery'>
+              <label for="top_crest_embroidery_press">Embroidery ($10)</label><br>
             </div>
             <div class="top_crest_logo_image_holder logo_holder row" style="display: none; margin-top:10px;margin-left:2px;">
                 <div class='col-12'>Custom Crest Logo</div>
@@ -80,6 +80,27 @@
             <img class="back_number_example" alt="Top Number Example" src="{{ 'top-number.jpg' | asset_url }}" style="width: 160px;">
           </div>
           {% render 'number-fonts', font_holder:'top' %}
+        </div>
+      </div>
+    </div>
+
+      <div class="ps-logo-holder mt-3">
+        <h6 class="product-inner-heading">PS Custom Logo:</h6>
+        <div class="toggle-group">
+          <input type="checkbox" name="properties[PS Custom Logo]" id="top_ps_logo_checkbox" value="yes">
+          <label for="top_ps_logo_checkbox">Add PS Logo (Free)</label>
+        </div>
+        <div class="top_ps_logo_position_holder" style="display:none; margin-top:8px;">
+          <div class="product-form__input product-form__input--dropdown">
+            <label class="form__label" for="top_ps_logo_position"><strong>PS Logo Position:</strong></label>
+            <div class="select">
+              <select id="top_ps_logo_position" class="select__select" name="properties[PS Logo Position]">
+                <option value="Bottom Left">Bottom Left</option>
+                <option value="Bottom Right">Bottom Right</option>
+              </select>
+              {% render 'icon-caret' %}
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -185,6 +206,11 @@
     $(document).on('change', '.quantity__input', appendNames);
     $('#show_custom_info').on('change', function() {
       this.checked ? $('.custom_info').slideDown() : $('.custom_info').slideUp();
+    });
+
+    // PS Custom Logo toggle
+    $('#top_ps_logo_checkbox').on('change', function() {
+      $(this).prop('checked') ? $('.top_ps_logo_position_holder').slideDown() : $('.top_ps_logo_position_holder').slideUp();
     });
   });
 </script>
