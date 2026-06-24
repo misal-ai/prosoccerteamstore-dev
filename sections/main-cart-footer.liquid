@@ -138,6 +138,12 @@
                         {%- endif -%}
                       </div>
 
+                      {%- comment -%} PS Custom Logo discount notice {%- endcomment -%}
+                      <div id="ps-logo-discount-notice" style="display:none; margin: 8px 0; padding: 8px 12px; background:#f0faf0; border:1px solid #b2dfb2; border-radius:4px; color:#2e7d32; font-size:0.9em;">
+                        {%- render 'icon-discount' -%}
+                        <strong>PS Logo Discount (prosoccer-Logo-5-per-off)</strong> will be applied at checkout
+                      </div>
+
                       <small class="tax-note caption-large rte">
                         {%- if cart.taxes_included and shop.shipping_policy.body != blank -%}
                           {{
@@ -1057,6 +1063,19 @@ function initialize() {
     var checkoutBtn = document.querySelector('.checkout-button');
     if (!checkoutBtn) return;
 
+    // Show/hide the discount notice on page load
+    fetch('/cart.js')
+      .then(function(r) { return r.json(); })
+      .then(function(cart) {
+        var hasPsLogo = cart.items.some(function(item) {
+          var val = (item.properties && item.properties['PS Custom Logo']) || '';
+          return val.toLowerCase() === 'yes';
+        });
+        var notice = document.getElementById('ps-logo-discount-notice');
+        if (notice) notice.style.display = hasPsLogo ? 'block' : 'none';
+      })
+      .catch(function() {});
+
     checkoutBtn.addEventListener('click', function(e) {
       // Check directly from cart items' properties — no dependency on applyCustomization
       fetch('/cart.js')
@@ -1180,4 +1199,3 @@ document.addEventListener('DOMContentLoaded', initialize);
   ]
 }
 {% endschema %}
-
