@@ -81,6 +81,25 @@
         <label for="bag_name_heat">Heat Press ($9)</label>
         <input name="properties[bagName]" type="radio" value="51712321323310" id="bag_name_yes" data-name="Embroidery">
         <label for="bag_name_yes">Embroidery ($12)</label>
+      </div>
+
+      <div class="ps-logo-holder mt-3">
+        <h6 class="product-inner-heading">PS Custom Logo:</h6>
+        <div class="toggle-group">
+          <input type="checkbox" name="properties[PS Custom Logo]" id="bag_ps_logo_checkbox" value="yes">
+          <label for="bag_ps_logo_checkbox">Add PS Logo (Free)</label>
+        </div>
+        <div class="bag_ps_logo_position_holder" style="display:none; margin-top:8px;">
+          <div class="product-form__input product-form__input--dropdown">
+            <label class="form__label" for="bag_ps_logo_position"><strong>PS Logo Position:</strong></label>
+            <div class="select">
+              <select id="bag_ps_logo_position" class="select__select" name="properties[PS Logo Position]">
+                <option value="Bottom Left">Bottom Left</option>
+                <option value="Bottom Right">Bottom Right</option>
+              </select>
+            </div>
+          </div>
+        </div>
       </div>                
     </div>
 
@@ -149,6 +168,11 @@
     $(document).on('change', '.quantity__input', appendNumbers);
     $('#show_custom_info').on('change', function() {
       this.checked ? $('.custom_info').slideDown() : $('.custom_info').slideUp();
+    });
+
+    // PS Custom Logo toggle
+    $('#bag_ps_logo_checkbox').on('change', function() {
+      $(this).prop('checked') ? $('.bag_ps_logo_position_holder').slideDown() : $('.bag_ps_logo_position_holder').slideUp();
     });
   });
 </script>
