@@ -95,10 +95,12 @@
     </div>
 
     <div class="ps-logo-holder mt-3">
-      <h6 class="product-inner-heading">PS Custom Logo:</h6>
+      <b>PS Custom Logo (Free):</b>
       <div class="toggle-group">
-        <input type="checkbox" name="properties[PS Custom Logo]" id="pant_ps_logo_checkbox" value="yes">
-        <label for="pant_ps_logo_checkbox">Add PS Logo (Free)</label>
+        <input type="radio" name="properties[PS Custom Logo]" id="pant_ps_logo_no" value="no" checked>
+        <label for="pant_ps_logo_no">No</label>
+        <input type="radio" name="properties[PS Custom Logo]" id="pant_ps_logo_yes" value="yes">
+        <label for="pant_ps_logo_yes">Yes</label>
       </div>
       <div class="pant_ps_logo_position_holder" style="display:none; margin-top:8px;">
         <div class="product-form__input product-form__input--dropdown">
@@ -192,8 +194,8 @@
     });
 
     // PS Custom Logo toggle
-    $('#pant_ps_logo_checkbox').on('change', function() {
-      $(this).prop('checked') ? $('.pant_ps_logo_position_holder').slideDown() : $('.pant_ps_logo_position_holder').slideUp();
+    $('input[name="properties[PS Custom Logo]"]').on('change', function() {
+      $(this).val() === 'yes' ? $('.pant_ps_logo_position_holder').slideDown() : $('.pant_ps_logo_position_holder').slideUp();
     });
   });
 </script>
