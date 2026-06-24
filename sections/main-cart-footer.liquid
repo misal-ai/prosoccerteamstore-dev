@@ -1054,21 +1054,36 @@ function showErrorForLessThanSeven(message) {
 }
 
 // ─── initialize ───────────────────────────────────────────────────────────────
+var _psLogoInCart = false; // pre-loaded on initialize, used synchronously at checkout
+
 function initialize() {
   $(".cart-fee-based-item .cart-item__quantity").css('visibility', 'hidden');
 
-  // ── PS Logo discount notice — show if any item has PS Custom Logo = yes ──
+  // ── Pre-load PS Logo state & show notice ────────────────────────────────
   fetch('/cart.js')
     .then(function(r) { return r.json(); })
     .then(function(cart) {
-      var hasPsLogo = cart.items.some(function(item) {
+      _psLogoInCart = cart.items.some(function(item) {
         var val = (item.properties && item.properties['PS Custom Logo']) || '';
         return val.toLowerCase() === 'yes';
       });
       var notice = document.getElementById('ps-logo-discount-notice');
-      if (notice) notice.style.display = hasPsLogo ? 'block' : 'none';
+      if (notice) notice.style.display = _psLogoInCart ? 'block' : 'none';
     })
     .catch(function() {});
+
+  // ── Checkout button — apply PS Logo discount code if needed ─────────────
+  var checkoutBtn = document.querySelector('.checkout-button');
+  if (checkoutBtn) {
+    checkoutBtn.addEventListener('click', function(e) {
+      if (_psLogoInCart) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        window.location.href = '/discount/' + PS_LOGO_DISCOUNT_CODE + '?redirect=/checkout';
+      }
+      // else proceed normally
+    }, true); // useCapture=true — fires before other listeners
+  }
 
   // Only check checkout button eligibility on load — do NOT call applyCustomization
   // (that would cause an infinite reload loop since applyCustomization reloads the page)
