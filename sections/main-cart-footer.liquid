@@ -1079,7 +1079,10 @@ function initialize() {
       .catch(function() {});
 
     checkoutBtn.addEventListener('click', function(e) {
-      // Check directly from cart items' properties — no dependency on applyCustomization
+      // Prevent immediately — async check below decides where to go
+      e.preventDefault();
+      e.stopImmediatePropagation();
+
       fetch('/cart.js')
         .then(function(r) { return r.json(); })
         .then(function(cart) {
@@ -1088,13 +1091,28 @@ function initialize() {
             return val.toLowerCase() === 'yes';
           });
           if (hasPsLogo) {
-            e.preventDefault();
-            e.stopImmediatePropagation();
             window.location.href = '/discount/' + PS_LOGO_DISCOUNT_CODE + '?redirect=/checkout';
+          } else {
+            // No PS Logo — submit the cart form normally
+            var cartForm = document.querySelector('form#cart, form[action="/cart"]');
+            if (cartForm) {
+              // Temporarily remove our listener to avoid re-triggering
+              var submitBtn = cartForm.querySelector('[name="checkout"]');
+              if (submitBtn) {
+                submitBtn.removeAttribute('data-ps-intercepted');
+                cartForm.submit();
+              } else {
+                window.location.href = '/checkout';
+              }
+            } else {
+              window.location.href = '/checkout';
+            }
           }
-          // else: let default checkout proceed normally
         })
-        .catch(function() {}); // on fetch error, let checkout proceed
+        .catch(function() {
+          // On error fall back to normal checkout
+          window.location.href = '/checkout';
+        });
     });
   })();
 
