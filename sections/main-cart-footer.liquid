@@ -1073,15 +1073,50 @@ function initialize() {
     .catch(function() {});
 
   // ── Checkout button — apply PS Logo discount code if needed ─────────────
+  // Strategy: collect any already-applied discount codes from the cart,
+  // then build a checkout URL that includes ALL codes so nothing is replaced.
   var checkoutBtn = document.querySelector('.checkout-button');
   if (checkoutBtn) {
     checkoutBtn.addEventListener('click', function(e) {
-      if (_psLogoInCart) {
-        e.preventDefault();
-        e.stopImmediatePropagation();
-        window.location.href = '/discount/' + PS_LOGO_DISCOUNT_CODE + '?redirect=/checkout';
-      }
-      // else proceed normally
+      if (!_psLogoInCart) return; // no PS Logo — proceed normally
+
+      e.preventDefault();
+      e.stopImmediatePropagation();
+
+      // Fetch cart to get any already-applied discount codes
+      fetch('/cart.js')
+        .then(function(r) { return r.json(); })
+        .then(function(cart) {
+          // Collect existing cart-level discount titles
+          var existingCodes = [];
+          if (cart.cart_level_discount_applications) {
+            cart.cart_level_discount_applications.forEach(function(d) {
+              if (d.title && d.title !== PS_LOGO_DISCOUNT_CODE &&
+                  d.title.toUpperCase() !== PS_LOGO_DISCOUNT_CODE.toUpperCase()) {
+                existingCodes.push(d.title);
+              }
+            });
+          }
+
+          if (existingCodes.length > 0) {
+            // Apply PS Logo code first via /discount/, then redirect back through
+            // the other codes. Shopify applies codes sequentially this way.
+            // Build chain: /discount/CODE1?redirect=/discount/CODE2?redirect=/checkout
+            var redirectTarget = '/checkout';
+            // Apply existing codes in reverse so the last one lands on /checkout
+            for (var i = existingCodes.length - 1; i >= 0; i--) {
+              redirectTarget = '/discount/' + encodeURIComponent(existingCodes[i]) + '?redirect=' + encodeURIComponent(redirectTarget);
+            }
+            window.location.href = '/discount/' + PS_LOGO_DISCOUNT_CODE + '?redirect=' + encodeURIComponent(redirectTarget);
+          } else {
+            // No other codes — simple redirect
+            window.location.href = '/discount/' + PS_LOGO_DISCOUNT_CODE + '?redirect=/checkout';
+          }
+        })
+        .catch(function() {
+          // Fallback — apply PS Logo code directly
+          window.location.href = '/discount/' + PS_LOGO_DISCOUNT_CODE + '?redirect=/checkout';
+        });
     }, true); // useCapture=true — fires before other listeners
   }
 
@@ -1188,4 +1223,3 @@ document.addEventListener('DOMContentLoaded', initialize);
   ]
 }
 {% endschema %}
-
