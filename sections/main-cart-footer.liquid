@@ -139,9 +139,11 @@
                       </div>
 
                       {%- comment -%} PS Custom Logo discount notice {%- endcomment -%}
-                      <div id="ps-logo-discount-notice" style="display:none; margin: 8px 0; padding: 8px 12px; background:#f0faf0; border:1px solid #b2dfb2; border-radius:4px; color:#2e7d32; font-size:0.9em;">
-                        {%- render 'icon-discount' -%}
-                        <strong>PS Logo Discount (prosoccer-Logo-5-per-off)</strong> will be applied at checkout
+                      <div id="ps-logo-discount-notice" style="display:none; margin: 6px 0; font-size:0.9em; color:#2e7d32;">
+                        <span style="display:inline-flex; align-items:center; gap:6px;">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                          <strong>prosoccer-Logo-5-per-off</strong> discount will be applied at checkout
+                        </span>
                       </div>
 
                       <small class="tax-note caption-large rte">
@@ -1199,3 +1201,4 @@ document.addEventListener('DOMContentLoaded', initialize);
   ]
 }
 {% endschema %}
+
