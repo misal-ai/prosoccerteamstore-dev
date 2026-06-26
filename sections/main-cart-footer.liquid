@@ -115,23 +115,6 @@
                     {% render block %}
                   {%- when 'subtotal' -%}
                     <div {{ block.shopify_attributes }}>
-
-                      {%- comment -%} Check if any cart item actually has PS Custom Logo = yes {%- endcomment -%}
-                      {%- assign has_ps_logo_item = false -%}
-                      {%- for item in cart.items -%}
-                        {%- if item.properties['PS Custom Logo'] == 'yes' or item.properties['PS Custom Logo'] == 'Yes' -%}
-                          {%- assign has_ps_logo_item = true -%}
-                        {%- endif -%}
-                      {%- endfor -%}
-
-                      {%- assign ps_discount_already_applied = false -%}
-                      {%- for discount in cart.cart_level_discount_applications -%}
-                        {%- assign discount_title_lower = discount.title | downcase -%}
-                        {%- if discount_title_lower == 'prosoccer-logo-5-per-off' -%}
-                          {%- assign ps_discount_already_applied = true -%}
-                        {%- endif -%}
-                      {%- endfor -%}
-
                       <div class="totals">
                         <h3 class="totals__subtotal">{{ 'sections.cart.subtotal' | t }}</h3>
                         <p class="totals__subtotal-value">{{ cart.total_price | money_with_currency }}</p>
@@ -140,11 +123,6 @@
                       {%- if cart.cart_level_discount_applications.size > 0 -%}
                         <ul class="discounts list-unstyled" role="list" aria-label="{{ 'customer.order.discount' | t }}">
                           {%- for discount in cart.cart_level_discount_applications -%}
-                            {%- assign discount_title_lower = discount.title | downcase -%}
-                            {%- comment -%} Only show PS Logo discount if there is actually a PS Logo item {%- endcomment -%}
-                            {%- if discount_title_lower == 'prosoccer-logo-5-per-off' and has_ps_logo_item == false -%}
-                              {%- continue -%}
-                            {%- endif -%}
                             <li class="discounts__discount discounts__discount--end">
                               {%- render 'icon-discount' -%}
                               {{ discount.title }}
@@ -153,14 +131,6 @@
                           {%- endfor -%}
                         </ul>
                       {%- endif -%}
-
-                      {%- comment -%} PS Logo discount pending notice — only when PS item exists but discount not yet applied {%- endcomment -%}
-                      <div id="ps-logo-discount-notice" style="display:none; margin:6px 0; font-size:0.9em; color:#2e7d32;">
-                        <span style="display:inline-flex; align-items:center; gap:6px;">
-                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
-                          <strong>prosoccer-Logo-5-per-off</strong> discount will be applied at checkout
-                        </span>
-                      </div>
 
                       <small class="tax-note caption-large rte">
                         {%- if cart.taxes_included and shop.shipping_policy.body != blank -%}
@@ -181,6 +151,19 @@
                           {{ 'sections.cart.update' | t }}
                         </button>
                       </noscript>
+
+                      {%- comment -%} PS Logo discount code info — shown above checkout when any item has PS Custom Logo = yes {%- endcomment -%}
+                      {%- assign has_ps_logo_item = false -%}
+                      {%- for item in cart.items -%}
+                        {%- if item.properties['PS Custom Logo'] == 'yes' or item.properties['PS Custom Logo'] == 'Yes' -%}
+                          {%- assign has_ps_logo_item = true -%}
+                        {%- endif -%}
+                      {%- endfor -%}
+                      {%- if has_ps_logo_item -%}
+                        <div style="margin-bottom:10px; padding:10px 12px; background:#f0faf0; border:1px solid #b2dfb2; border-radius:6px; font-size:0.875em; color:#1a5c1a; text-align:center;">
+                          🏷 Use code <strong>prosoccer-Logo-5-per-off</strong> at checkout for your PS Logo discount
+                        </div>
+                      {%- endif -%}
 
                       <button
                         type="submit"
@@ -244,7 +227,6 @@ var HOODIE_NAME_ID   = '50534311428398';
 var JACKET_NAME_ID   = '50536571699502';
 var JERSEY_SLEEVE_LOGO_ID   = 51936281428270;
 var JERSEY_SPONSOR_LOGO_ID  = 51936282247470;
-var PS_LOGO_DISCOUNT_CODE   = 'prosoccer-Logo-5-per-off';
 var SAME_VENDOR_TYPES = ['Jackets','Jersey','Training Tops','Hoodies','Polos','T-Shirt'];
 
 // Dynamic variant IDs (set per item during applyCustomization loop)
@@ -506,16 +488,6 @@ function applyCustomizationDebounced() {
 
     addVectorKey(sleeveLogoName, 'Standard');
     addVectorKey(sponsorLogoName, 'Standard');
-  });
-
-  // ─── PS Custom Logo — check if any customized item has PS Logo enabled ────
-  var hasPsLogo = false;
-  $(".cart-item[data-customized='true']").each(function(idx, item) {
-    var val = ($(item).find('.psCustomLogoEnabled').val() || '').toLowerCase();
-    if (val === 'yes') {
-      hasPsLogo = true;
-      return false; // break
-    }
   });
 
   // Build desired fee quantities
@@ -1065,81 +1037,8 @@ function showErrorForLessThanSeven(message) {
 }
 
 // ─── initialize ───────────────────────────────────────────────────────────────
-var _psLogoInCart = false; // pre-loaded on initialize, used synchronously at checkout
-
 function initialize() {
   $(".cart-fee-based-item .cart-item__quantity").css('visibility', 'hidden');
-
-  // ── Pre-load PS Logo state & show notice ────────────────────────────────
-  fetch('/cart.js')
-    .then(function(r) { return r.json(); })
-    .then(function(cart) {
-      _psLogoInCart = cart.items.some(function(item) {
-        var val = (item.properties && item.properties['PS Custom Logo']) || '';
-        return val.toLowerCase() === 'yes';
-      });
-
-      var notice = document.getElementById('ps-logo-discount-notice');
-      if (!_psLogoInCart) {
-        if (notice) notice.style.display = 'none';
-        return;
-      }
-
-      // PS Logo exists — show pending notice only if not already applied
-      var alreadyApplied = (cart.cart_level_discount_applications || []).some(function(d) {
-        return d.title && d.title.toLowerCase() === PS_LOGO_DISCOUNT_CODE.toLowerCase();
-      });
-      if (notice) notice.style.display = alreadyApplied ? 'none' : 'block';
-    })
-    .catch(function() {});
-
-  // ── Checkout button — apply PS Logo discount code if needed ─────────────
-  // Strategy: collect any already-applied discount codes from the cart,
-  // then build a checkout URL that includes ALL codes so nothing is replaced.
-  var checkoutBtn = document.querySelector('.checkout-button');
-  if (checkoutBtn) {
-    checkoutBtn.addEventListener('click', function(e) {
-      if (!_psLogoInCart) return; // no PS Logo — proceed normally
-
-      e.preventDefault();
-      e.stopImmediatePropagation();
-
-      // Fetch cart to get any already-applied discount codes
-      fetch('/cart.js')
-        .then(function(r) { return r.json(); })
-        .then(function(cart) {
-          // Collect existing cart-level discount titles
-          var existingCodes = [];
-          if (cart.cart_level_discount_applications) {
-            cart.cart_level_discount_applications.forEach(function(d) {
-              if (d.title && d.title !== PS_LOGO_DISCOUNT_CODE &&
-                  d.title.toUpperCase() !== PS_LOGO_DISCOUNT_CODE.toUpperCase()) {
-                existingCodes.push(d.title);
-              }
-            });
-          }
-
-          if (existingCodes.length > 0) {
-            // Apply PS Logo code first via /discount/, then redirect back through
-            // the other codes. Shopify applies codes sequentially this way.
-            // Build chain: /discount/CODE1?redirect=/discount/CODE2?redirect=/checkout
-            var redirectTarget = '/checkout';
-            // Apply existing codes in reverse so the last one lands on /checkout
-            for (var i = existingCodes.length - 1; i >= 0; i--) {
-              redirectTarget = '/discount/' + encodeURIComponent(existingCodes[i]) + '?redirect=' + encodeURIComponent(redirectTarget);
-            }
-            window.location.href = '/discount/' + PS_LOGO_DISCOUNT_CODE + '?redirect=' + encodeURIComponent(redirectTarget);
-          } else {
-            // No other codes — simple redirect
-            window.location.href = '/discount/' + PS_LOGO_DISCOUNT_CODE + '?redirect=/checkout';
-          }
-        })
-        .catch(function() {
-          // Fallback — apply PS Logo code directly
-          window.location.href = '/discount/' + PS_LOGO_DISCOUNT_CODE + '?redirect=/checkout';
-        });
-    }, true); // useCapture=true — fires before other listeners
-  }
 
   // Only check checkout button eligibility on load — do NOT call applyCustomization
   // (that would cause an infinite reload loop since applyCustomization reloads the page)
