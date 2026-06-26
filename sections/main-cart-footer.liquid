@@ -107,18 +107,7 @@
                 <div class="shipping_rate_package"></div>
               </div>
             {%- endif -%}
-            {%- comment -%} PS Logo discount code info — shown above checkout when any item has PS Custom Logo = yes {%- endcomment -%}
-                      {%- assign has_ps_logo_item = false -%}
-                      {%- for item in cart.items -%}
-                        {%- if item.properties['PS Custom Logo'] == 'yes' or item.properties['PS Custom Logo'] == 'Yes' -%}
-                          {%- assign has_ps_logo_item = true -%}
-                        {%- endif -%}
-                      {%- endfor -%}
-                      {%- if has_ps_logo_item -%}
-                        <p style="margin-bottom:8px; font-size:0.875em; color:#1a5c1a;">
-                          🏷 Use code <strong>prosoccer-Logo-5-per-off</strong> at checkout for your PS Logo discount
-                        </p>
-                      {%- endif -%}
+
             <div class="cart__blocks js-contents">
               {% for block in section.blocks %}
                 {%- case block.type -%}
@@ -162,9 +151,6 @@
                           {{ 'sections.cart.update' | t }}
                         </button>
                       </noscript>
-
-                      
-
                       <button
                         type="submit"
                         class="cart__checkout-button button checkout-button"
