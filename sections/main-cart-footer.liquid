@@ -154,7 +154,7 @@
                     {%- endfor -%}
                     {%- if has_ps_logo_item -%}
                       <p style="margin-bottom:8px; font-size:0.875em; color:#1a5c1a;">
-                        🏷 Use code <strong style="color:red;">prosoccer-Logo-5-per-off</strong> at checkout for your PS Logo discount
+                        🏷 Use code <strong>prosoccer-Logo-5-per-off</strong> at checkout for your PS Logo discount
                       </p>
                     {%- endif -%}
 
@@ -227,6 +227,7 @@ var HOODIE_NAME_ID   = '50534311428398';
 var JACKET_NAME_ID   = '50536571699502';
 var JERSEY_SLEEVE_LOGO_ID   = 51936281428270;
 var JERSEY_SPONSOR_LOGO_ID  = 51936282247470;
+var JERSEY_TEAM_NAME_ID     = 52243868385582;
 var SAME_VENDOR_TYPES = ['Jackets','Jersey','Training Tops','Hoodies','Polos','T-Shirt'];
 
 // Dynamic variant IDs (set per item during applyCustomization loop)
@@ -324,6 +325,7 @@ function applyCustomizationDebounced() {
   var totalPantNumbers = 0;
   var totalJerseySleeveLogos = 0;
   var totalJerseySponsorLogos = 0;
+  var totalJerseyTeamNames = 0;
 
   $(".cart-item[data-customized='true']").each(function(idx, item) {
     var qty = parseInt($(item).find('.quantity__input').val()) || 0;
@@ -488,6 +490,9 @@ function applyCustomizationDebounced() {
 
     addVectorKey(sleeveLogoName, 'Standard');
     addVectorKey(sponsorLogoName, 'Standard');
+
+    // Jersey Team Name on Back — qty = item quantity
+    if (($(item).find('.jerseyTeamNameEnabled').val() || '').toLowerCase() === 'yes') totalJerseyTeamNames += qty;
   });
 
   // Build desired fee quantities
@@ -509,6 +514,7 @@ function applyCustomizationDebounced() {
   desired[JACKET_NAME_ID]  = totalJacketNames;
   desired[JERSEY_SLEEVE_LOGO_ID]  = totalJerseySleeveLogos;
   desired[JERSEY_SPONSOR_LOGO_ID] = totalJerseySponsorLogos;
+  desired[JERSEY_TEAM_NAME_ID]    = totalJerseyTeamNames;
   if (topNumberVariantId)    desired[topNumberVariantId]    = totalTopNumbers;
   if (hoodieNumberVariantId) desired[hoodieNumberVariantId] = totalHoodieNumbers;
   if (jacketNumberVariantId) desired[jacketNumberVariantId] = totalJacketNumbers;
@@ -534,6 +540,7 @@ function applyCustomizationDebounced() {
     '51769027952942',                  // cap embroidery
     51936281428270,                    // jersey sleeve logo
     51936282247470,                    // jersey sponsor/team logo
+    52243868385582,                    // jersey team name on back
     // bag crest logo — heatpress / embroidery (all bag types)
     '50564127523118','50564127654190', // sackpack heatpress / embroidery
     '50566668419374','50566678348078', // duffel bag heatpress / embroidery
@@ -1143,4 +1150,3 @@ document.addEventListener('DOMContentLoaded', initialize);
   ]
 }
 {% endschema %}
-
