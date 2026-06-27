@@ -1559,7 +1559,7 @@
                       {% endif %}
 
                       <div class="ps-logo-holder mt-3 col-12">
-                        <div><div class="product-inner-heading">PS Custom Logo (5% discount):</div></div>
+                        <div><b>PS Custom Logo (Free):</b></div>
                         <div class="toggle-group">
                           <input type="radio" name="properties[PS Custom Logo]" id="jersey_ps_logo_no" value="no" checked>
                           <label for="jersey_ps_logo_no">No</label>
@@ -1894,6 +1894,29 @@
                             </div>
                           </div>
                         </div>
+
+                        <div class='col-md-12 col-log-12 col-xl-12 col-xxl-12 mt-2'>
+                          <div><b>Team Name on Back:</b></div>
+                          <div class="toggle-group" style="width:auto;">
+                            <input name="properties[jerseyTeamNameEnable]" type="radio" value="no" checked="" id='team_name_no'>
+                            <label for='team_name_no'>No</label>
+                            <input name="properties[jerseyTeamNameEnable]" type="radio" value="yes" id='team_name_yes'>
+                            <label for='team_name_yes'>Yes</label>
+                          </div>
+                          <div class="jersey_team_name_holder" style="display:none; margin-top:8px;">
+                            <div class="product-form__input">
+                              <label class="form__label" for="jersey_team_name_input"><strong>Team Name:</strong></label>
+                              <input
+                                type="text"
+                                id="jersey_team_name_input"
+                                name="properties[Team Name]"
+                                class="input__field"
+                                placeholder="Enter team name"
+                                style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;"
+                              >
+                            </div>
+                          </div>
+                        </div>
                         {% endif %}
 
                         <div class="player_number_name" style="display: none;">
@@ -2180,6 +2203,11 @@
                         $('input[name="properties[jerseySponsorLogoEnable]"]:checked').val() === 'yes'
                           ? $('.sponsor_logo_upload').show()
                           : $('.sponsor_logo_upload').hide();
+                    });
+
+                    // Team Name on Back — Jersey only
+                    $('input[name="properties[jerseyTeamNameEnable]"]').on('change', function(){
+                        $(this).val() === 'yes' ? $('.jersey_team_name_holder').slideDown() : $('.jersey_team_name_holder').slideUp();
                     });
 
                     // PS Custom Logo toggle
