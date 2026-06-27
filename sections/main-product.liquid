@@ -126,6 +126,7 @@
 {% assign alreadyJerseySponsorLogoTotal = 0 %}
 {% assign alreadyJerseyTeamNameItem = "no" %}
 {% assign alreadyJerseyTeamNameTotal = 0 %}
+{% assign alreadyJerseyTeamNameValue = "" %}
 
 {% assign alreadyBackNumber = "no" %}
 {% assign alreadyBackNumberTotal = 0 %}
@@ -384,6 +385,10 @@
     {% assign alreadyJerseyTeamNameTotal = cartItem.quantity %}
   {% endif %}
 
+  {% if cartItem.properties['Team Name Enable'] == 'yes' and cartItem.properties['Team Name'] != blank %}
+    {% assign alreadyJerseyTeamNameValue = cartItem.properties['Team Name'] %}
+  {% endif %}
+
   {% if frontNumber == "yes" %}
     {% assign alreadyFrontNumberTotal = alreadyFrontNumberTotal | plus: countFrontNumbers %}
   {% endif %}
@@ -436,6 +441,7 @@
 <input type='hidden' id='alreadyJerseySponsorLogoTotal' value='{{ alreadyJerseySponsorLogoTotal }}'>
 <input type='hidden' id='alreadyJerseyTeamNameItem' value='{{ alreadyJerseyTeamNameItem }}'>
 <input type='hidden' id='alreadyJerseyTeamNameTotal' value='{{ alreadyJerseyTeamNameTotal }}'>
+<input type='hidden' id='alreadyJerseyTeamNameValue' value='{{ alreadyJerseyTeamNameValue | escape }}'>
 
 
 <input type='hidden' id='alreadyTotalBagNumber' value='{{ alreadyTotalBagNumber }}'>
@@ -1924,6 +1930,7 @@
                                 name="properties[Team Name]"
                                 class="input__field"
                                 placeholder="Enter team name"
+                                value="{{ alreadyJerseyTeamNameValue | escape }}"
                                 style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;"
                               >
                             </div>
