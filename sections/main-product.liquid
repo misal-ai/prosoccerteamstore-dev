@@ -1896,7 +1896,7 @@
                         </div>
 
                         <div class='col-md-12 col-log-12 col-xl-12 col-xxl-12 mt-2'>
-                          <div><b>Team Name on Back:</b></div>
+                          <div><b>Team Name($7):</b></div>
                           <div class="toggle-group" style="width:auto;">
                             <input name="properties[jerseyTeamNameEnable]" type="radio" value="no" checked="" id='team_name_no'>
                             <label for='team_name_no'>No</label>
@@ -2596,6 +2596,7 @@
 
                         var count_of_jersey_sleeve_logo = 0;
                         var count_of_jersey_sponsor_logo = 0;
+                        var count_of_jersey_team_name = 0;
 
                                           
                         $('.tags-holder .quantity__input').each(function() {
@@ -2972,6 +2973,17 @@
                                 }
                                 count_of_jersey_sponsor_logo += quantity;
                                 apply_vector_fee = true;
+                              }
+
+                              // ---------------- Jersey Team Name on Back ----------------
+                              var jerseyTeamNameEnable = $('input[name="properties[jerseyTeamNameEnable]"]:checked').val();
+                              if (jerseyTeamNameEnable === 'yes') {
+                                var teamNameValue = $('#jersey_team_name_input').val().trim();
+                                if (teamNameValue) {
+                                  properties['Team Name'] = teamNameValue;
+                                  properties['Team Name Enable'] = 'yes';
+                                  count_of_jersey_team_name += quantity;
+                                }
                               }
 
                               // ---------------- PS Custom Logo ----------------
