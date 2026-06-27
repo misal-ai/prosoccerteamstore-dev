@@ -2219,7 +2219,23 @@
 
                     // Team Name on Back — Jersey only
                     $('input[name="properties[jerseyTeamNameEnable]"]').on('change', function(){
-                        $(this).val() === 'yes' ? $('.jersey_team_name_holder').slideDown() : $('.jersey_team_name_holder').slideUp();
+                        var isYes = $(this).val() === 'yes';
+                        isYes ? $('.jersey_team_name_holder').slideDown() : $('.jersey_team_name_holder').slideUp();
+
+                        // If switching to No and fee product was already in cart — zero it out
+                        if (!isYes) {
+                            var alreadyInCart = $('#alreadyJerseyTeamNameItem').val();
+                            if (alreadyInCart === 'yes') {
+                                var fd = new FormData();
+                                fd.append('updates[52243868385582]', 0);
+                                fetch('/cart/update.js', { method: 'POST', body: fd })
+                                    .then(function() {
+                                        $('#alreadyJerseyTeamNameItem').val('no');
+                                        $('#alreadyJerseyTeamNameTotal').val('0');
+                                    })
+                                    .catch(function(e) { console.error('Team name remove error:', e); });
+                            }
+                        }
                     });
 
                     // PS Custom Logo toggle
