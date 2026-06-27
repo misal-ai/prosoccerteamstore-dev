@@ -124,6 +124,8 @@
 {% assign alreadyJerseySleeveLogoTotal = 0 %}
 {% assign alreadyJerseySponsorLogoItem = "no" %}
 {% assign alreadyJerseySponsorLogoTotal = 0 %}
+{% assign alreadyJerseyTeamNameItem = "no" %}
+{% assign alreadyJerseyTeamNameTotal = 0 %}
 
 {% assign alreadyBackNumber = "no" %}
 {% assign alreadyBackNumberTotal = 0 %}
@@ -377,6 +379,10 @@
     {% assign alreadyJerseySponsorLogoItem = "yes" %}
     {% assign alreadyJerseySponsorLogoTotal = cartItem.quantity %}
   {% endif %}
+  {% if cartItem.variant_id == 52243868385582 %}
+    {% assign alreadyJerseyTeamNameItem = "yes" %}
+    {% assign alreadyJerseyTeamNameTotal = cartItem.quantity %}
+  {% endif %}
 
   {% if frontNumber == "yes" %}
     {% assign alreadyFrontNumberTotal = alreadyFrontNumberTotal | plus: countFrontNumbers %}
@@ -428,6 +434,8 @@
 <input type='hidden' id='alreadyJerseySleeveLogoTotal' value='{{ alreadyJerseySleeveLogoTotal }}'>
 <input type='hidden' id='alreadyJerseySponsorLogoItem' value='{{ alreadyJerseySponsorLogoItem }}'>
 <input type='hidden' id='alreadyJerseySponsorLogoTotal' value='{{ alreadyJerseySponsorLogoTotal }}'>
+<input type='hidden' id='alreadyJerseyTeamNameItem' value='{{ alreadyJerseyTeamNameItem }}'>
+<input type='hidden' id='alreadyJerseyTeamNameTotal' value='{{ alreadyJerseyTeamNameTotal }}'>
 
 
 <input type='hidden' id='alreadyTotalBagNumber' value='{{ alreadyTotalBagNumber }}'>
@@ -1912,7 +1920,7 @@
                                 name="properties[Team Name]"
                                 class="input__field"
                                 placeholder="Enter team name"
-                                style="background-color:white !important;"
+                                style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px;"
                               >
                             </div>
                           </div>
@@ -3389,6 +3397,7 @@
                   handleSimpleItem(count_of_front_number, 47913304129838, "#alreadyFrontNumber", "#alreadyFrontNumberTotal");
                   handleSimpleItem(count_of_jersey_sleeve_logo, 51936281428270, "#alreadyJerseySleeveLogoItem", "#alreadyJerseySleeveLogoTotal");
                   handleSimpleItem(count_of_jersey_sponsor_logo, 51936282247470, "#alreadyJerseySponsorLogoItem", "#alreadyJerseySponsorLogoTotal");
+                  handleSimpleItem(count_of_jersey_team_name, 52243868385582, "#alreadyJerseyTeamNameItem", "#alreadyJerseyTeamNameTotal");
 
 
                   function handleNameNumber(count, options) {
