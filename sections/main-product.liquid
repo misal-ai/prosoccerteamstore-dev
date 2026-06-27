@@ -1906,12 +1906,16 @@
                         <div class='col-md-12 col-log-12 col-xl-12 col-xxl-12 mt-2'>
                           <div><b>Team Name($7):</b></div>
                           <div class="toggle-group" style="width:auto;">
-                            <input name="properties[jerseyTeamNameEnable]" type="radio" value="no" checked="" id='team_name_no'>
+                            <input name="properties[jerseyTeamNameEnable]" type="radio" value="no"
+                              {% if alreadyJerseyTeamNameItem == 'no' %}checked=""{% endif %}
+                              id='team_name_no'>
                             <label for='team_name_no'>No</label>
-                            <input name="properties[jerseyTeamNameEnable]" type="radio" value="yes" id='team_name_yes'>
+                            <input name="properties[jerseyTeamNameEnable]" type="radio" value="yes"
+                              {% if alreadyJerseyTeamNameItem == 'yes' %}checked=""{% endif %}
+                              id='team_name_yes'>
                             <label for='team_name_yes'>Yes</label>
                           </div>
-                          <div class="jersey_team_name_holder" style="display:none; margin-top:8px;">
+                          <div class="jersey_team_name_holder" style="{% if alreadyJerseyTeamNameItem == 'yes' %}display:block{% else %}display:none{% endif %}; margin-top:8px;">
                             <div class="product-form__input">
                               <label class="form__label" for="jersey_team_name_input"><strong>Team Name:</strong></label>
                               <input
