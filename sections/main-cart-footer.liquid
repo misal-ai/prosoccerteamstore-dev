@@ -145,6 +145,18 @@
                       </small>
                     </div>
                   {%- else -%}
+                    {%- assign has_ps_logo_item = false -%}
+                    {%- for item in cart.items -%}
+                      {%- if item.properties['PS Custom Logo'] == 'yes' or item.properties['PS Custom Logo'] == 'Yes' -%}
+                        {%- assign has_ps_logo_item = true -%}
+                      {%- endif -%}
+                    {%- endfor -%}
+                    {%- if has_ps_logo_item -%}
+                      <p style="margin-bottom:8px; font-size:0.875em; color:#555; text-align:center;">
+                        Apply code <strong>prosoccer-Logo-5-per-off</strong> at checkout for your PS Logo discount
+                      </p>
+                    {%- endif -%}
+
                     <div class="cart__ctas" {{ block.shopify_attributes }}>
                       <noscript>
                         <button type="submit" class="cart__update-button button button--secondary" form="cart">
