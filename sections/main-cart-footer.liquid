@@ -145,18 +145,13 @@
                       </small>
                     </div>
                   {%- else -%}
-                    {%- comment -%} PS Logo discount code info — above the ctas block {%- endcomment -%}
+                    {%- comment -%} PS Logo discount code — applied silently, no message shown {%- endcomment -%}
                     {%- assign has_ps_logo_item = false -%}
                     {%- for item in cart.items -%}
                       {%- if item.properties['PS Custom Logo'] == 'yes' or item.properties['PS Custom Logo'] == 'Yes' -%}
                         {%- assign has_ps_logo_item = true -%}
                       {%- endif -%}
                     {%- endfor -%}
-                    {%- if has_ps_logo_item -%}
-                      <p style="margin-bottom:8px; font-size:0.875em; color:#1a5c1a;">
-                        🏷 Use code <strong>prosoccer-Logo-5-per-off</strong> at checkout for your PS Logo discount
-                      </p>
-                    {%- endif -%}
 
                     <div class="cart__ctas" {{ block.shopify_attributes }}>
                       <noscript>
@@ -1059,6 +1054,32 @@ function initialize() {
         var val = (item.properties && item.properties['PS Custom Logo']) || '';
         return val.toLowerCase() === 'yes';
       });
+
+      // Check if discount is already applied in cart
+      var discountAlreadyApplied = (cart.cart_level_discount_applications || []).some(function(d) {
+        return d.title && d.title.toLowerCase() === PS_LOGO_DISCOUNT_CODE.toLowerCase();
+      });
+
+      if (_psLogoInCart && !discountAlreadyApplied) {
+        // Silently apply discount at cart level
+        fetch('/cart/update.js', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ discount: PS_LOGO_DISCOUNT_CODE })
+        })
+        .then(function() { location.reload(); })
+        .catch(function() {});
+
+      } else if (!_psLogoInCart && discountAlreadyApplied) {
+        // Remove stale discount when no PS Logo items in cart
+        fetch('/cart/update.js', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ discount: '' })
+        })
+        .then(function() { location.reload(); })
+        .catch(function() {});
+      }
     })
     .catch(function() {});
 
