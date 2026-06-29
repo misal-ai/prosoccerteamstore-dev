@@ -228,6 +228,7 @@ var JACKET_NAME_ID   = '50536571699502';
 var JERSEY_SLEEVE_LOGO_ID   = 51936281428270;
 var JERSEY_SPONSOR_LOGO_ID  = 51936282247470;
 var JERSEY_TEAM_NAME_ID     = 52243868385582;
+var PS_LOGO_DISCOUNT_CODE   = 'prosoccer-Logo-5-per-off';
 var SAME_VENDOR_TYPES = ['Jackets','Jersey','Training Tops','Hoodies','Polos','T-Shirt'];
 
 // Dynamic variant IDs (set per item during applyCustomization loop)
@@ -1043,9 +1044,38 @@ function showErrorForLessThanSeven(message) {
   });
 }
 
+// ─── PS Logo discount — pre-loaded flag used synchronously at checkout ────────
+var _psLogoInCart = false;
+
 // ─── initialize ───────────────────────────────────────────────────────────────
 function initialize() {
   $(".cart-fee-based-item .cart-item__quantity").css('visibility', 'hidden');
+
+  // Pre-load PS Logo state from cart API on page load
+  fetch('/cart.js')
+    .then(function(r) { return r.json(); })
+    .then(function(cart) {
+      _psLogoInCart = cart.items.some(function(item) {
+        var val = (item.properties && item.properties['PS Custom Logo']) || '';
+        return val.toLowerCase() === 'yes';
+      });
+    })
+    .catch(function() {});
+
+  // Intercept checkout button — apply PS Logo discount code if needed
+  // B2B pricing is safe: BSS B2B uses variant price overrides, NOT discount codes.
+  // The /discount/ URL only affects Shopify's code discount field — zero conflict.
+  var checkoutBtn = document.querySelector('.checkout-button');
+  if (checkoutBtn) {
+    checkoutBtn.addEventListener('click', function(e) {
+      if (_psLogoInCart) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        window.location.href = '/discount/' + PS_LOGO_DISCOUNT_CODE + '?redirect=/checkout';
+      }
+      // else: proceed to checkout normally
+    }, true); // useCapture=true fires before all other listeners
+  }
 
   // Only check checkout button eligibility on load — do NOT call applyCustomization
   // (that would cause an infinite reload loop since applyCustomization reloads the page)
@@ -1150,3 +1180,4 @@ document.addEventListener('DOMContentLoaded', initialize);
   ]
 }
 {% endschema %}
+
