@@ -633,8 +633,8 @@ function showHideCartButton() {
   if (!checkoutButton) { hideLoader(); return; }
 
   var excludedTypes = ['backpacks','sackpacks','duffel bags','miscellaneous'];
-  var vendorGrouped = {};   // sameVendorTypes items grouped by vendor
-  var exactTyped    = {};   // other items grouped by vendor|type
+  var vendorGrouped = {};
+  var exactTyped    = {};
   var jomaQtys = [], vestQtys = [], bagQtys = [];
 
   $(".cart-item:not(.cart-fee-based-item)").each(function(i, item) {
@@ -643,12 +643,12 @@ function showHideCartButton() {
     var ptype  = $(item).find('.product_type').val() || '';
     var isCustomized = $(item).attr('data-customized') === 'true';
 
+    console.log('[showHideCartButton] item', i, '| qty:', qty, '| vendor:', vendor, '| type:', ptype, '| customized:', isCustomized);
+
     if (excludedTypes.some(function(t) { return ptype.toLowerCase().indexOf(t) !== -1; })) return;
 
-    // Joma socks: always enforce multiples of 4, customized or not
     if (vendor === 'joma' && ptype === 'Socks') { jomaQtys.push(qty); return; }
 
-    // Only apply min-7 / vest / bag rules to customized items
     if (!isCustomized) return;
 
     if (vendor === 'select' && ptype === 'Scrimmage Vest') { vestQtys.push(qty); return; }
@@ -664,6 +664,7 @@ function showHideCartButton() {
   });
 
   var minSevenQtys = Object.values(vendorGrouped).concat(Object.values(exactTyped));
+  console.log('[showHideCartButton] vendorGrouped:', JSON.stringify(vendorGrouped), '| exactTyped:', JSON.stringify(exactTyped), '| minSevenQtys:', minSevenQtys);
 
   function atLeast7(arr) {
     if (!arr.length) return true;
@@ -684,6 +685,7 @@ function showHideCartButton() {
         && (!hasVest || multOf12(vestQtys));
 
   var finalStatus = (hasMin7 || hasBag || hasJoma || hasVest) ? ok : true;
+  console.log('[showHideCartButton] hasMin7:', hasMin7, '| ok:', ok, '| finalStatus:', finalStatus);
 
   setTimeout(function() {
     hideLoader();
