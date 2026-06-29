@@ -1054,32 +1054,6 @@ function initialize() {
         var val = (item.properties && item.properties['PS Custom Logo']) || '';
         return val.toLowerCase() === 'yes';
       });
-
-      // Check if discount is already applied in cart
-      var discountAlreadyApplied = (cart.cart_level_discount_applications || []).some(function(d) {
-        return d.title && d.title.toLowerCase() === PS_LOGO_DISCOUNT_CODE.toLowerCase();
-      });
-
-      if (_psLogoInCart && !discountAlreadyApplied) {
-        // Silently apply discount at cart level
-        fetch('/cart/update.js', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ discount: PS_LOGO_DISCOUNT_CODE })
-        })
-        .then(function() { location.reload(); })
-        .catch(function() {});
-
-      } else if (!_psLogoInCart && discountAlreadyApplied) {
-        // Remove stale discount when no PS Logo items in cart
-        fetch('/cart/update.js', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ discount: '' })
-        })
-        .then(function() { location.reload(); })
-        .catch(function() {});
-      }
     })
     .catch(function() {});
 
