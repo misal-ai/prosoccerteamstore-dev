@@ -1572,26 +1572,12 @@
                       </div>
                       {% endif %}
 
-                      <div class="ps-logo-holder mt-3 col-12">
-                        <div><b>PS Custom Logo (Free):</b></div>
-                        <div class="toggle-group">
-                          <input type="radio" name="properties[PS Custom Logo]" id="jersey_ps_logo_no" value="no" checked>
-                          <label for="jersey_ps_logo_no">No</label>
-                          <input type="radio" name="properties[PS Custom Logo]" id="jersey_ps_logo_yes" value="yes">
-                          <label for="jersey_ps_logo_yes">Yes</label>
-                        </div>
-                        <div class="jersey_ps_logo_position_holder" style="display:none; margin-top:8px;">
-                          <div class="product-form__input product-form__input--dropdown">
-                            <label class="form__label" for="jersey_ps_logo_position"><strong>PS Logo Position:</strong></label>
-                            <div class="select">
-                              <select id="jersey_ps_logo_position" class="select__select" name="properties[PS Logo Position]">
-                                <option value="Bottom Left">Bottom Left</option>
-                                <option value="Bottom Right">Bottom Right</option>
-                              </select>
-                              {% render 'icon-caret' %}
-                            </div>
-                          </div>
-                        </div>
+                      <div class="col-12">
+                        {% render 'ps-logo-card',
+                          prefix: 'jersey',
+                          position_id: 'jersey_ps_logo_position',
+                          position_holder_class: 'jersey_ps_logo_position_holder'
+                        %}
                       </div>
 
                     </div> 
@@ -2247,7 +2233,9 @@
 
                     // PS Custom Logo toggle
                     $('input[name="properties[PS Custom Logo]"]').on('change', function(){
-                        $(this).val() === 'yes' ? $('.jersey_ps_logo_position_holder').slideDown() : $('.jersey_ps_logo_position_holder').slideUp();
+                        var isYes = $(this).val() === 'yes';
+                        isYes ? $('.jersey_ps_logo_position_holder').slideDown() : $('.jersey_ps_logo_position_holder').slideUp();
+                        isYes ? $('#jersey_ps_preview').addClass('show') : $('#jersey_ps_preview').removeClass('show');
                     });
     
                     $('input[name="properties[frontNumber]"]').click(function(){
