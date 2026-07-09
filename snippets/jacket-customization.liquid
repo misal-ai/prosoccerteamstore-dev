@@ -61,26 +61,12 @@
         {% render 'number-fonts', font_holder:'jacket' %}
       </div>
 
-      <div class="ps-logo-holder mt-3">
-        <div class="product-inner-heading">PS Custom Logo (5% discount):</div>
-        <div class="toggle-group">
-          <input type="radio" name="properties[PS Custom Logo]" id="jacket_ps_logo_no" value="no" checked>
-          <label for="jacket_ps_logo_no">No</label>
-          <input type="radio" name="properties[PS Custom Logo]" id="jacket_ps_logo_yes" value="yes">
-          <label for="jacket_ps_logo_yes">Yes</label>
-        </div>
-        <div class="jacket_ps_logo_position_holder" style="display:none; margin-top:8px;">
-          <div class="product-form__input product-form__input--dropdown">
-            <label class="form__label" for="jacket_ps_logo_position"><strong>PS Logo Position:</strong></label>
-            <div class="select">
-              <select id="jacket_ps_logo_position" class="select__select" name="properties[PS Logo Position]">
-                <option value="Bottom Left">Bottom Left</option>
-                <option value="Bottom Right">Bottom Right</option>
-              </select>
-            </div>
-          </div>
-        </div>
-      </div>
+      {% render 'ps-logo-card',
+        prefix: 'jacket',
+        position_id: 'jacket_ps_logo_position',
+        position_holder_class: 'jacket_ps_logo_position_holder',
+        already_yes: alreadyJerseyTeamNameItem
+      %}
     </div>
 
     <div id="back_section" class="my-1">
@@ -204,9 +190,11 @@
       this.checked ? $('.custom_info').slideDown() : $('.custom_info').slideUp();
     });
 
-    // 6. PS Custom Logo toggle
+    // PS Custom Logo toggle
     $('input[name="properties[PS Custom Logo]"]').on('change', function() {
-      $(this).val() === 'yes' ? $('.jacket_ps_logo_position_holder').slideDown() : $('.jacket_ps_logo_position_holder').slideUp();
+      var isYes = $(this).val() === 'yes';
+      isYes ? $('.jacket_ps_logo_position_holder').slideDown() : $('.jacket_ps_logo_position_holder').slideUp();
+      isYes ? $('#jacket_ps_preview').addClass('show') : $('#jacket_ps_preview').removeClass('show');
     });
   });
 </script>
