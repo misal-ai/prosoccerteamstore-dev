@@ -1,0 +1,195 @@
+{% comment %}
+  PS Logo Card — reusable snippet
+  Parameters:
+    prefix       — unique id prefix e.g. 'jacket', 'hoodie', 'top', etc.
+    position_id  — id for the position select e.g. 'jacket_ps_logo_position'
+    position_holder_class — class for the position holder div e.g. 'jacket_ps_logo_position_holder'
+    already_yes  — pass 'yes' if the logo was already selected (pre-check Yes radio)
+{% endcomment %}
+
+<style>
+.ps-logo-card {
+  position: relative;
+  margin-top: 18px;
+  border: 2px solid #8ec640;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #ffffff 0%, #f0f8e3 100%);
+  padding: 18px 18px 14px;
+  box-shadow: 0 2px 14px rgba(11,93,59,0.10);
+  overflow: hidden;
+}
+.ps-logo-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #8ec640, #101820);
+}
+.ps-logo-card .ps-ribbon {
+  position: absolute;
+  top: 14px; right: -2px;
+  background: #101820;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  padding: 6px 14px 6px 18px;
+  border-radius: 20px 0 0 20px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+.ps-logo-card .ps-card-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+.ps-logo-card .ps-badge {
+  width: 30px; height: 30px;
+  border-radius: 8px;
+  background: #8ec640;
+  display: flex; align-items: center; justify-content: center;
+  flex: none;
+}
+.ps-logo-card .ps-badge svg { width: 16px; height: 16px; fill: #fff; }
+.ps-logo-card .ps-card-title {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+}
+.ps-logo-card .ps-card-sub {
+  font-size: 13px;
+  color: #6b7280;
+  margin: 2px 0 14px;
+  padding-right: 70px;
+  line-height: 1.5;
+}
+.ps-logo-card .ps-card-sub b { color: #8ec640; }
+.ps-logo-card .ps-top-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.ps-logo-card .ps-toggle {
+  display: inline-flex;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid #8ec640;
+  font-size: 13px;
+  font-weight: 600;
+}
+.ps-logo-card .ps-toggle label {
+  border: none;
+  background: #fff;
+  color: #1a1a1a;
+  padding: 6px 18px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  margin: 0;
+  transition: background 0.15s, color 0.15s;
+}
+.ps-logo-card .ps-toggle input[type="radio"] { display: none; }
+.ps-logo-card .ps-toggle input[type="radio"]:checked + label {
+  background: #8ec640;
+  color: #fff;
+}
+.ps-logo-card .ps-real-logo {
+  max-height: 40px;
+  width: auto;
+  display: block;
+  margin-left: auto;
+}
+.ps-logo-card .ps-free-tag {
+  font-size: 11px;
+  font-weight: 700;
+  color: #8ec640;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-bottom: 6px;
+}
+.ps-logo-card .ps-save-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #101820;
+  background: #eceef0;
+  padding: 4px 10px;
+  border-radius: 20px;
+  margin-bottom: 10px;
+}
+.ps-logo-card .ps-save-line svg { width: 12px; height: 12px; fill: #101820; }
+.ps-logo-card .ps-position-holder {
+  margin-top: 8px;
+}
+.ps-logo-card .ps-preview {
+  display: none;
+  margin-top: 12px;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 12.5px;
+  color: #6b7280;
+}
+.ps-logo-card .ps-preview.show { display: flex; }
+.ps-logo-card .ps-preview b { color: #1a1a1a; }
+</style>
+
+<div class="ps-logo-card">
+  <div class="ps-ribbon">SAVE 5%</div>
+
+  <div class="ps-card-head">
+    <div class="ps-badge">
+      <svg viewBox="0 0 24 24"><path d="M12 2 3 7v6c0 5 4 8.5 9 9 5-.5 9-4 9-9V7l-9-5z"/></svg>
+    </div>
+    <div class="ps-card-title">Add ProSoccer Logo</div>
+  </div>
+
+  <div class="ps-card-sub">
+    This item will feature the <b>ProSoccer</b> logo — always included, <b>free</b>, and it unlocks a <b>5% discount</b> on this product.
+  </div>
+
+  <div class="ps-top-row">
+    <div class="ps-toggle">
+      <input type="radio" name="properties[PS Custom Logo]" id="{{ prefix }}_ps_logo_no" value="no"
+        {% unless already_yes == 'yes' %}checked{% endunless %}>
+      <label for="{{ prefix }}_ps_logo_no">No</label>
+      <input type="radio" name="properties[PS Custom Logo]" id="{{ prefix }}_ps_logo_yes" value="yes"
+        {% if already_yes == 'yes' %}checked{% endif %}>
+      <label for="{{ prefix }}_ps_logo_yes">Yes</label>
+    </div>
+    <img class="ps-real-logo"
+      src="https://prosoccerteamstore.com/cdn/shop/files/prosoc_log.fa7ca117_180x.png?v=1704372587"
+      alt="ProSoccer logo">
+  </div>
+
+  <div class="ps-free-tag">Always free to add</div>
+
+  <div class="ps-save-line">
+    <svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5 1.4-1.4L9 14.2 18.6 4.6z"/></svg>
+    5% off applied at checkout
+  </div>
+
+  <div class="{{ position_holder_class }} ps-position-holder" style="display:none;">
+    <div class="product-form__input product-form__input--dropdown">
+      <label class="form__label" for="{{ position_id }}"><strong>PS Logo Position:</strong></label>
+      <div class="select">
+        <select id="{{ position_id }}" class="select__select" name="properties[PS Logo Position]">
+          <option value="Bottom Left">Bottom Left</option>
+          <option value="Bottom Right">Bottom Right</option>
+        </select>
+        {% render 'icon-caret' %}
+      </div>
+    </div>
+  </div>
+
+  <div class="ps-preview {% if already_yes == 'yes' %}show{% endif %}" id="{{ prefix }}_ps_preview">
+    <b>ProSoccer logo added.</b>&nbsp;Your 5% discount will show at checkout.
+  </div>
+</div>
