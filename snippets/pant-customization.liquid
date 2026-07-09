@@ -94,26 +94,11 @@
       </div> 
     </div>
 
-    <div class="ps-logo-holder mt-3">
-      <div class="product-inner-heading">PS Custom Logo (5% discount):</div>
-      <div class="toggle-group">
-        <input type="radio" name="properties[PS Custom Logo]" id="pant_ps_logo_no" value="no" checked>
-        <label for="pant_ps_logo_no">No</label>
-        <input type="radio" name="properties[PS Custom Logo]" id="pant_ps_logo_yes" value="yes">
-        <label for="pant_ps_logo_yes">Yes</label>
-      </div>
-      <div class="pant_ps_logo_position_holder" style="display:none; margin-top:8px;">
-        <div class="product-form__input product-form__input--dropdown">
-          <label class="form__label" for="pant_ps_logo_position"><strong>PS Logo Position:</strong></label>
-          <div class="select">
-            <select id="pant_ps_logo_position" class="select__select" name="properties[PS Logo Position]">
-              <option value="Bottom Left">Bottom Left</option>
-              <option value="Bottom Right">Bottom Right</option>
-            </select>
-          </div>
-        </div>
-      </div>
-    </div>
+    {% render 'ps-logo-card',
+      prefix: 'pant',
+      position_id: 'pant_ps_logo_position',
+      position_holder_class: 'pant_ps_logo_position_holder'
+    %}
 
     <div class="player_number_name row" style="display: none; margin-top:20px;"></div>
   </div>
@@ -195,7 +180,9 @@
 
     // PS Custom Logo toggle
     $('input[name="properties[PS Custom Logo]"]').on('change', function() {
-      $(this).val() === 'yes' ? $('.pant_ps_logo_position_holder').slideDown() : $('.pant_ps_logo_position_holder').slideUp();
+      var isYes = $(this).val() === 'yes';
+      isYes ? $('.pant_ps_logo_position_holder').slideDown() : $('.pant_ps_logo_position_holder').slideUp();
+      isYes ? $('#pant_ps_preview').addClass('show') : $('#pant_ps_preview').removeClass('show');
     });
   });
 </script>
