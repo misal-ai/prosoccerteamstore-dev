@@ -177,12 +177,39 @@
   </div>
 
   <div class="{{ position_holder_class }} ps-position-holder" style="display:none;">
-    <div class="product-form__input product-form__input--dropdown">
-      <label class="form__label" for="{{ position_id }}"><strong>PS Logo Position:</strong></label>
+    <!-- Jersey Side -->
+    <div class="product-form__input product-form__input--dropdown mb-3">
+      <label class="form__label" for="{{ prefix }}_ps_jersey_side"><strong>Jersey Side:</strong></label>
       <div class="select">
-        <select id="{{ position_id }}" class="select__select" name="properties[PS Logo Position]">
-          <option value="Bottom Left">Bottom Left</option>
-          <option value="Bottom Right">Bottom Right</option>
+        <select id="{{ prefix }}_ps_jersey_side" class="select__select" name="properties[PS Jersey Side]">
+          <option value="Front Side">Front Side</option>
+          <option value="Back Side">Back Side</option>
+        </select>
+        {% render 'icon-caret' %}
+      </div>
+    </div>
+
+    <!-- Position Of Logo -->
+    <div class="product-form__input product-form__input--dropdown mb-3">
+      <label class="form__label" for="{{ prefix }}_ps_logo_position"><strong>Position Of Logo:</strong></label>
+      <div class="select">
+        <select id="{{ prefix }}_ps_logo_position" class="select__select" name="properties[PS Logo Position]">
+          <option value="Chest">Chest</option>
+          <option value="Crest">Crest</option>
+        </select>
+        {% render 'icon-caret' %}
+      </div>
+    </div>
+
+    <!-- Color & Shape -->
+    <div class="product-form__input product-form__input--dropdown">
+      <label class="form__label" for="{{ prefix }}_ps_logo_color_shape"><strong>Color & Shape:</strong></label>
+      <div class="select">
+        <select id="{{ prefix }}_ps_logo_color_shape" class="select__select" name="properties[PS Logo Color Shape]">
+          <option value="Rectangular Coloured">Rectangular Coloured</option>
+          <option value="Rectangular Black">Rectangular Black</option>
+          <option value="Square Coloured">Square Coloured</option>
+          <option value="Square Black">Square Black</option>
         </select>
         {% render 'icon-caret' %}
       </div>
@@ -193,3 +220,42 @@
     <b>ProSoccer logo added.</b>&nbsp;Your 5% discount will show at checkout.
   </div>
 </div>
+
+<script>
+(function() {
+  const jerseySideSelect = document.getElementById('{{ prefix }}_ps_jersey_side');
+  const logoPositionSelect = document.getElementById('{{ prefix }}_ps_logo_position');
+
+  function updatePositionOptions() {
+    const side = jerseySideSelect.value;
+    logoPositionSelect.innerHTML = '';
+
+    if (side === 'Front Side') {
+      const optionChest = document.createElement('option');
+      optionChest.value = 'Chest';
+      optionChest.textContent = 'Chest';
+      logoPositionSelect.appendChild(optionChest);
+
+      const optionCrest = document.createElement('option');
+      optionCrest.value = 'Crest';
+      optionCrest.textContent = 'Crest';
+      logoPositionSelect.appendChild(optionCrest);
+    } else {
+      const optionTop = document.createElement('option');
+      optionTop.value = 'Top';
+      optionTop.textContent = 'Top';
+      logoPositionSelect.appendChild(optionTop);
+
+      const optionBottom = document.createElement('option');
+      optionBottom.value = 'Bottom';
+      optionBottom.textContent = 'Bottom';
+      logoPositionSelect.appendChild(optionBottom);
+    }
+  }
+
+  if (jerseySideSelect && logoPositionSelect) {
+    jerseySideSelect.addEventListener('change', updatePositionOptions);
+    updatePositionOptions(); // Initialize on load
+  }
+})();
+</script>
