@@ -1903,9 +1903,9 @@
                             <div class="col-12 mb-1">
                               <div><b>Team Name Position:</b></div>
                               <div class="toggle-group" style="width:auto;">
-                                <input name="properties[Team Logo Position]" type="radio" value="Top Back" checked id='team_position_top'>
+                                <input name="properties[Team Name Position]" type="radio" value="Top Back" checked id='team_position_top'>
                                 <label for='team_position_top' style="width: 95px;">Top Back</label>
-                                <input name="properties[Team Logo Position]" type="radio" value="Bottom Back" id='team_position_bottom'>
+                                <input name="properties[Team Name Position]" type="radio" value="Bottom Back" id='team_position_bottom'>
                                 <label for='team_position_bottom' style="width: 95px;">Bottom Back</label>
                               </div>
                             </div>
@@ -3010,9 +3010,9 @@
                               // ---------------- Jersey Team Logo on Back ----------------
                               var jerseyTeamNameEnable = $('input[name="properties[jerseyTeamNameEnable]"]:checked').val();
                               if (jerseyTeamNameEnable === 'yes') {
-                                properties['Team Logo Enable'] = 'yes';
-                                var teamLogoPosition = $('input[name="properties[Team Logo Position]"]:checked').val();
-                                if (teamLogoPosition) properties['Team Logo Position'] = teamLogoPosition;
+                                properties['Team Name Enable'] = 'yes';
+                                var teamLogoPosition = $('input[name="properties[Team Name Position]"]:checked').val();
+                                if (teamLogoPosition) properties['Team Name Position'] = teamLogoPosition;
                                 var teamLogoFile = $('#team_logo_file')[0]?.files?.[0] ?? null;
                                 if (teamLogoFile) {
                                   properties['Team Logo Name'] = teamLogoFile.name;
