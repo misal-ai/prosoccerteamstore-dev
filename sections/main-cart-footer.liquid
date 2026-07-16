@@ -151,9 +151,10 @@
                         {%- assign has_ps_logo_item = true -%}
                       {%- endif -%}
                     {%- endfor -%}
+
                     {%- if has_ps_logo_item -%}
                       <p style="margin-bottom:8px; font-size:0.875em; color:#555; text-align:center;">
-                        Apply code <strong style="color:red;">PS5OFF</strong> at checkout and get <strong>5% off</strong> on your order
+                        Apply code <strong>prosoccer-Logo-5-per-off</strong> at checkout and get <strong>5% off</strong> your order
                       </p>
                     {%- endif -%}
 
@@ -168,14 +169,25 @@
                         type="submit"
                         class="cart__checkout-button button checkout-button"
                         name="checkout"
-                        {% if cart == empty %}
-                          disabled
-                        {% endif %}
+                        data-ps-logo="{{ has_ps_logo_item }}"
+                        {% if cart == empty %}disabled{% endif %}
                         form="cart"
                       >
                         {{ 'sections.cart.checkout' | t }}
                       </button>
                     </div>
+
+                    <script>
+                      (function() {
+                        var btn = document.querySelector('.checkout-button[data-ps-logo="true"]');
+                        if (!btn) return;
+                        btn.addEventListener('click', function(e) {
+                          e.preventDefault();
+                          e.stopImmediatePropagation();
+                          window.location.href = '/checkout?discount=prosoccer-Logo-5-per-off';
+                        }, true);
+                      })();
+                    </script>
 
                     {%- if additional_checkout_buttons -%}
                       <div class="cart__dynamic-checkout-buttons additional-checkout-buttons">
@@ -387,6 +399,7 @@ function applyCustomizationDebounced() {
 
     var sleeveLogoName   = strVal($(item).find('.jerseySleeveLogoName'));
     var sponsorLogoName  = strVal($(item).find('.jerseySponsorLogoName'));
+    var teamLogoName     = strVal($(item).find('.jerseyTeamLogoName'));
 
     // ── Per-slot logo type tracking (1 processing fee per distinct logo slot) ──
 
@@ -479,19 +492,23 @@ function applyCustomizationDebounced() {
     totalJacketNames   += parseInt($(item).find('.totalJacketNames').val())   || 0;
     totalPantNumbers   += parseInt($(item).find('.totalPantNumbers').val())   || 0;
 
-    // Jersey sleeve & sponsor logos — flat per-unit fee, qty = item quantity
+    // Jersey sleeve & sponsor & team logos — flat per-unit fee, qty = item quantity
     if ($(item).find('.jerseySleeveLogoEnabled').val() === 'yes')   totalJerseySleeveLogos  += qty;
     if ($(item).find('.jerseySponsorLogoEnabled').val() === 'yes')  totalJerseySponsorLogos += qty;
 
-    // Track sleeve/sponsor as distinct logo types for processing fee
+    // Track sleeve/sponsor/team as distinct logo types for processing fee
     if ($(item).find('.jerseySleeveLogoEnabled').val() === 'yes')  vectorLogoTypes['sleeve']  = true;
     if ($(item).find('.jerseySponsorLogoEnabled').val() === 'yes') vectorLogoTypes['sponsor'] = true;
 
     addVectorKey(sleeveLogoName, 'Standard');
     addVectorKey(sponsorLogoName, 'Standard');
+    addVectorKey(teamLogoName, 'Standard');
 
-    // Jersey Team Name on Back — qty = item quantity
-    if (($(item).find('.jerseyTeamNameEnabled').val() || '').toLowerCase() === 'yes') totalJerseyTeamNames += qty;
+    // Jersey Team Logo on Back — qty = item quantity
+    if (($(item).find('.jerseyTeamNameEnabled').val() || '').toLowerCase() === 'yes') {
+      totalJerseyTeamNames += qty;
+      vectorLogoTypes['team'] = true;
+    }
   });
 
   // Build desired fee quantities
