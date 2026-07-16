@@ -342,10 +342,11 @@
                               <input type='hidden' class='jerseySponsorLogoName' value='{{ item.properties['Sponsor Logo Name'] | default: '' }}'>
                           {% endif %}
 
-                          {% if item.properties['Team Name Enable'] %}
-                              <input type='hidden' class='jerseyTeamNameEnabled' value='{{ item.properties['Team Name Enable'] }}'>
-                              <input type='hidden' class='jerseyTeamName' value='{{ item.properties['Team Name'] | default: '' }}'>
-                          {% endif %}
+                          {% if item.properties['Team Logo Enable'] %}
+    <input type='hidden' class='jerseyTeamNameEnabled' value='{{ item.properties['Team Logo Enable'] }}'>
+    <input type='hidden' class='jerseyTeamLogoName' value='{{ item.properties['Team Logo Name'] | default: '' }}'>
+    <input type='hidden' class='jerseyTeamLogoPosition' value='{{ item.properties['Team Logo Position'] | default: '' }}'>
+  {% endif %}
 
                           {% if item.properties['PS Custom Logo'] %}
                               <input type='hidden' class='psCustomLogoEnabled' value='{{ item.properties['PS Custom Logo'] }}'>
