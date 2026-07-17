@@ -399,7 +399,7 @@ function applyCustomizationDebounced() {
 
     var sleeveLogoName   = strVal($(item).find('.jerseySleeveLogoName'));
     var sponsorLogoName  = strVal($(item).find('.jerseySponsorLogoName'));
-    var teamLogoName     = strVal($(item).find('.jerseyTeamLogoName'));
+    var teamNameFile     = strVal($(item).find('.jerseyTeamName'));
 
     // ── Per-slot logo type tracking (1 processing fee per distinct logo slot) ──
 
@@ -502,9 +502,9 @@ function applyCustomizationDebounced() {
 
     addVectorKey(sleeveLogoName, 'Standard');
     addVectorKey(sponsorLogoName, 'Standard');
-    addVectorKey(teamLogoName, 'Standard');
+    addVectorKey(teamNameFile, 'Standard');
 
-    // Jersey Team Logo on Back — qty = item quantity
+    // Jersey Team Name on Back — qty = item quantity
     if (($(item).find('.jerseyTeamNameEnabled').val() || '').toLowerCase() === 'yes') {
       totalJerseyTeamNames += qty;
       vectorLogoTypes['team'] = true;
