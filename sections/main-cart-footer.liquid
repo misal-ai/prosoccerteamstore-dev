@@ -152,13 +152,11 @@
                       {%- endif -%}
                     {%- endfor -%}
 
-                    {%- comment -%}
-                    {%- if has_ps_logo_item -%}
+                    {%- if cart.discount_code == 'PS5OFF' -%}
                       <p style="margin-bottom:8px; font-size:0.875em; color:#555; text-align:center;">
-                        Apply code <strong style="color:red;">PS5OFF</strong> at checkout and get <strong>5% off</strong> your order
+                        <strong style="color:green;">5% discount applied!</strong>
                       </p>
                     {%- endif -%}
-                    {%- endcomment -%}
 
                     <div class="cart__ctas" {{ block.shopify_attributes }}>
                       <noscript>
