@@ -153,11 +153,9 @@
                     {%- endfor -%}
 
                     {%- if has_ps_logo_item -%}
-                      {%- if cart.discount_code == 'PS5OFF' -%}
-                        <p style="margin-bottom:8px; font-size:0.875em; color:#555; text-align:center;">
-                          <strong style="color:green;">5% discount applied!</strong>
-                        </p>
-                      {%- endif -%}
+                      <p style="margin-bottom:8px; font-size:0.875em; color:#555; text-align:center;">
+                        Apply code <strong style="color:red;">PS5OFF</strong> at checkout and get <strong>5% off</strong> your order
+                      </p>
                     {%- endif -%}
 
                     <div class="cart__ctas" {{ block.shopify_attributes }}>
@@ -168,16 +166,28 @@
                       </noscript>
 
                       <button
-                        type="button"
+                        type="submit"
                         class="cart__checkout-button button checkout-button"
                         name="checkout"
                         data-ps-logo="{{ has_ps_logo_item }}"
                         {% if cart == empty %}disabled{% endif %}
-                        onclick="handleCheckoutWithDiscount(this)"
+                        form="cart"
                       >
                         {{ 'sections.cart.checkout' | t }}
                       </button>
                     </div>
+
+                    <script>
+                      (function() {
+                        var btn = document.querySelector('.checkout-button[data-ps-logo="true"]');
+                        if (!btn) return;
+                        btn.addEventListener('click', function(e) {
+                          e.preventDefault();
+                          e.stopImmediatePropagation();
+                          window.location.href = '/checkout?discount=prosoccer-Logo-5-per-off';
+                        }, true);
+                      })();
+                    </script>
 
                     {%- if additional_checkout_buttons -%}
                       <div class="cart__dynamic-checkout-buttons additional-checkout-buttons">
@@ -213,27 +223,6 @@
 
 {% endjavascript %}
 <script src="{{ 'shipping_calculator.js' | asset_url }}" defer></script>
-<script>
-// Only handles checkout redirect with discount
-function handleCheckoutWithDiscount(btn) {
-  var hasPsLogo = {{ has_ps_logo_item }};
-
-  if (hasPsLogo) {
-    btn.disabled = true;
-    btn.textContent = 'Redirecting...';
-    // Add discount to checkout URL - does not interfere with B2B pricing
-    window.location.href = '/checkout?discount=PS5OFF';
-  } else {
-    window.location.href = '/checkout';
-  }
-}
-</script>
-{%- assign ps_logo_in_cart = false -%}
-{%- for item in cart.items -%}
-  {%- if item.properties['PS Custom Logo'] == 'yes' or item.properties['PS Custom Logo'] == 'Yes' -%}
-    {%- assign ps_logo_in_cart = true -%}
-  {%- endif -%}
-{%- endfor -%}
 <!-- Cart Customization Logic -->
 <script>
 // ─── Constants ───────────────────────────────────────────────────────────────
@@ -602,6 +591,7 @@ function applyCustomizationDebounced() {
 
       if (!toZero.length && !toUpdate.length && !toAdd.length) {
         hideLoader();
+        location.reload();
         return;
       }
 
@@ -1176,3 +1166,4 @@ document.addEventListener('DOMContentLoaded', initialize);
   ]
 }
 {% endschema %}
+
