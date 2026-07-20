@@ -157,21 +157,6 @@
                         <p style="margin-bottom:8px; font-size:0.875em; color:#555; text-align:center;">
                           <strong style="color:green;">5% discount applied!</strong>
                         </p>
-                      {%- else -%}
-                        <p style="margin-bottom:8px; font-size:0.875em; color:#555; text-align:center;">
-                          <strong style="color:orange;">Applying 5% discount...</strong>
-                        </p>
-                        <script>
-                          document.addEventListener('DOMContentLoaded', function() {
-                            fetch('/cart.js', {
-                              method: 'POST',
-                              headers: { 'Content-Type': 'application/json' },
-                              body: JSON.stringify({ discount: 'PS5OFF' })
-                            }).then(function() {
-                              window.location.reload();
-                            });
-                          });
-                        </script>
                       {%- endif -%}
                     {%- endif -%}
 
@@ -193,21 +178,6 @@
                         {{ 'sections.cart.checkout' | t }}
                       </button>
                     </div>
-
-                    <script>
-                      function handleCheckoutWithDiscount(btn) {
-                        var hasPsLogo = {{ has_ps_logo_item }};
-
-                        if (hasPsLogo) {
-                          btn.disabled = true;
-                          btn.textContent = 'Redirecting to checkout...';
-                          // Use URL discount parameter - more reliable
-                          window.location.href = '/checkout?discount=PS5OFF';
-                        } else {
-                          window.location.href = '/checkout';
-                        }
-                      }
-                    </script>
 
                     {%- if additional_checkout_buttons -%}
                       <div class="cart__dynamic-checkout-buttons additional-checkout-buttons">
@@ -244,60 +214,19 @@
 {% endjavascript %}
 <script src="{{ 'shipping_calculator.js' | asset_url }}" defer></script>
 <script>
-function applyPsDiscount() {
-  return fetch('/cart.js', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ discount: 'PS5OFF' })
-  }).then(function(response) {
-    return response.json();
-  }).then(function(cart) {
-    if (cart.discount_code === 'PS5OFF') {
-      console.log('PS5OFF discount applied successfully');
-    } else {
-      console.log('Failed to apply PS5OFF discount');
-    }
-    return cart;
-  });
+// Only handles checkout redirect with discount
+function handleCheckoutWithDiscount(btn) {
+  var hasPsLogo = {{ has_ps_logo_item }};
+
+  if (hasPsLogo) {
+    btn.disabled = true;
+    btn.textContent = 'Redirecting...';
+    // Add discount to checkout URL - does not interfere with B2B pricing
+    window.location.href = '/checkout?discount=PS5OFF';
+  } else {
+    window.location.href = '/checkout';
+  }
 }
-
-function removePsDiscount() {
-  return fetch('/cart.js', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ discount: '' })
-  });
-}
-
-function checkPsLogoDiscount() {
-  return fetch('/cart.js')
-    .then(function(r) { return r.json(); })
-    .then(function(cart) {
-      var hasPsLogo = false;
-      cart.items.forEach(function(item) {
-        if (item.properties && (item.properties['PS Custom Logo'] === 'yes' || item.properties['PS Custom Logo'] === 'Yes')) {
-          hasPsLogo = true;
-        }
-      });
-
-      var currentDiscount = cart.discount_code;
-
-      // Auto-apply discount if PS logo exists and discount not already applied
-      if (hasPsLogo && currentDiscount !== 'PS5OFF') {
-        applyPsDiscount();
-      }
-
-      // Remove discount if PS logo removed but discount still applied
-      if (!hasPsLogo && currentDiscount === 'PS5OFF') {
-        removePsDiscount();
-      }
-    });
-}
-
-// Run on page load
-document.addEventListener('DOMContentLoaded', function() {
-  checkPsLogoDiscount();
-});
 </script>
 {%- assign ps_logo_in_cart = false -%}
 {%- for item in cart.items -%}
@@ -673,7 +602,6 @@ function applyCustomizationDebounced() {
 
       if (!toZero.length && !toUpdate.length && !toAdd.length) {
         hideLoader();
-        checkPsLogoDiscount();
         return;
       }
 
@@ -733,7 +661,7 @@ function updateFeeItems(toZero, toUpdate, toAdd) {
   }
 
   return chain
-    .then(function() { checkPsLogoDiscount(); })
+    .then(function() { location.reload(); })
     .catch(function(err) { console.error('updateFeeItems error:', err); hideLoader(); });
 }
 
@@ -1100,8 +1028,6 @@ function manageRemove(productId, orderItemKey) {
     if (removedRow) removedRow.remove();
     // applyCustomization recalculates all fees from remaining items and reloads
     applyCustomization();
-    // Check PS logo discount after removal
-    checkPsLogoDiscount();
   })
   .catch(function(err) { console.error('manageRemove error:', err); hideLoader(); });
 }
@@ -1122,8 +1048,6 @@ function manageSingleRemove(productId, orderItemKey) {
     if (removedRow) removedRow.remove();
     // applyCustomization recalculates all fees from remaining items and reloads
     applyCustomization();
-    // Check PS logo discount after removal
-    checkPsLogoDiscount();
   })
   .catch(function(err) { console.error('manageSingleRemove error:', err); hideLoader(); });
 }
