@@ -152,10 +152,27 @@
                       {%- endif -%}
                     {%- endfor -%}
 
-                    {%- if cart.discount_code == 'PS5OFF' -%}
-                      <p style="margin-bottom:8px; font-size:0.875em; color:#555; text-align:center;">
-                        <strong style="color:green;">5% discount applied!</strong>
-                      </p>
+                    {%- if has_ps_logo_item -%}
+                      {%- if cart.discount_code == 'PS5OFF' -%}
+                        <p style="margin-bottom:8px; font-size:0.875em; color:#555; text-align:center;">
+                          <strong style="color:green;">5% discount applied!</strong>
+                        </p>
+                      {%- else -%}
+                        <p style="margin-bottom:8px; font-size:0.875em; color:#555; text-align:center;">
+                          <strong style="color:orange;">Applying 5% discount...</strong>
+                        </p>
+                        <script>
+                          document.addEventListener('DOMContentLoaded', function() {
+                            fetch('/cart.js', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ discount: 'PS5OFF' })
+                            }).then(function() {
+                              window.location.reload();
+                            });
+                          });
+                        </script>
+                      {%- endif -%}
                     {%- endif -%}
 
                     <div class="cart__ctas" {{ block.shopify_attributes }}>
@@ -166,16 +183,43 @@
                       </noscript>
 
                       <button
-                        type="submit"
+                        type="button"
                         class="cart__checkout-button button checkout-button"
                         name="checkout"
                         data-ps-logo="{{ has_ps_logo_item }}"
                         {% if cart == empty %}disabled{% endif %}
-                        form="cart"
+                        onclick="handleCheckoutWithDiscount(this)"
                       >
                         {{ 'sections.cart.checkout' | t }}
                       </button>
                     </div>
+
+                    <script>
+                      function handleCheckoutWithDiscount(btn) {
+                        var hasPsLogo = {{ has_ps_logo_item }};
+                        var currentDiscount = {{ cart.discount_code | json }};
+
+                        if (hasPsLogo && currentDiscount !== 'PS5OFF') {
+                          btn.disabled = true;
+                          btn.textContent = 'Applying discount...';
+                          fetch('/cart.js', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ discount: 'PS5OFF' })
+                          }).then(function() {
+                            btn.disabled = false;
+                            btn.textContent = 'Redirecting...';
+                            window.location.href = '/checkout';
+                          }).catch(function() {
+                            btn.disabled = false;
+                            btn.textContent = {{ 'sections.cart.checkout' | t | json }};
+                            window.location.href = '/checkout';
+                          });
+                        } else {
+                          window.location.href = '/checkout';
+                        }
+                      }
+                    </script>
 
                     {%- if additional_checkout_buttons -%}
                       <div class="cart__dynamic-checkout-buttons additional-checkout-buttons">
