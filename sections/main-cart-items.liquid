@@ -340,6 +340,7 @@
                           {% if item.properties['Sponsor/Team Logo'] %}
                               <input type='hidden' class='jerseySponsorLogoEnabled' value='{{ item.properties['Sponsor/Team Logo'] }}'>
                               <input type='hidden' class='jerseySponsorLogoName' value='{{ item.properties['Sponsor Logo Name'] | default: '' }}'>
+                              <input type='hidden' class='jerseySponsorLogoPosition' value='{{ item.properties['Sponsor Logo Position'] | default: '' }}'>
                           {% endif %}
 
                           {% if item.properties['Team Name Enable'] %}
