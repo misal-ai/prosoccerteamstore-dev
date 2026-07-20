@@ -212,8 +212,33 @@
 {% endjavascript %}
 <script src="{{ 'shipping_calculator.js' | asset_url }}" defer></script>
 <script>
+function applyPsDiscount() {
+  return fetch('/cart.js', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ discount: 'PS5OFF' })
+  }).then(function(response) {
+    return response.json();
+  }).then(function(cart) {
+    if (cart.discount_code === 'PS5OFF') {
+      console.log('PS5OFF discount applied successfully');
+    } else {
+      console.log('Failed to apply PS5OFF discount');
+    }
+    return cart;
+  });
+}
+
+function removePsDiscount() {
+  return fetch('/cart.js', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ discount: '' })
+  });
+}
+
 function checkPsLogoDiscount() {
-  fetch('/cart.js')
+  return fetch('/cart.js')
     .then(function(r) { return r.json(); })
     .then(function(cart) {
       var hasPsLogo = false;
@@ -224,40 +249,23 @@ function checkPsLogoDiscount() {
       });
 
       var currentDiscount = cart.discount_code;
-      var btn = document.querySelector('.ps-logo-discount-wrapper');
-      var applyBtn = document.querySelector('.apply-ps-discount');
 
+      // Auto-apply discount if PS logo exists and discount not already applied
       if (hasPsLogo && currentDiscount !== 'PS5OFF') {
-        if (btn) btn.style.display = 'block';
-      } else {
-        if (btn) btn.style.display = 'none';
+        applyPsDiscount();
       }
 
-      if (hasPsLogo && currentDiscount !== 'PS5OFF' && applyBtn) {
-        applyBtn.addEventListener('click', function() {
-          fetch('/cart.js', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ discount: 'PS5OFF' })
-          }).then(function() {
-            window.location.reload();
-          });
-        });
-      }
-
+      // Remove discount if PS logo removed but discount still applied
       if (!hasPsLogo && currentDiscount === 'PS5OFF') {
-        fetch('/cart.js', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ discount: '' })
-        }).then(function() {
-          window.location.reload();
-        });
+        removePsDiscount();
       }
     });
 }
 
-document.addEventListener('DOMContentLoaded', checkPsLogoDiscount);
+// Run on page load
+document.addEventListener('DOMContentLoaded', function() {
+  checkPsLogoDiscount();
+});
 </script>
 {%- assign ps_logo_in_cart = false -%}
 {%- for item in cart.items -%}
