@@ -217,17 +217,24 @@
     {%- assign ps_logo_in_cart = true -%}
   {%- endif -%}
 {%- endfor -%}
-{% if ps_logo_in_cart %}
+{% if ps_logo_in_cart and cart.discount_code != 'PS5OFF' %}
+<div class="ps-logo-discount-wrapper" style="text-align:center; margin-bottom:15px;">
+  <button type="button" class="button apply-ps-discount" style="background:#e60023; color:#fff; border:none; padding:10px 20px; cursor:pointer;">
+    Apply 5% Discount (PS Logo)
+  </button>
+</div>
 <script>
 (function() {
-  var currentDiscount = {{ cart.discount_code | json }};
-  if (currentDiscount !== 'PS5OFF') {
+  document.querySelector('.apply-ps-discount')?.addEventListener('click', function() {
     fetch('/cart.js', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ discount: 'PS5OFF' })
+    }).then(function() {
+      document.querySelector('.ps-logo-discount-wrapper')?.remove();
+      window.location.reload();
     });
-  }
+  });
 })();
 </script>
 {% endif %}
