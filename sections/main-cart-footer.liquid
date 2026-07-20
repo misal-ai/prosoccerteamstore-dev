@@ -211,6 +211,54 @@
 
 {% endjavascript %}
 <script src="{{ 'shipping_calculator.js' | asset_url }}" defer></script>
+<script>
+function checkPsLogoDiscount() {
+  fetch('/cart.js')
+    .then(function(r) { return r.json(); })
+    .then(function(cart) {
+      var hasPsLogo = false;
+      cart.items.forEach(function(item) {
+        if (item.properties && (item.properties['PS Custom Logo'] === 'yes' || item.properties['PS Custom Logo'] === 'Yes')) {
+          hasPsLogo = true;
+        }
+      });
+
+      var currentDiscount = cart.discount_code;
+      var btn = document.querySelector('.ps-logo-discount-wrapper');
+      var applyBtn = document.querySelector('.apply-ps-discount');
+
+      if (hasPsLogo && currentDiscount !== 'PS5OFF') {
+        if (btn) btn.style.display = 'block';
+      } else {
+        if (btn) btn.style.display = 'none';
+      }
+
+      if (hasPsLogo && currentDiscount !== 'PS5OFF' && applyBtn) {
+        applyBtn.addEventListener('click', function() {
+          fetch('/cart.js', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ discount: 'PS5OFF' })
+          }).then(function() {
+            window.location.reload();
+          });
+        });
+      }
+
+      if (!hasPsLogo && currentDiscount === 'PS5OFF') {
+        fetch('/cart.js', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ discount: '' })
+        }).then(function() {
+          window.location.reload();
+        });
+      }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', checkPsLogoDiscount);
+</script>
 {%- assign ps_logo_in_cart = false -%}
 {%- for item in cart.items -%}
   {%- if item.properties['PS Custom Logo'] == 'yes' or item.properties['PS Custom Logo'] == 'Yes' -%}
@@ -223,20 +271,6 @@
     Apply 5% Discount (PS Logo)
   </button>
 </div>
-<script>
-(function() {
-  document.querySelector('.apply-ps-discount')?.addEventListener('click', function() {
-    fetch('/cart.js', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ discount: 'PS5OFF' })
-    }).then(function() {
-      document.querySelector('.ps-logo-discount-wrapper')?.remove();
-      window.location.reload();
-    });
-  });
-})();
-</script>
 {% endif %}
 <!-- Cart Customization Logic -->
 <script>
@@ -606,7 +640,7 @@ function applyCustomizationDebounced() {
 
       if (!toZero.length && !toUpdate.length && !toAdd.length) {
         hideLoader();
-        location.reload();
+        checkPsLogoDiscount();
         return;
       }
 
@@ -666,7 +700,7 @@ function updateFeeItems(toZero, toUpdate, toAdd) {
   }
 
   return chain
-    .then(function() { location.reload(); })
+    .then(function() { checkPsLogoDiscount(); })
     .catch(function(err) { console.error('updateFeeItems error:', err); hideLoader(); });
 }
 
@@ -1033,6 +1067,8 @@ function manageRemove(productId, orderItemKey) {
     if (removedRow) removedRow.remove();
     // applyCustomization recalculates all fees from remaining items and reloads
     applyCustomization();
+    // Check PS logo discount after removal
+    checkPsLogoDiscount();
   })
   .catch(function(err) { console.error('manageRemove error:', err); hideLoader(); });
 }
@@ -1053,6 +1089,8 @@ function manageSingleRemove(productId, orderItemKey) {
     if (removedRow) removedRow.remove();
     // applyCustomization recalculates all fees from remaining items and reloads
     applyCustomization();
+    // Check PS logo discount after removal
+    checkPsLogoDiscount();
   })
   .catch(function(err) { console.error('manageSingleRemove error:', err); hideLoader(); });
 }
