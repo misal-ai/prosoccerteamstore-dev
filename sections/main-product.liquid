@@ -1873,6 +1873,15 @@
                             <label for='sponsor_logo_yes'>Yes</label>
                           </div>
                           <div class="sponsor_logo_upload logo_holder row" style="display:none; margin-left:2px; margin-top:8px;">
+                            <div class="col-12 mb-1">
+                              <div><b>Sponsor/Team Logo Position:</b></div>
+                              <div class="toggle-group" style="width:auto;">
+                                <input name="properties[Sponsor Logo Position]" type="radio" value="Above Number" checked id='sponsor_position_top'>
+                                <label for='sponsor_position_top' style="width: 95px;">Above Number</label>
+                                <input name="properties[Sponsor Logo Position]" type="radio" value="Below Number" id='sponsor_position_bottom'>
+                                <label for='sponsor_position_bottom' style="width: 95px;">Below Number</label>
+                              </div>
+                            </div>
                             <div class='heading col-12'>Sponsor/Team Logo File</div>
                             <div class='col-7 align-self-center'>
                               <input accept=".png,.svg,.pdf,.ai,.eps,.jpg,.jpeg,.psd,.tif,.tiff"
@@ -1899,14 +1908,14 @@
                               id='team_name_yes'>
                             <label for='team_name_yes'>Yes</label>
                           </div>
-                          <div class="jersey_team_name_holder logo_holder row" style="{% if alreadyJerseyTeamNameItem == 'yes' %}display:block{% else %}display:none{% endif %}; margin-left:2px; margin-top:8px;width:230px;">
+                          <div class="jersey_team_name_holder logo_holder row" style="{% if alreadyJerseyTeamNameItem == 'yes' %}display:block{% else %}display:none{% endif %}; margin-left:2px; margin-top:8px;">
                             <div class="col-12 mb-1">
                               <div><b>Team Name Position:</b></div>
                               <div class="toggle-group" style="width:auto;">
-                                <input name="properties[Team Name Position]" type="radio" value="Top Back" checked id='team_position_top'>
-                                <label for='team_position_top' style="width: 95px;">Top Back</label>
-                                <input name="properties[Team Name Position]" type="radio" value="Bottom Back" id='team_position_bottom'>
-                                <label for='team_position_bottom' style="width: 95px;">Bottom Back</label>
+                                <input name="properties[Team Name Position]" type="radio" value="Above Number" checked id='team_position_top'>
+                                <label for='team_position_top' style="width: 95px;">Above Number</label>
+                                <input name="properties[Team Name Position]" type="radio" value="Below Number" id='team_position_bottom'>
+                                <label for='team_position_bottom' style="width: 95px;">Below Number</label>
                               </div>
                             </div>
                             <div class='heading col-12'>Team Name File</div>
@@ -2999,6 +3008,8 @@
                               var jerseySponsorLogoEnable = $('input[name="properties[jerseySponsorLogoEnable]"]:checked').val();
                               if (jerseySponsorLogoEnable === 'yes') {
                                 properties['Sponsor/Team Logo'] = 'yes';
+                                var sponsorLogoPosition = $('input[name="properties[Sponsor Logo Position]"]:checked').val();
+                                if (sponsorLogoPosition) properties['Sponsor Logo Position'] = sponsorLogoPosition;
                                 var sponsorLogoFile = $('#sponsor_logo_file')[0]?.files?.[0] ?? null;
                                 if (sponsorLogoFile) {
                                   properties['Sponsor Logo Name'] = sponsorLogoFile.name;
