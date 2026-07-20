@@ -197,24 +197,12 @@
                     <script>
                       function handleCheckoutWithDiscount(btn) {
                         var hasPsLogo = {{ has_ps_logo_item }};
-                        var currentDiscount = {{ cart.discount_code | json }};
 
-                        if (hasPsLogo && currentDiscount !== 'PS5OFF') {
+                        if (hasPsLogo) {
                           btn.disabled = true;
-                          btn.textContent = 'Applying discount...';
-                          fetch('/cart.js', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ discount: 'PS5OFF' })
-                          }).then(function() {
-                            btn.disabled = false;
-                            btn.textContent = 'Redirecting...';
-                            window.location.href = '/checkout';
-                          }).catch(function() {
-                            btn.disabled = false;
-                            btn.textContent = {{ 'sections.cart.checkout' | t | json }};
-                            window.location.href = '/checkout';
-                          });
+                          btn.textContent = 'Redirecting to checkout...';
+                          // Use URL discount parameter - more reliable
+                          window.location.href = '/checkout?discount=PS5OFF';
                         } else {
                           window.location.href = '/checkout';
                         }
