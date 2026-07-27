@@ -2257,6 +2257,7 @@
                         var isYes = $(this).val() === 'yes';
                         isYes ? $('.jersey_ps_logo_position_holder').slideDown() : $('.jersey_ps_logo_position_holder').slideUp();
                         isYes ? $('#jersey_ps_preview').addClass('show') : $('#jersey_ps_preview').removeClass('show');
+                        isYes ? $('#jersey_ps_image_preview').addClass('show') : $('#jersey_ps_image_preview').removeClass('show');
                     });
     
                     $('input[name="properties[frontNumber]"]').click(function(){
