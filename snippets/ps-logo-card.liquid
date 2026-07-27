@@ -139,6 +139,49 @@
 }
 .ps-logo-card .ps-preview.show { display: flex; }
 .ps-logo-card .ps-preview b { color: #1a1a1a; }
+
+.ps-logo-card .ps-controls-row {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+}
+.ps-logo-card .ps-controls-left {
+  flex: 1;
+  min-width: 0;
+}
+.ps-logo-card .ps-controls-right {
+  width: 240px;
+  flex: none;
+}
+.ps-logo-card .ps-image-preview {
+  display: none;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border: 1px dashed #c5d2a9;
+  border-radius: 10px;
+  background: #f8fcee;
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+}
+.ps-logo-card .ps-image-preview.show { display: flex; }
+.ps-logo-card .ps-image-preview img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
+@media (max-width: 640px) {
+  .ps-logo-card .ps-controls-row {
+    flex-direction: column;
+  }
+  .ps-logo-card .ps-controls-right {
+    width: 100%;
+  }
+}
 </style>
 
 <div class="ps-logo-card">
@@ -177,41 +220,51 @@
   </div>
 
   <div class="{{ position_holder_class }} ps-position-holder" style="display:none;">
-    <!-- Jersey Side -->
-    <div class="product-form__input product-form__input--dropdown mb-3">
-      <label class="form__label" for="{{ prefix }}_ps_jersey_side"><strong>Jersey Side:</strong></label>
-      <div class="select">
-        <select id="{{ prefix }}_ps_jersey_side" class="select__select" name="properties[PS Jersey Side]">
-          <option value="Front Side">Front Side</option>
-          <option value="Back Side">Back Side</option>
-        </select>
-        {% render 'icon-caret' %}
-      </div>
-    </div>
+    <div class="ps-controls-row">
+      <div class="ps-controls-left">
+        <!-- Jersey Side -->
+        <div class="product-form__input product-form__input--dropdown mb-3">
+          <label class="form__label" for="{{ prefix }}_ps_jersey_side"><strong>Jersey Side:</strong></label>
+          <div class="select">
+            <select id="{{ prefix }}_ps_jersey_side" class="select__select" name="properties[PS Jersey Side]">
+              <option value="Front Side">Front Side</option>
+              <option value="Back Side">Back Side</option>
+            </select>
+            {% render 'icon-caret' %}
+          </div>
+        </div>
 
-    <!-- Position Of Logo -->
-    <div class="product-form__input product-form__input--dropdown mb-3">
-      <label class="form__label" for="{{ prefix }}_ps_logo_position"><strong>Position Of Logo:</strong></label>
-      <div class="select">
-        <select id="{{ prefix }}_ps_logo_position" class="select__select" name="properties[PS Logo Position]">
-          <option value="Chest">Chest</option>
-          <option value="Crest">Crest</option>
-        </select>
-        {% render 'icon-caret' %}
-      </div>
-    </div>
+        <!-- Position Of Logo -->
+        <div class="product-form__input product-form__input--dropdown mb-3">
+          <label class="form__label" for="{{ prefix }}_ps_logo_position"><strong>Position Of Logo:</strong></label>
+          <div class="select">
+            <select id="{{ prefix }}_ps_logo_position" class="select__select" name="properties[PS Logo Position]">
+              <option value="Chest">Chest</option>
+              <option value="Crest">Crest</option>
+            </select>
+            {% render 'icon-caret' %}
+          </div>
+        </div>
 
-    <!-- Color & Shape -->
-    <div class="product-form__input product-form__input--dropdown">
-      <label class="form__label" for="{{ prefix }}_ps_logo_color_shape"><strong>Color & Shape:</strong></label>
-      <div class="select">
-        <select id="{{ prefix }}_ps_logo_color_shape" class="select__select" name="properties[PS Logo Color Shape]">
-          <option value="Rectangular Coloured">Rectangular Coloured</option>
-          <option value="Rectangular Black">Rectangular Black</option>
-          <option value="Square Coloured">Square Coloured</option>
-          <option value="Square Black">Square Black</option>
-        </select>
-        {% render 'icon-caret' %}
+        <!-- Color & Shape -->
+        <div class="product-form__input product-form__input--dropdown">
+          <label class="form__label" for="{{ prefix }}_ps_logo_color_shape"><strong>Color & Shape:</strong></label>
+          <div class="select">
+            <select id="{{ prefix }}_ps_logo_color_shape" class="select__select" name="properties[PS Logo Color Shape]">
+              <option value="Rectangular Coloured">Rectangular Coloured</option>
+              <option value="Rectangular Black">Rectangular Black</option>
+              <option value="Square Coloured">Square Coloured</option>
+              <option value="Square Black">Square Black</option>
+            </select>
+            {% render 'icon-caret' %}
+          </div>
+        </div>
+      </div>
+
+      <div class="ps-controls-right">
+        <div class="ps-image-preview {% if already_yes == 'yes' %}show{% endif %}" id="{{ prefix }}_ps_image_preview">
+          <img id="{{ prefix }}_ps_preview_img" src="{{ 'front_chest.png' | asset_url }}" alt="Logo Position Preview">
+        </div>
       </div>
     </div>
   </div>
@@ -223,8 +276,34 @@
 
 <script>
 (function() {
-  const jerseySideSelect = document.getElementById('{{ prefix }}_ps_jersey_side');
-  const logoPositionSelect = document.getElementById('{{ prefix }}_ps_logo_position');
+  const prefix = '{{ prefix }}';
+  const jerseySideSelect = document.getElementById(prefix + '_ps_jersey_side');
+  const logoPositionSelect = document.getElementById(prefix + '_ps_logo_position');
+  const previewImg = document.getElementById(prefix + '_ps_preview_img');
+  const imagePreview = document.getElementById(prefix + '_ps_image_preview');
+  const logoYesRadio = document.getElementById(prefix + '_ps_logo_yes');
+  const logoNoRadio = document.getElementById(prefix + '_ps_logo_no');
+
+  const imageMap = {
+    'Front Side': {
+      'Chest': "{{ 'front_chest.png' | asset_url }}",
+      'Crest': "{{ 'front_crest.png' | asset_url }}"
+    },
+    'Back Side': {
+      'Top': "{{ 'back_top.png' | asset_url }}",
+      'Bottom': "{{ 'back_bottom.png' | asset_url }}"
+    }
+  };
+
+  function updatePreviewImage() {
+    if (!jerseySideSelect || !logoPositionSelect || !previewImg) return;
+    const side = jerseySideSelect.value;
+    const position = logoPositionSelect.value;
+    const imgSrc = imageMap[side] && imageMap[side][position];
+    if (imgSrc) {
+      previewImg.src = imgSrc;
+    }
+  }
 
   function updatePositionOptions() {
     const side = jerseySideSelect.value;
@@ -251,11 +330,30 @@
       optionBottom.textContent = 'Bottom';
       logoPositionSelect.appendChild(optionBottom);
     }
+
+    updatePreviewImage();
+  }
+
+  function handleLogoToggle() {
+    if (!imagePreview) return;
+    const isYes = logoYesRadio && logoYesRadio.checked;
+    if (isYes) {
+      imagePreview.classList.add('show');
+    } else {
+      imagePreview.classList.remove('show');
+    }
   }
 
   if (jerseySideSelect && logoPositionSelect) {
     jerseySideSelect.addEventListener('change', updatePositionOptions);
+    logoPositionSelect.addEventListener('change', updatePreviewImage);
     updatePositionOptions(); // Initialize on load
+  }
+
+  if (logoYesRadio && logoNoRadio) {
+    logoYesRadio.addEventListener('change', handleLogoToggle);
+    logoNoRadio.addEventListener('change', handleLogoToggle);
+    handleLogoToggle(); // Initialize on load
   }
 })();
 </script>
