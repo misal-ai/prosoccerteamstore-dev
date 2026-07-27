@@ -148,6 +148,7 @@ $(document).ready(function () {
     var isYes = $(this).val() === 'yes';
     isYes ? $('.short_ps_logo_position_holder').slideDown() : $('.short_ps_logo_position_holder').slideUp();
     isYes ? $('#short_ps_preview').addClass('show') : $('#short_ps_preview').removeClass('show');
+    isYes ? $('#short_ps_image_preview').addClass('show') : $('#short_ps_image_preview').removeClass('show');
   });
 
 });
