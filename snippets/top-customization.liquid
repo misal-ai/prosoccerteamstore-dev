@@ -84,27 +84,11 @@
       </div>
     </div>
 
-      <div class="ps-logo-holder mt-3">
-        <div class="product-inner-heading">PS Custom Logo (5% discount):</div>
-        <div class="toggle-group">
-          <input type="radio" name="properties[PS Custom Logo]" id="top_ps_logo_no" value="no" checked>
-          <label for="top_ps_logo_no">No</label>
-          <input type="radio" name="properties[PS Custom Logo]" id="top_ps_logo_yes" value="yes">
-          <label for="top_ps_logo_yes">Yes</label>
-        </div>
-        <div class="top_ps_logo_position_holder" style="display:none; margin-top:8px;">
-          <div class="product-form__input product-form__input--dropdown">
-            <label class="form__label" for="top_ps_logo_position"><strong>PS Logo Position:</strong></label>
-            <div class="select">
-              <select id="top_ps_logo_position" class="select__select" name="properties[PS Logo Position]">
-                <option value="Bottom Left">Bottom Left</option>
-                <option value="Bottom Right">Bottom Right</option>
-              </select>
-              {% render 'icon-caret' %}
-            </div>
-          </div>
-        </div>
-      </div>
+      {% render 'ps-logo-card',
+        prefix: 'top',
+        position_id: 'top_ps_logo_position',
+        position_holder_class: 'top_ps_logo_position_holder'
+      %}
     </div>
 
     <div id="back_section" class="mt-3">
@@ -212,7 +196,10 @@
 
     // PS Custom Logo toggle
     $('input[name="properties[PS Custom Logo]"]').on('change', function() {
-      $(this).val() === 'yes' ? $('.top_ps_logo_position_holder').slideDown() : $('.top_ps_logo_position_holder').slideUp();
+      var isYes = $(this).val() === 'yes';
+      isYes ? $('.top_ps_logo_position_holder').slideDown() : $('.top_ps_logo_position_holder').slideUp();
+      isYes ? $('#top_ps_preview').addClass('show') : $('#top_ps_preview').removeClass('show');
+      isYes ? $('#top_ps_image_preview').addClass('show') : $('#top_ps_image_preview').removeClass('show');
     });
   });
 </script>
