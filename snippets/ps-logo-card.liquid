@@ -60,15 +60,13 @@
   font-size: 13px;
   color: #6b7280;
   margin: 2px 0 14px;
-  padding-right: 70px;
+  padding-right: 260px;
   line-height: 1.5;
 }
 .ps-logo-card .ps-card-sub b { color: #8ec640; }
 .ps-logo-card .ps-top-row {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  column-gap: 16px;
-  align-items: start;
+  position: relative;
+  padding-right: 260px;
   margin-bottom: 12px;
 }
 .ps-logo-card .ps-top-left {
@@ -79,11 +77,13 @@
   gap: 10px;
 }
 .ps-logo-card .ps-right-logos {
+  position: absolute;
+  top: 0;
+  right: 0;
   display: flex;
   flex-direction: column;
   gap: 8px;
   align-items: flex-end;
-  justify-self: end;
 }
 .ps-logo-card .ps-logo-image {
   display: block;
@@ -151,7 +151,17 @@
 }
 .ps-logo-card .ps-save-line svg { width: 12px; height: 12px; fill: #101820; }
 .ps-logo-card .ps-position-holder {
-  margin-top: 8px;
+  margin-top: 14px;
+}
+.ps-logo-card .ps-controls-left .product-form__input {
+  margin: 0 0 14px;
+}
+.ps-logo-card .ps-controls-left .product-form__input:last-child {
+  margin-bottom: 0;
+}
+.ps-logo-card .ps-controls-left .form__label {
+  margin-bottom: 6px;
+  display: block;
 }
 .ps-logo-card .ps-preview {
   display: none;
@@ -178,7 +188,7 @@
   min-width: 0;
 }
 .ps-logo-card .ps-controls-right {
-  width: 219px;
+  width: 240px;
   flex: none;
 }
 .ps-logo-card .ps-image-preview {
@@ -204,13 +214,16 @@
 
 @media (max-width: 640px) {
   .ps-logo-card .ps-top-row {
-    grid-template-columns: 1fr;
-    row-gap: 12px;
+    padding-right: 0;
   }
   .ps-logo-card .ps-right-logos {
+    position: static;
     width: 100%;
     align-items: center;
-    justify-self: start;
+    margin-top: 12px;
+  }
+  .ps-logo-card .ps-position-holder {
+    margin-top: 12px;
   }
   .ps-logo-card .ps-logo-image {
     width: min(320px, 100%);
@@ -295,9 +308,9 @@
           <label class="form__label" for="{{ prefix }}_ps_logo_color_shape"><strong>Color & Shape:</strong></label>
           <div class="select">
             <select id="{{ prefix }}_ps_logo_color_shape" class="select__select" name="properties[PS Logo Color Shape]">
-              <option value="Rectangular White">Rectangular White</option>
+              <option value="Rectangular Coloured">Rectangular Coloured</option>
               <option value="Rectangular Black">Rectangular Black</option>
-              <option value="Square White">Square White</option>
+              <option value="Square Coloured">Square Coloured</option>
               <option value="Square Black">Square Black</option>
             </select>
             {% render 'icon-caret' %}
