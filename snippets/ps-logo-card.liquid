@@ -66,10 +66,32 @@
 .ps-logo-card .ps-card-sub b { color: #8ec640; }
 .ps-logo-card .ps-top-row {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
+  justify-content: space-between;
   gap: 16px;
   flex-wrap: wrap;
   margin-bottom: 8px;
+}
+.ps-logo-card .ps-right-logos {
+  margin-left: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+}
+.ps-logo-card .ps-logo-image {
+  display: block;
+  width: 220px;
+  max-width: 45vw;
+  height: auto;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 10px;
+  box-shadow: 0 1px 10px rgba(0, 0, 0, 0.06);
+}
+.ps-logo-card .ps-logo-image--below {
+  display: none;
 }
 .ps-logo-card .ps-toggle {
   display: inline-flex;
@@ -175,6 +197,25 @@
 }
 
 @media (max-width: 640px) {
+  .ps-logo-card .ps-top-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .ps-logo-card .ps-right-logos {
+    width: 100%;
+    align-items: center;
+  }
+  .ps-logo-card .ps-logo-image {
+    width: min(320px, 100%);
+    max-width: 100%;
+  }
+  .ps-logo-card .ps-logo-image--above {
+    display: none;
+  }
+  .ps-logo-card .ps-logo-image--below {
+    display: block;
+  }
   .ps-logo-card .ps-controls-row {
     flex-direction: column;
   }
@@ -207,8 +248,10 @@
         {% if already_yes == 'yes' %}checked{% endif %}>
       <label for="{{ prefix }}_ps_logo_yes">Yes</label>
     </div>
-    <img id="{{ prefix }}_ps_logo_above" src="{{ 'ps_above.png' | asset_url }}" alt="Ps logo Above" width="200">
-    <img id="{{ prefix }}_ps_logo_below" src="{{ 'ps_below.png' | asset_url }}" alt="Ps logo below" width="200">
+    <div class="ps-right-logos">
+      <img class="ps-logo-image ps-logo-image--above" id="{{ prefix }}_ps_logo_above" src="{{ 'ps_above.png' | asset_url }}" alt="Ps logo Above" width="200">
+      <img class="ps-logo-image ps-logo-image--below" id="{{ prefix }}_ps_logo_below" src="{{ 'ps_below.png' | asset_url }}" alt="Ps logo below" width="200">
+    </div>
   </div>
 
   <div class="ps-free-tag">Always free to add</div>
