@@ -65,19 +65,25 @@
 }
 .ps-logo-card .ps-card-sub b { color: #8ec640; }
 .ps-logo-card .ps-top-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  column-gap: 16px;
+  align-items: start;
+  margin-bottom: 12px;
+}
+.ps-logo-card .ps-top-left {
+  min-width: 0;
   display: flex;
+  flex-direction: column;
   align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
-  margin-bottom: 8px;
+  gap: 10px;
 }
 .ps-logo-card .ps-right-logos {
-  margin-left: auto;
   display: flex;
   flex-direction: column;
   gap: 8px;
   align-items: flex-end;
+  justify-self: end;
 }
 .ps-logo-card .ps-logo-image {
   display: block;
@@ -198,13 +204,13 @@
 
 @media (max-width: 640px) {
   .ps-logo-card .ps-top-row {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
+    grid-template-columns: 1fr;
+    row-gap: 12px;
   }
   .ps-logo-card .ps-right-logos {
     width: 100%;
     align-items: center;
+    justify-self: start;
   }
   .ps-logo-card .ps-logo-image {
     width: min(320px, 100%);
@@ -234,25 +240,27 @@
   </div>
 
   <div class="ps-top-row">
-    <div class="ps-toggle">
-      <input type="radio" name="properties[PS Custom Logo]" id="{{ prefix }}_ps_logo_no" value="no"
-        {% unless already_yes == 'yes' %}checked{% endunless %}>
-      <label for="{{ prefix }}_ps_logo_no">No</label>
-      <input type="radio" name="properties[PS Custom Logo]" id="{{ prefix }}_ps_logo_yes" value="yes"
-        {% if already_yes == 'yes' %}checked{% endif %}>
-      <label for="{{ prefix }}_ps_logo_yes">Yes</label>
+    <div class="ps-top-left">
+      <div class="ps-toggle">
+        <input type="radio" name="properties[PS Custom Logo]" id="{{ prefix }}_ps_logo_no" value="no"
+          {% unless already_yes == 'yes' %}checked{% endunless %}>
+        <label for="{{ prefix }}_ps_logo_no">No</label>
+        <input type="radio" name="properties[PS Custom Logo]" id="{{ prefix }}_ps_logo_yes" value="yes"
+          {% if already_yes == 'yes' %}checked{% endif %}>
+        <label for="{{ prefix }}_ps_logo_yes">Yes</label>
+      </div>
+
+      <div class="ps-free-tag">Always free to add</div>
+
+      <div class="ps-save-line">
+        <svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5 1.4-1.4L9 14.2 18.6 4.6z"/></svg>
+        5% off applied at checkout
+      </div>
     </div>
     <div class="ps-right-logos">
       <img class="ps-logo-image ps-logo-image--above" id="{{ prefix }}_ps_logo_above" src="{{ 'ps_above.png' | asset_url }}" alt="Ps logo Above" width="200">
       <img class="ps-logo-image ps-logo-image--below" id="{{ prefix }}_ps_logo_below" src="{{ 'ps_below.png' | asset_url }}" alt="Ps logo below" width="200">
     </div>
-  </div>
-
-  <div class="ps-free-tag">Always free to add</div>
-
-  <div class="ps-save-line">
-    <svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5 1.4-1.4L9 14.2 18.6 4.6z"/></svg>
-    5% off applied at checkout
   </div>
 
   <div class="{{ position_holder_class }} ps-position-holder" style="display:none;">
