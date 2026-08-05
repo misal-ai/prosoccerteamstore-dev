@@ -207,9 +207,7 @@
         {% if already_yes == 'yes' %}checked{% endif %}>
       <label for="{{ prefix }}_ps_logo_yes">Yes</label>
     </div>
-    <img class="ps-real-logo"
-      src="https://prosoccerteamstore.com/cdn/shop/files/prosoc_log.fa7ca117_180x.png?v=1704372587"
-      alt="ProSoccer logo">
+    <img id="{{ prefix }}_ps_logo_above" src="{{ 'ps_above.png' | asset_url }}" alt="Ps logo Above">
   </div>
 
   <div class="ps-free-tag">Always free to add</div>
