@@ -60,13 +60,18 @@
   font-size: 13px;
   color: #6b7280;
   margin: 2px 0 14px;
-  padding-right: 260px;
+  padding-right: 70px;
   line-height: 1.5;
+}
+.ps-logo-card.is-yes .ps-card-sub {
+  padding-right: 260px;
 }
 .ps-logo-card .ps-card-sub b { color: #8ec640; }
 .ps-logo-card .ps-top-row {
-  position: relative;
-  padding-right: 260px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  column-gap: 16px;
+  align-items: center;
   margin-bottom: 12px;
 }
 .ps-logo-card .ps-top-left {
@@ -75,15 +80,27 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 10px;
+  align-self: center;
+}
+.ps-logo-card.is-yes .ps-top-row {
+  position: relative;
+  padding-right: 260px;
+  align-items: start;
+}
+.ps-logo-card.is-yes .ps-top-left {
+  align-self: start;
 }
 .ps-logo-card .ps-right-logos {
-  position: absolute;
-  top: 0;
-  right: 0;
   display: flex;
   flex-direction: column;
   gap: 8px;
   align-items: flex-end;
+  justify-self: end;
+}
+.ps-logo-card.is-yes .ps-right-logos {
+  position: absolute;
+  top: 0;
+  right: 0;
 }
 .ps-logo-card .ps-logo-image {
   display: block;
@@ -213,14 +230,20 @@
 }
 
 @media (max-width: 640px) {
-  .ps-logo-card .ps-top-row {
+  .ps-logo-card .ps-card-sub {
     padding-right: 0;
+  }
+  .ps-logo-card .ps-top-row {
+    grid-template-columns: 1fr;
   }
   .ps-logo-card .ps-right-logos {
     position: static;
     width: 100%;
     align-items: center;
     margin-top: 12px;
+  }
+  .ps-logo-card.is-yes .ps-top-row {
+    padding-right: 0;
   }
   .ps-logo-card .ps-position-holder {
     margin-top: 12px;
@@ -238,7 +261,7 @@
 }
 </style>
 
-<div class="ps-logo-card">
+<div class="ps-logo-card{% if already_yes == 'yes' %} is-yes{% endif %}" id="{{ prefix }}_ps_logo_card">
   <div class="ps-ribbon">SAVE 5%</div>
 
   <div class="ps-card-head">
@@ -338,6 +361,7 @@
   const logoPositionSelect = document.getElementById(prefix + '_ps_logo_position');
   const previewImg = document.getElementById(prefix + '_ps_preview_img');
   const imagePreview = document.getElementById(prefix + '_ps_image_preview');
+  const cardEl = document.getElementById(prefix + '_ps_logo_card');
   const logoYesRadio = document.getElementById(prefix + '_ps_logo_yes');
   const logoNoRadio = document.getElementById(prefix + '_ps_logo_no');
 
@@ -392,12 +416,14 @@
   }
 
   function handleLogoToggle() {
-    if (!imagePreview) return;
     const isYes = logoYesRadio && logoYesRadio.checked;
+    if (cardEl) {
+      cardEl.classList.toggle('is-yes', !!isYes);
+    }
     if (isYes) {
-      imagePreview.classList.add('show');
+      if (imagePreview) imagePreview.classList.add('show');
     } else {
-      imagePreview.classList.remove('show');
+      if (imagePreview) imagePreview.classList.remove('show');
     }
   }
 
