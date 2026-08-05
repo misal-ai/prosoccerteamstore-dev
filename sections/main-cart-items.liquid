@@ -98,6 +98,8 @@
                           {% assign customizable_tag_found = true %}
                         {% elsif item.properties['bagName'] and item.properties['bagName'] != 'no' %}
                           {% assign customizable_tag_found = true %}
+                        {% elsif item.properties['PS Custom Logo'] %}
+                          {% assign customizable_tag_found = true %}
                         {% endif %}
                       {% endif %}
 
@@ -340,6 +342,18 @@
                           {% if item.properties['Sponsor/Team Logo'] %}
                               <input type='hidden' class='jerseySponsorLogoEnabled' value='{{ item.properties['Sponsor/Team Logo'] }}'>
                               <input type='hidden' class='jerseySponsorLogoName' value='{{ item.properties['Sponsor Logo Name'] | default: '' }}'>
+                              <input type='hidden' class='jerseySponsorLogoPosition' value='{{ item.properties['Sponsor Logo Position'] | default: '' }}'>
+                          {% endif %}
+
+                          {% if item.properties['Team Name Enable'] %}
+                              <input type='hidden' class='jerseyTeamNameEnabled' value='{{ item.properties['Team Name Enable'] }}'>
+                              <input type='hidden' class='jerseyTeamName' value='{{ item.properties['Team Name File'] | default: '' }}'>
+                              <input type='hidden' class='jerseyTeamNamePosition' value='{{ item.properties['Team Name Position'] | default: '' }}'>
+                          {% endif %}
+
+                          {% if item.properties['PS Custom Logo'] %}
+                              <input type='hidden' class='psCustomLogoEnabled' value='{{ item.properties['PS Custom Logo'] }}'>
+                              <input type='hidden' class='psLogoPosition' value='{{ item.properties['PS Logo Position'] | default: '' }}'>
                           {% endif %}
 
                         
@@ -505,15 +519,15 @@
                               <circle cx="6.5" cy="6.5" r="5.5" fill="#EB001B" stroke="#EB001B" stroke-width="0.7"/>
                               <path d="M5.87413 3.52832L5.97439 7.57216H7.02713L7.12739 3.52832H5.87413ZM6.50076 9.66091C6.88091 9.66091 7.18169 9.37267 7.18169 9.00504C7.18169 8.63742 6.88091 8.34917 6.50076 8.34917C6.12061 8.34917 5.81982 8.63742 5.81982 9.00504C5.81982 9.37267 6.12061 9.66091 6.50076 9.66091Z" fill="white"/>
                               <path d="M5.87413 3.17832H5.51535L5.52424 3.537L5.6245 7.58083L5.63296 7.92216H5.97439H7.02713H7.36856L7.37702 7.58083L7.47728 3.537L7.48617 3.17832H7.12739H5.87413ZM6.50076 10.0109C7.06121 10.0109 7.5317 9.57872 7.5317 9.00504C7.5317 8.43137 7.06121 7.99918 6.50076 7.99918C5.94031 7.99918 5.46982 8.43137 5.46982 9.00504C5.46982 9.57872 5.94031 10.0109 6.50076 10.0109Z" fill="white" stroke="#EB001B" stroke-width="0.7">
-                            </svg>
-                          </p>
-                          {% if fee_tag_found==false and customizable_tag_found %}
-                            <div class="showDetailProperties button button--small show" 
-                                  style="margin-top: 15px; background-color: white; color: black; border-color: black;">
-                              Show Details
-                            </div>
-                          {% endif %}
-                        </td>
+                             </svg>
+                           </p>
+                           {% if fee_tag_found==false and customizable_tag_found %}
+                             <div class="showDetailProperties button button--small show"
+                                   style="margin-top: 15px; background-color: white; color: black; border-color: black;">
+                               Show Details
+                             </div>
+                           {% endif %}
+                         </td>
 
                         <td class="cart-item__totals right medium-hide large-up-hide">
                           <div class="loading-overlay hidden">
@@ -706,18 +720,15 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script>
   $(document).ready(function() {
-
     $(".cart-fee-based-item .cart-item__quantity").css('visibility','hidden');
-    $('.showDetailProperties').on('click', function(){      
-      if($(this).hasClass('show')){        
-        //$(this).siblings('.others').show();
+    $('.showDetailProperties').on('click', function(){
+      if($(this).hasClass('show')){
         $(this).parent().find('.others').show();
         $(this).removeClass('show');
         $(this).addClass('hide');
         $(this).text('Hide Details');
       }
       else if($(this).hasClass('hide')){
-        //$(this).siblings('.others').hide();
         $(this).parent().find('.others').hide();
         $(this).removeClass('hide');
         $(this).addClass('show');

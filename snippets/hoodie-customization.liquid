@@ -166,6 +166,12 @@
       </div>
     </div>
 
+      {% render 'ps-logo-card',
+        prefix: 'hoodie',
+        position_id: 'hoodie_ps_logo_position',
+        position_holder_class: 'hoodie_ps_logo_position_holder'
+      %}
+
     <div id="back_section">
       <h3 class="mb-0">Back Customizations</h3>
       <div>
@@ -289,5 +295,13 @@
 
   $('#show_custom_info').on('change', function () {
     this.checked ? $('.custom_info').slideDown() : $('.custom_info').slideUp();
+  });
+
+  // PS Custom Logo toggle
+  $('input[name="properties[PS Custom Logo]"]').on('change', function() {
+    var isYes = $(this).val() === 'yes';
+    isYes ? $('.hoodie_ps_logo_position_holder').slideDown() : $('.hoodie_ps_logo_position_holder').slideUp();
+    isYes ? $('#hoodie_ps_preview').addClass('show') : $('#hoodie_ps_preview').removeClass('show');
+    isYes ? $('#hoodie_ps_image_preview').addClass('show') : $('#hoodie_ps_image_preview').removeClass('show');
   });
 </script>

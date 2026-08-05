@@ -22,6 +22,12 @@
           <label for="front_yes">Yes</label>
         </div>
       </div>
+
+      {% render 'ps-logo-card',
+        prefix: 'short',
+        position_id: 'short_ps_logo_position',
+        position_holder_class: 'short_ps_logo_position_holder'
+      %}
     </div>
     <!-- Back -->
     <div id="back_section" class="mt-1">
@@ -135,6 +141,14 @@ $(document).ready(function () {
         }else{
             $('.short_number_holder').show();
         }
+  });
+
+  // PS Custom Logo toggle
+  $('input[name="properties[PS Custom Logo]"]').on('change', function() {
+    var isYes = $(this).val() === 'yes';
+    isYes ? $('.short_ps_logo_position_holder').slideDown() : $('.short_ps_logo_position_holder').slideUp();
+    isYes ? $('#short_ps_preview').addClass('show') : $('#short_ps_preview').removeClass('show');
+    isYes ? $('#short_ps_image_preview').addClass('show') : $('#short_ps_image_preview').removeClass('show');
   });
 
 });

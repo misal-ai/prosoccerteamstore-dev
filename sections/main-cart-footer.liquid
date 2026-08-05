@@ -120,43 +120,44 @@
                         <p class="totals__subtotal-value">{{ cart.total_price | money_with_currency }}</p>
                       </div>
 
-                      <div>
-                        {%- if cart.cart_level_discount_applications.size > 0 -%}
-                          <ul
-                            class="discounts list-unstyled"
-                            role="list"
-                            aria-label="{{ 'customer.order.discount' | t }}"
-                          >
-                            {%- for discount in cart.cart_level_discount_applications -%}
-                              <li class="discounts__discount discounts__discount--end">
-                                {%- render 'icon-discount' -%}
-                                {{ discount.title }}
-                                (-{{ discount.total_allocated_amount | money }})
-                              </li>
-                            {%- endfor -%}
-                          </ul>
-                        {%- endif -%}
-                      </div>
+                      {%- if cart.cart_level_discount_applications.size > 0 -%}
+                        <ul class="discounts list-unstyled" role="list" aria-label="{{ 'customer.order.discount' | t }}">
+                          {%- for discount in cart.cart_level_discount_applications -%}
+                            <li class="discounts__discount discounts__discount--end">
+                              {%- render 'icon-discount' -%}
+                              {{ discount.title }}
+                              (-{{ discount.total_allocated_amount | money }})
+                            </li>
+                          {%- endfor -%}
+                        </ul>
+                      {%- endif -%}
 
                       <small class="tax-note caption-large rte">
                         {%- if cart.taxes_included and shop.shipping_policy.body != blank -%}
-                          {{
-                            'sections.cart.taxes_included_and_shipping_policy_html'
-                            | t: link: shop.shipping_policy.url
-                          }}
+                          {{ 'sections.cart.taxes_included_and_shipping_policy_html' | t: link: shop.shipping_policy.url }}
                         {%- elsif cart.taxes_included -%}
                           {{ 'sections.cart.taxes_included_but_shipping_at_checkout' | t }}
                         {%- elsif shop.shipping_policy.body != blank -%}
-                          {{
-                            'sections.cart.taxes_and_shipping_policy_at_checkout_html'
-                            | t: link: shop.shipping_policy.url
-                          }}
+                          {{ 'sections.cart.taxes_and_shipping_policy_at_checkout_html' | t: link: shop.shipping_policy.url }}
                         {%- else -%}
                           {{ 'sections.cart.taxes_and_shipping_at_checkout' | t }}
                         {%- endif -%}
                       </small>
                     </div>
                   {%- else -%}
+                    {%- assign has_ps_logo_item = false -%}
+                    {%- for item in cart.items -%}
+                      {%- if item.properties['PS Custom Logo'] == 'yes' or item.properties['PS Custom Logo'] == 'Yes' -%}
+                        {%- assign has_ps_logo_item = true -%}
+                      {%- endif -%}
+                    {%- endfor -%}
+
+                    {%- if has_ps_logo_item -%}
+                      <p style="margin-bottom:8px; font-size:0.875em; color:#555; text-align:center;">
+                        Apply code <strong style="color:red;">PS5OFF</strong> at checkout and get <strong>5% off</strong> your order
+                      </p>
+                    {%- endif -%}
+
                     <div class="cart__ctas" {{ block.shopify_attributes }}>
                       <noscript>
                         <button type="submit" class="cart__update-button button button--secondary" form="cart">
@@ -168,15 +169,13 @@
                         type="submit"
                         class="cart__checkout-button button checkout-button"
                         name="checkout"
-                        {% if cart == empty %}
-                          disabled
-                        {% endif %}
+                        data-ps-logo="{{ has_ps_logo_item }}"
+                        {% if cart == empty %}disabled{% endif %}
                         form="cart"
                       >
                         {{ 'sections.cart.checkout' | t }}
                       </button>
                     </div>
-
                     {%- if additional_checkout_buttons -%}
                       <div class="cart__dynamic-checkout-buttons additional-checkout-buttons">
                         {{ content_for_additional_checkout_buttons }}
@@ -226,6 +225,7 @@ var HOODIE_NAME_ID   = '50534311428398';
 var JACKET_NAME_ID   = '50536571699502';
 var JERSEY_SLEEVE_LOGO_ID   = 51936281428270;
 var JERSEY_SPONSOR_LOGO_ID  = 51936282247470;
+var JERSEY_TEAM_NAME_ID     = 52243868385582;
 var SAME_VENDOR_TYPES = ['Jackets','Jersey','Training Tops','Hoodies','Polos','T-Shirt'];
 
 // Dynamic variant IDs (set per item during applyCustomization loop)
@@ -323,6 +323,7 @@ function applyCustomizationDebounced() {
   var totalPantNumbers = 0;
   var totalJerseySleeveLogos = 0;
   var totalJerseySponsorLogos = 0;
+  var totalJerseyTeamNames = 0;
 
   $(".cart-item[data-customized='true']").each(function(idx, item) {
     var qty = parseInt($(item).find('.quantity__input').val()) || 0;
@@ -385,6 +386,7 @@ function applyCustomizationDebounced() {
 
     var sleeveLogoName   = strVal($(item).find('.jerseySleeveLogoName'));
     var sponsorLogoName  = strVal($(item).find('.jerseySponsorLogoName'));
+    var teamNameFile     = strVal($(item).find('.jerseyTeamName'));
 
     // ── Per-slot logo type tracking (1 processing fee per distinct logo slot) ──
 
@@ -477,16 +479,23 @@ function applyCustomizationDebounced() {
     totalJacketNames   += parseInt($(item).find('.totalJacketNames').val())   || 0;
     totalPantNumbers   += parseInt($(item).find('.totalPantNumbers').val())   || 0;
 
-    // Jersey sleeve & sponsor logos — flat per-unit fee, qty = item quantity
+    // Jersey sleeve & sponsor & team logos — flat per-unit fee, qty = item quantity
     if ($(item).find('.jerseySleeveLogoEnabled').val() === 'yes')   totalJerseySleeveLogos  += qty;
     if ($(item).find('.jerseySponsorLogoEnabled').val() === 'yes')  totalJerseySponsorLogos += qty;
 
-    // Track sleeve/sponsor as distinct logo types for processing fee
+    // Track sleeve/sponsor/team as distinct logo types for processing fee
     if ($(item).find('.jerseySleeveLogoEnabled').val() === 'yes')  vectorLogoTypes['sleeve']  = true;
     if ($(item).find('.jerseySponsorLogoEnabled').val() === 'yes') vectorLogoTypes['sponsor'] = true;
 
     addVectorKey(sleeveLogoName, 'Standard');
     addVectorKey(sponsorLogoName, 'Standard');
+    addVectorKey(teamNameFile, 'Standard');
+
+    // Jersey Team Name on Back — qty = item quantity
+    if (($(item).find('.jerseyTeamNameEnabled').val() || '').toLowerCase() === 'yes') {
+      totalJerseyTeamNames += qty;
+      vectorLogoTypes['team'] = true;
+    }
   });
 
   // Build desired fee quantities
@@ -508,6 +517,7 @@ function applyCustomizationDebounced() {
   desired[JACKET_NAME_ID]  = totalJacketNames;
   desired[JERSEY_SLEEVE_LOGO_ID]  = totalJerseySleeveLogos;
   desired[JERSEY_SPONSOR_LOGO_ID] = totalJerseySponsorLogos;
+  desired[JERSEY_TEAM_NAME_ID]    = totalJerseyTeamNames;
   if (topNumberVariantId)    desired[topNumberVariantId]    = totalTopNumbers;
   if (hoodieNumberVariantId) desired[hoodieNumberVariantId] = totalHoodieNumbers;
   if (jacketNumberVariantId) desired[jacketNumberVariantId] = totalJacketNumbers;
@@ -533,6 +543,7 @@ function applyCustomizationDebounced() {
     '51769027952942',                  // cap embroidery
     51936281428270,                    // jersey sleeve logo
     51936282247470,                    // jersey sponsor/team logo
+    52243868385582,                    // jersey team name on back
     // bag crest logo — heatpress / embroidery (all bag types)
     '50564127523118','50564127654190', // sackpack heatpress / embroidery
     '50566668419374','50566678348078', // duffel bag heatpress / embroidery
@@ -559,13 +570,12 @@ function applyCustomizationDebounced() {
       Object.keys(desired).forEach(function(id) {
         var want = desired[id];
         var have = currentQtys[id] || 0;
-        if (want === have) return; // no change needed
+        if (want === have) return;
         if (want === 0 && have > 0) toZero.push({ id: Number(id), qty: 0 });
         else if (want > 0 && have > 0) toUpdate.push({ id: Number(id), qty: want });
         else if (want > 0 && have === 0) toAdd.push({ id: Number(id), qty: want });
       });
 
-      // Nothing changed — skip update but still reload to sync DOM with cart state
       if (!toZero.length && !toUpdate.length && !toAdd.length) {
         hideLoader();
         location.reload();
@@ -639,8 +649,8 @@ function showHideCartButton() {
   if (!checkoutButton) { hideLoader(); return; }
 
   var excludedTypes = ['backpacks','sackpacks','duffel bags','miscellaneous'];
-  var vendorGrouped = {};   // sameVendorTypes items grouped by vendor
-  var exactTyped    = {};   // other items grouped by vendor|type
+  var vendorGrouped = {};
+  var exactTyped    = {};
   var jomaQtys = [], vestQtys = [], bagQtys = [];
 
   $(".cart-item:not(.cart-fee-based-item)").each(function(i, item) {
@@ -1039,6 +1049,7 @@ function showErrorForLessThanSeven(message) {
 // ─── initialize ───────────────────────────────────────────────────────────────
 function initialize() {
   $(".cart-fee-based-item .cart-item__quantity").css('visibility', 'hidden');
+
   // Only check checkout button eligibility on load — do NOT call applyCustomization
   // (that would cause an infinite reload loop since applyCustomization reloads the page)
   setTimeout(showHideCartButton, 500);

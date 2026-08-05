@@ -34,6 +34,12 @@
           <img width="" height="" alt="crest-logo" src="{{ 'cap-logo.jpeg' | asset_url }}">
       </div>
     </div>
+
+    {% render 'ps-logo-card',
+      prefix: 'cap',
+      position_id: 'cap_ps_logo_position',
+      position_holder_class: 'cap_ps_logo_position_holder'
+    %}
   </div>
 </div>
 <script>
@@ -76,6 +82,14 @@
     // Quantity change
     $(document).on('change', '.quantity__input', function () {
       checkMinimumQuantity();
+    });
+
+    // PS Custom Logo toggle
+    $('input[name="properties[PS Custom Logo]"]').on('change', function() {
+      var isYes = $(this).val() === 'yes';
+      isYes ? $('.cap_ps_logo_position_holder').slideDown() : $('.cap_ps_logo_position_holder').slideUp();
+      isYes ? $('#cap_ps_preview').addClass('show') : $('#cap_ps_preview').removeClass('show');
+      isYes ? $('#cap_ps_image_preview').addClass('show') : $('#cap_ps_image_preview').removeClass('show');
     });
 
     checkMinimumQuantity();
